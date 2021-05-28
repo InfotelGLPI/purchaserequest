@@ -27,7 +27,7 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include ("../../../inc/includes.php");
+include("../../../inc/includes.php");
 
 if (!isset($_GET["id"])) {
    $_GET["id"] = "";
@@ -35,45 +35,43 @@ if (!isset($_GET["id"])) {
 
 $plugin = new Plugin();
 
-   $threshold = new PluginPurchaserequestThreshold();
+$threshold = new PluginPurchaserequestThreshold();
 
-   if (isset($_POST["add"])) {
-      $threshold->check(-1, CREATE, $_POST);
-      $newID = $threshold->add($_POST);
-      $url   = Toolbox::getItemTypeFormURL('PluginPurchaserequestPurchaseRequest') . "?id=$newID";
-      Html::back();
+if (isset($_POST["add"])) {
+   $threshold->check(-1, CREATE, $_POST);
+   $newID = $threshold->add($_POST);
+   $url   = Toolbox::getItemTypeFormURL('PluginPurchaserequestPurchaseRequest') . "?id=$newID";
+   Html::back();
 
-   } else if (isset($_POST["add_tickets"])) {
-      $threshold->check(-1, CREATE, $_POST);
-      $newID = $threshold->add($_POST);
-      Html::back();
+} else if (isset($_POST["add_tickets"])) {
+   $threshold->check(-1, CREATE, $_POST);
+   $newID = $threshold->add($_POST);
+   Html::back();
 
-      /* delete purchaserequest */
-   } else if (isset($_POST["delete"])) {
+   /* delete purchaserequest */
+} else if (isset($_POST["delete"])) {
 
-      $threshold->check($_POST['id'], DELETE);
-      $threshold->delete($_POST);
-      Html::back();
-   } else if (isset($_POST["restore"])) {
+   $threshold->check($_POST['id'], DELETE);
+   $threshold->delete($_POST);
+   Html::back();
+} else if (isset($_POST["restore"])) {
 
-      $threshold->check($_POST['id'], DELETE);
-      $threshold->restore($_POST);
-      Html::back();
+   $threshold->check($_POST['id'], DELETE);
+   $threshold->restore($_POST);
+   Html::back();
 
-   }else if (isset($_POST["purge"])) {
-      $threshold->check($_POST['id'], PURGE);
-      $threshold->delete($_POST, 1);
-      Html::back();
+} else if (isset($_POST["purge"])) {
+   $threshold->check($_POST['id'], PURGE);
+   $threshold->delete($_POST, 1);
+   Html::back();
 
-      /* update purchaserequest */
-   } else if (isset($_POST["update"]) || (isset($_POST['update_status']))) {
+   /* update purchaserequest */
+} else if (isset($_POST["update"]) || (isset($_POST['update_status']))) {
 
-      $threshold->check($_POST['id'], UPDATE);
-      $threshold->update($_POST);
-      Html::back();
-   }
-
-
+   $threshold->check($_POST['id'], UPDATE);
+   $threshold->update($_POST);
+   Html::back();
+}
 
 
 Html::back();

@@ -54,7 +54,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
    static function getMenuTitle() {
 
       $btstyle = "";
-      $nb = self::countPurchasesToValidate();
+      $nb      = self::countPurchasesToValidate();
       if ($nb > 0) {
          $btstyle = "style='color: firebrick;'";
       }

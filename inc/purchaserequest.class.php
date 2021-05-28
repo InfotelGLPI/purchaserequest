@@ -123,6 +123,13 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
     */
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
+      $plugin = new Plugin();
+      if (!$plugin->isActivated('order')) {
+         echo "<div class='center'><br><br>";
+         echo "<i class='fas fa-exclamation-triangle fa-4x' style='color:orange'></i><br><br>";
+         echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+         return false;
+      }
       if ($item->getType() == "PluginPurchaserequestPurchaseRequest") {
          PluginPurchaserequestValidation::showValidation($item);
       } else if ($item->getType() == "Ticket") {
@@ -788,9 +795,9 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       echo "</td>";
       echo "</tr>";
       echo "<tr class='tab_bg_1'>";
-      $order = new PluginOrderOrder();
+      $order  = new PluginOrderOrder();
       $hidden = false;
-      if($this->fields["status"] != CommonITILValidation::ACCEPTED){
+      if ($this->fields["status"] != CommonITILValidation::ACCEPTED) {
          $hidden = "hidden";
       }
       echo "<td $hidden>" . __("Linked to the order", "purchaserequest") . "</td>";
@@ -812,7 +819,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       $options['entity'] = $this->fields["entities_id"];
       Ticket::dropdown($options);
       echo "</td>";
-      if($hidden != false){
+      if ($hidden != false) {
          echo "<td colspan='2'></td>";
       }
       echo "</tr>";
@@ -897,7 +904,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
 
       $actor  = new Ticket_User();
       $actors = $actor->getActors($tickets_id);
-      $count = 0;
+      $count  = 0;
       if (isset($actors[CommonITILActor::REQUESTER])) {
          $count = count($actors[CommonITILActor::REQUESTER]);
       }

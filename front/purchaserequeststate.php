@@ -27,8 +27,8 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include ("../../../inc/includes.php");
+include("../../../inc/includes.php");
 
 $dropdown = new PluginPurchaserequestPurchaseRequestState();
 
-include (GLPI_ROOT . "/front/dropdown.common.php");
+include(GLPI_ROOT . "/front/dropdown.common.php");

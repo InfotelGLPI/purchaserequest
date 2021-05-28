@@ -39,9 +39,9 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
    public        $dohistory = true;
 
 
-   static $list_type_allowed  = ["ComputerType","MonitorType","PeripheralType","NetworkEquipmentType","PrinterType",
-                                 "PhoneType","ConsumableItemType","CartridgeItemType","ContractType","PluginOrderOtherType",
-                                 "SoftwareLicenseType","CertificateType","RackType","PduType",];
+   static $list_type_allowed = ["ComputerType", "MonitorType", "PeripheralType", "NetworkEquipmentType", "PrinterType",
+                                "PhoneType", "ConsumableItemType", "CartridgeItemType", "ContractType", "PluginOrderOtherType",
+                                "SoftwareLicenseType", "CertificateType", "RackType", "PduType",];
 
 
    /**
@@ -74,15 +74,12 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     */
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
-//      if ($item->getType() == ComputerType::getType()) {
-         return _n("Threshold", "Thresholds", 1, "purchaserequest");
-//      }
+      //      if ($item->getType() == ComputerType::getType()) {
+      return _n("Threshold", "Thresholds", 1, "purchaserequest");
+      //      }
 
       return '';
    }
-
-
-
 
 
    /**
@@ -98,15 +95,13 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
       if (in_array($item->getType(), self::$list_type_allowed)) {
          $threshold = new self();
          $threshold->getEmpty();
-         $threshold->getFromDBByCrit(["itemtype"=>$item->getType(),
-                                      "items_id"=>$item->getID()]);
-         $threshold->showForm($threshold->getID(),$item);
+         $threshold->getFromDBByCrit(["itemtype" => $item->getType(),
+                                      "items_id" => $item->getID()]);
+         $threshold->showForm($threshold->getID(), $item);
       }
 
       return true;
    }
-
-
 
 
    /**
@@ -116,7 +111,7 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     *
     * @return bool
     */
-   public function showForm($ID, $item,$options = []) {
+   public function showForm($ID, $item, $options = []) {
       global $CFG_GLPI;
 
       $dbu = new DbUtils();
@@ -195,8 +190,8 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
    }
 
 
-   public static function getObject($type){
-     return $type."Type";
+   public static function getObject($type) {
+      return $type . "Type";
    }
 
 }

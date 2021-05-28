@@ -40,6 +40,7 @@ class PluginPurchaserequestProfile extends Profile {
 
    /**
     * @param int $nb
+    *
     * @return translated
     */
    static function getTypeName($nb = 0) {
@@ -50,13 +51,14 @@ class PluginPurchaserequestProfile extends Profile {
     * Get tab name for item
     *
     * @param CommonGLPI $item
-    * @param type $withtemplate
+    * @param type       $withtemplate
+    *
     * @return string
     */
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
-      if ($item->getType()=='Profile'
-//          && $item->fields['interface'] == 'central'
+      if ($item->getType() == 'Profile'
+         //          && $item->fields['interface'] == 'central'
       ) {
          return _n("Purchase request", "Purchase requests", 2, "purchaserequest");
       }
@@ -66,23 +68,24 @@ class PluginPurchaserequestProfile extends Profile {
    /**
     * display tab content for item
     *
-    * @global type $CFG_GLPI
     * @param CommonGLPI $item
-    * @param type $tabnum
-    * @param type $withtemplate
+    * @param type       $tabnum
+    * @param type       $withtemplate
+    *
     * @return boolean
+    * @global type      $CFG_GLPI
     */
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      if ($item->getType()=='Profile') {
-         $ID = $item->getID();
+      if ($item->getType() == 'Profile') {
+         $ID   = $item->getID();
          $prof = new self();
 
          self::addDefaultProfileInfos($ID,
                                       ['plugin_purchaserequest_purchaserequest' => 0,
-                                            'plugin_purchaserequest_validate'        => 0,
-                                            'plugin_purchaserequest_config'        => 0,
-                                         ]);
+                                       'plugin_purchaserequest_validate'        => 0,
+                                       'plugin_purchaserequest_config'          => 0,
+                                      ]);
          $prof->showForm($ID);
 
       }
@@ -95,15 +98,16 @@ class PluginPurchaserequestProfile extends Profile {
     *
     * @param type $ID
     * @param type $options
+    *
     * @return boolean
     */
-   function showForm ($profiles_id = 0, $openform = true, $closeform = true) {
+   function showForm($profiles_id = 0, $openform = true, $closeform = true) {
 
       echo "<div class='firstbloc'>";
       if (($canedit = Session::haveRightsOr(self::$rightname, [UPDATE, PURGE]))
           && $openform) {
          $profile = new Profile();
-         echo "<form method='post' action='".$profile->getFormURL()."'>";
+         echo "<form method='post' action='" . $profile->getFormURL() . "'>";
       }
 
       $profile = new Profile();
@@ -111,8 +115,8 @@ class PluginPurchaserequestProfile extends Profile {
 
       $rights = $this->getAllRights();
       $profile->displayRightsChoiceMatrix($rights, ['canedit'       => $canedit,
-                                                         'default_class' => 'tab_bg_2',
-                                                         'title'         => __('General')]);
+                                                    'default_class' => 'tab_bg_2',
+                                                    'title'         => __('General')]);
 
       echo "<table class='tab_cadre_fixehov'>";
       echo "<tr class='tab_bg_1'><th colspan='4'>" . __('Helpdesk') . "</th></tr>\n";
@@ -121,14 +125,14 @@ class PluginPurchaserequestProfile extends Profile {
       echo "<tr class='tab_bg_2'>";
       echo "<td width='20%'>" . __("Purchase request validation", "purchaserequest") . "</td>";
       echo "<td colspan='5'>";
-      Html::showCheckbox(['name' => '_plugin_purchaserequest_validate',
-                               'checked' => $effective_rights['plugin_purchaserequest_validate']]);
+      Html::showCheckbox(['name'    => '_plugin_purchaserequest_validate',
+                          'checked' => $effective_rights['plugin_purchaserequest_validate']]);
       echo "</td></tr>\n";
       $effective_rights = ProfileRight::getProfileRights($profiles_id, ['plugin_purchaserequest_config']);
       echo "<tr class='tab_bg_2'>";
       echo "<td width='20%'>" . __("Setup") . "</td>";
       echo "<td colspan='5'>";
-      Html::showCheckbox(['name' => '_plugin_purchaserequest_config',
+      Html::showCheckbox(['name'    => '_plugin_purchaserequest_config',
                           'checked' => $effective_rights['plugin_purchaserequest_config']]);
       echo "</td></tr>\n";
       echo "</table>";
@@ -149,23 +153,24 @@ class PluginPurchaserequestProfile extends Profile {
     * Get all rights
     *
     * @param type $all
+    *
     * @return array
     */
    static function getAllRights($all = false) {
 
       $rights = [
-         ['itemtype'  => 'PluginPurchaserequestPurchaserequest',
-               'label'     => __('Purchase request', 'purchaserequest'),
-               'field'     => 'plugin_purchaserequest_purchaserequest'
+         ['itemtype' => 'PluginPurchaserequestPurchaserequest',
+          'label'    => __('Purchase request', 'purchaserequest'),
+          'field'    => 'plugin_purchaserequest_purchaserequest'
          ]
       ];
       if ($all) {
          $rights[] = ['itemtype' => 'PluginPurchaserequestPurchaserequest',
-                           'label' => __("Purchase request validation", "purchaserequest"),
-                           'field' => 'plugin_purchaserequest_validate'];
+                      'label'    => __("Purchase request validation", "purchaserequest"),
+                      'field'    => 'plugin_purchaserequest_validate'];
          $rights[] = ['itemtype' => 'PluginPurchaserequestConfig',
-                      'label' => __("Setup"),
-                      'field' => 'plugin_purchaserequest_config'];
+                      'label'    => __("Setup"),
+                      'field'    => 'plugin_purchaserequest_config'];
       }
 
       return $rights;
@@ -195,10 +200,11 @@ class PluginPurchaserequestProfile extends Profile {
 
 
    /**
+    * @param $profiles_id the profile ID
+    *
+    * @return bool
     * @since 0.85
     * Migration rights from old system to the new one for one profile
-    * @param $profiles_id the profile ID
-    * @return bool
     */
    static function migrateOneProfile($profiles_id) {
       global $DB;
@@ -210,8 +216,8 @@ class PluginPurchaserequestProfile extends Profile {
       foreach ($DB->request('glpi_plugin_purchaserequest_profiles',
                             "`profiles_id`='$profiles_id'") as $profile_data) {
 
-         $matching = ['show_purchaserequest_tab' => 'plugin_purchaserequest_purchaserequest',
-                           'validation'               => 'plugin_purchaserequest_validate'];
+         $matching       = ['show_purchaserequest_tab' => 'plugin_purchaserequest_purchaserequest',
+                            'validation'               => 'plugin_purchaserequest_validate'];
          $current_rights = ProfileRight::getProfileRights($profiles_id, array_values($matching));
          foreach ($matching as $old => $new) {
             if (!isset($current_rights[$old])) {
@@ -234,7 +240,7 @@ class PluginPurchaserequestProfile extends Profile {
       //Add new rights in glpi_profilerights table
       foreach ($profile->getAllRights(true) as $data) {
          if ($dbu->countElementsInTable("glpi_profilerights",
-                                  ["name" => $data['field']]) == 0) {
+                                        ["name" => $data['field']]) == 0) {
             ProfileRight::addProfileRights([$data['field']]);
          }
       }
@@ -245,7 +251,7 @@ class PluginPurchaserequestProfile extends Profile {
       }
       foreach ($DB->request("SELECT *
                            FROM `glpi_profilerights` 
-                           WHERE `profiles_id`='".$_SESSION['glpiactiveprofile']['id']."' 
+                           WHERE `profiles_id`='" . $_SESSION['glpiactiveprofile']['id'] . "' 
                               AND `name` LIKE '%plugin_purchaserequest_purchaserequest%'") as $prof) {
          $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
       }
@@ -259,7 +265,7 @@ class PluginPurchaserequestProfile extends Profile {
 
       foreach ($DB->request("SELECT *
                            FROM `glpi_profilerights` 
-                           WHERE `profiles_id`='".$_SESSION['glpiactiveprofile']['id']."' 
+                           WHERE `profiles_id`='" . $_SESSION['glpiactiveprofile']['id'] . "' 
                               AND `name` LIKE '%plugin_purchaserequest_purchaserequest%'") as $prof) {
          $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
       }
@@ -272,9 +278,9 @@ class PluginPurchaserequestProfile extends Profile {
    static function createFirstAccess($profiles_id) {
 
       $rights = ['plugin_purchaserequest_purchaserequest' => 127,
-                      'plugin_purchaserequest_validate'        => 1,
-                      'plugin_purchaserequest_config'        => 1,
-         ];
+                 'plugin_purchaserequest_validate'        => 1,
+                 'plugin_purchaserequest_config'          => 1,
+      ];
 
       self::addDefaultProfileInfos($profiles_id,
                                    $rights, true);
@@ -289,13 +295,13 @@ class PluginPurchaserequestProfile extends Profile {
       $profileRight = new ProfileRight();
       foreach ($rights as $right => $value) {
          if ($dbu->countElementsInTable('glpi_profilerights',
-                                  ["profiles_id" => $profiles_id,
-                                  "name" => $right]) && $drop_existing) {
+                                        ["profiles_id" => $profiles_id,
+                                         "name"        => $right]) && $drop_existing) {
             $profileRight->deleteByCriteria(['profiles_id' => $profiles_id, 'name' => $right]);
          }
          if (!$dbu->countElementsInTable('glpi_profilerights',
-                                   ["profiles_id" => $profiles_id,
-                                   "name" => $right])) {
+                                         ["profiles_id" => $profiles_id,
+                                          "name"        => $right])) {
             $myright['profiles_id'] = $profiles_id;
             $myright['name']        = $right;
             $myright['rights']      = $value;

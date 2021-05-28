@@ -65,14 +65,15 @@ function plugin_init_purchaserequest() {
                 Pdutype::getType(),
                 Enclosure::getType()];
 
-      if($plugin->isActivated('order')){
-         array_push($types,"PluginOrderOtherType");
+      if ($plugin->isActivated('order')) {
+         array_push($types, "PluginOrderOtherType");
       }
       Plugin::registerClass(PluginPurchaserequestThreshold::getType(), ['addtabon' => $types]);
 
       //TODO create right config
-      if (Session::haveRight("PluginPurchaserequestConfig",READ));{
-         $PLUGIN_HOOKS['config_page']['purchaserequest']        = 'front/config.form.php';
+      if (Session::haveRight("PluginPurchaserequestConfig", READ)) ;
+      {
+         $PLUGIN_HOOKS['config_page']['purchaserequest'] = 'front/config.form.php';
       }
 
       if (PluginPurchaserequestPurchaseRequest::canView()) {
@@ -96,11 +97,11 @@ function plugin_init_purchaserequest() {
  * @return array
  */
 function plugin_version_purchaserequest() {
-   return ['name'           => _n("Purchase request", "Purchase requests", 1, "purchaserequest"),
-           'version'        => PLUGIN_PURCHASEREQUEST_VERSION,
-           'author'         => "<a href='http://infotel.com/services/expertise-technique/glpi/'>Infotel</a>",
-           'license'        => 'GPLv2+',
-           'requirements'   => [
+   return ['name'         => _n("Purchase request", "Purchase requests", 1, "purchaserequest"),
+           'version'      => PLUGIN_PURCHASEREQUEST_VERSION,
+           'author'       => "<a href='http://infotel.com/services/expertise-technique/glpi/'>Infotel</a>",
+           'license'      => 'GPLv2+',
+           'requirements' => [
               'glpi' => [
                  'min' => '9.5',
                  'dev' => false

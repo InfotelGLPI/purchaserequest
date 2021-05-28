@@ -46,7 +46,7 @@ if ($plugin->isActivated("purchaserequest")) {
          Html::header(__('Setup'), '', "config", PluginPurchaserequestConfig::getType());
          $config->GetFromDB(1);
          $config->display($_GET);
-//         $config->showForm();
+         //         $config->showForm();
 
          Html::footer();
       }

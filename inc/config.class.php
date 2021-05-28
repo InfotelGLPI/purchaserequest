@@ -28,8 +28,8 @@
  ---------------------------------------------------------------------- */
 
 class PluginPurchaserequestConfig extends CommonDBTM {
-   static $rightname = "plugin_purchaserequest_config";
-   var $can_be_translated = true;
+   static $rightname         = "plugin_purchaserequest_config";
+   var    $can_be_translated = true;
 
    /**
     * PluginPurchaserequestConfig constructor.
@@ -60,8 +60,8 @@ class PluginPurchaserequestConfig extends CommonDBTM {
 
    static function getMenuContent() {
 
-      $menu['title'] = self::getMenuName(2);
-      $menu['page'] = self::getSearchURL(false);
+      $menu['title']           = self::getMenuName(2);
+      $menu['page']            = self::getSearchURL(false);
       $menu['links']['search'] = self::getSearchURL(false);
       if (self::canCreate()) {
          $menu['links']['add'] = self::getFormURL(false);
@@ -83,7 +83,7 @@ class PluginPurchaserequestConfig extends CommonDBTM {
 
       $ong = [];
       $this->addDefaultFormTab($ong);
-//      $this->addStandardTab(__CLASS__, $ong, $options);
+      //      $this->addStandardTab(__CLASS__, $ong, $options);
 
       return $ong;
    }
@@ -91,7 +91,7 @@ class PluginPurchaserequestConfig extends CommonDBTM {
    function showForm() {
       global $DB, $CFG_GLPI;
       echo "<form name='form' method='post' action='" .
-         Toolbox::getItemTypeFormURL(self::getType()) . "'>";
+           Toolbox::getItemTypeFormURL(self::getType()) . "'>";
       echo "<input type='hidden' name='id' value='" . $this->fields['id'] . "'>";
       echo "<div align='center'><table class='tab_cadre_fixe'  cellspacing='2' cellpadding='2'>";
       echo "<tr><th colspan='2'>" . __('Configuration purchase request', 'purchaserequest') . "</th></tr>";
@@ -105,8 +105,6 @@ class PluginPurchaserequestConfig extends CommonDBTM {
                       'right'  => 'plugin_purchaserequest_validate']);
 
       echo "</td></tr>";
-
-
 
 
       echo "<tr class='tab_bg_2 center'><td colspan='2'><input type=\"submit\" name=\"update_config\" class=\"submit\"
@@ -150,8 +148,6 @@ class PluginPurchaserequestConfig extends CommonDBTM {
       $table = $dbu->getTableForItemType(__CLASS__);
       $DB->query("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
    }
-
-
 
 
 }

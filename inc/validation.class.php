@@ -149,7 +149,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       global $CFG_GLPI;
 
       if ($CFG_GLPI["notifications_mailing"]) {
-         if($this->input["first"] == true){
+         if ($this->input["first"] == true) {
             $purchase_request = new PluginPurchaserequestPurchaseRequest();
             $purchase_request->getFromDB($this->fields["plugin_purchaserequest_purchaserequests_id"]);
             $options = ['validation_id'     => $this->fields["id"],
@@ -228,11 +228,11 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                //               NotificationEvent::raiseEvent('validation_answer', $purchase_request, $options);
                if (isset($this->input['status'])
                    && $this->input['status'] == CommonITILValidation::ACCEPTED) {
-                  if($validation == true && $purchase_request->fields["status"] == CommonITILValidation::ACCEPTED ){
+                  if ($validation == true && $purchase_request->fields["status"] == CommonITILValidation::ACCEPTED) {
                      NotificationEvent::raiseEvent('validation_purchaserequest', $purchase_request, $options);
-                  }else if($purchase_request->fields["status"] == CommonITILValidation::WAITING){
+                  } else if ($purchase_request->fields["status"] == CommonITILValidation::WAITING) {
 
-                     $items       = $this->find(["plugin_purchaserequest_purchaserequests_id" => $this->fields["plugin_purchaserequest_purchaserequests_id"]]);
+                     $items = $this->find(["plugin_purchaserequest_purchaserequests_id" => $this->fields["plugin_purchaserequest_purchaserequests_id"]]);
 
                      foreach ($items as $item) {
                         if ($item["status"] == CommonITILValidation::WAITING) {

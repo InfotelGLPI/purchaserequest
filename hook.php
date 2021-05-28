@@ -36,33 +36,33 @@ function plugin_purchaserequest_install() {
    foreach (glob(GLPI_ROOT . '/plugins/purchaserequest/inc/*.php') as $file) {
       //Do not load datainjection files (not needed and avoid missing class error message)
       if (!preg_match('/injection.class.php/', $file)) {
-         include_once ($file);
+         include_once($file);
       }
    }
 
    echo "<center>";
    echo "<table class='tab_cadre_fixe'>";
-   echo "<tr><th>".__("Plugin installation or upgrade", "purchaserequest")."<th></tr>";
+   echo "<tr><th>" . __("Plugin installation or upgrade", "purchaserequest") . "<th></tr>";
 
    echo "<tr class='tab_bg_1'>";
    echo "<td align='center'>";
 
    $migration = new Migration("2.1.1");
-   $classes = ['PluginPurchaserequestNotificationTargetPurchaseRequest',
-                    'PluginPurchaserequestPurchaseRequest',
-                    'PluginPurchaserequestConfig',
-                    'PluginPurchaserequestThreshold',
-                    'PluginPurchaserequestValidation',
-                    'PluginPurchaserequestPurchaseRequestState'];
+   $classes   = ['PluginPurchaserequestNotificationTargetPurchaseRequest',
+                 'PluginPurchaserequestPurchaseRequest',
+                 'PluginPurchaserequestConfig',
+                 'PluginPurchaserequestThreshold',
+                 'PluginPurchaserequestValidation',
+                 'PluginPurchaserequestPurchaseRequestState'];
 
    foreach ($classes as $class) {
-      if ($plug=isPluginItemType($class)) {
-         $plugname=strtolower($plug['plugin']);
-         $dir=GLPI_ROOT . "/plugins/$plugname/inc/";
-         $item=strtolower($plug['class']);
+      if ($plug = isPluginItemType($class)) {
+         $plugname = strtolower($plug['plugin']);
+         $dir      = GLPI_ROOT . "/plugins/$plugname/inc/";
+         $item     = strtolower($plug['class']);
          if (file_exists("$dir$item.class.php")) {
-            include_once ("$dir$item.class.php");
-            call_user_func([$class,'install'], $migration);
+            include_once("$dir$item.class.php");
+            call_user_func([$class, 'install'], $migration);
          }
       }
    }
@@ -86,15 +86,15 @@ function plugin_purchaserequest_uninstall() {
    foreach (glob(GLPI_ROOT . '/plugins/purchaserequest/inc/*.php') as $file) {
       //Do not load datainjection files (not needed and avoid missing class error message)
       if (!preg_match('/injection.class.php/', $file)) {
-         include_once ($file);
+         include_once($file);
       }
    }
 
    $classes = ['PluginPurchaserequestNotificationTargetPurchaseRequest',
-                    'PluginPurchaserequestPurchaseRequest',
-                    'PluginPurchaserequestPurchaseRequestState'];
+               'PluginPurchaserequestPurchaseRequest',
+               'PluginPurchaserequestPurchaseRequestState'];
    foreach ($classes as $class) {
-      call_user_func([$class,'uninstall']);
+      call_user_func([$class, 'uninstall']);
    }
 
    //Delete rights associated with the plugin
@@ -121,17 +121,17 @@ function plugin_purchaserequest_getDropdown() {
 function plugin_purchaserequest_getDatabaseRelations() {
    $plugin = new Plugin();
    if ($plugin->isActivated("purchaserequest")) {
-      return  ["glpi_entities" => ["glpi_plugin_purchaserequest_purchaserequests" => "entities_id"],
-         "glpi_profiles"      => ["glpi_plugin_purchaserequest_profiles" => "profiles_id"],
-         "glpi_users"         => ["glpi_plugin_purchaserequest_purchaserequests" => "users_id",
-                                       "glpi_plugin_purchaserequest_purchaserequests" => "users_id_validate",
-                                       "glpi_plugin_purchaserequest_purchaserequests" => "users_id_creator"],
-         "glpi_groups"        => ["glpi_plugin_purchaserequest_purchaserequests" => "groups_id"],
-         "glpi_tickets"       => ["glpi_plugin_purchaserequest_purchaserequests" => "tickets_id"],
-                    "glpi_plugin_purchaserequest_purchaserequeststates" =>  [
-                       "glpi_plugin_purchaserequest_purchaserequests" => "plugin_purchaserequest_purchaserequeststates_id"]];
+      return ["glpi_entities"                                     => ["glpi_plugin_purchaserequest_purchaserequests" => "entities_id"],
+              "glpi_profiles"                                     => ["glpi_plugin_purchaserequest_profiles" => "profiles_id"],
+              "glpi_users"                                        => ["glpi_plugin_purchaserequest_purchaserequests" => "users_id",
+                                                                      "glpi_plugin_purchaserequest_purchaserequests" => "users_id_validate",
+                                                                      "glpi_plugin_purchaserequest_purchaserequests" => "users_id_creator"],
+              "glpi_groups"                                       => ["glpi_plugin_purchaserequest_purchaserequests" => "groups_id"],
+              "glpi_tickets"                                      => ["glpi_plugin_purchaserequest_purchaserequests" => "tickets_id"],
+              "glpi_plugin_purchaserequest_purchaserequeststates" => [
+                 "glpi_plugin_purchaserequest_purchaserequests" => "plugin_purchaserequest_purchaserequeststates_id"]];
    } else {
-      return  [];
+      return [];
    }
 }
 
@@ -158,7 +158,7 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num) {
    switch ($table . '.' . $field) {
       /* display associated items with order */
       case "glpi_plugin_purchaserequest_purchaserequests.types_id" :
-         $file="";
+         $file = "";
          if (isset($data['raw']["itemtype"]) && $data['raw']["itemtype"] == 'PluginOrderOther') {
             $file = GLPI_ROOT . "/plugins/order/inc/othertype.class.php";
          } elseif (isset($data['raw']["itemtype"])) {
@@ -192,18 +192,18 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num) {
 
 function plugin_purchaserequest_getAddSearchOptions($itemtype) {
 
-   $sopt=[];
+   $sopt = [];
 
    if ($itemtype == 'Ticket') {
       if (Session::haveRight('plugin_purchaserequest_purchaserequest', READ)) {
-         $sopt[22227]['table']             = 'glpi_plugin_purchaserequest_purchaserequests';
-         $sopt[22227]['field']             = 'id';
-         $sopt[22227]['name']              = _x('quantity', 'Number of purchase request', 'purchaserequest');
-         $sopt[22227]['forcegroupby']      = true;
-         $sopt[22227]['usehaving']         = true;
-         $sopt[22227]['datatype']          = 'count';
-         $sopt[22227]['massiveaction']     = false;
-         $sopt[22227]['joinparams']        = ['jointype'  => 'child'];
+         $sopt[22227]['table']         = 'glpi_plugin_purchaserequest_purchaserequests';
+         $sopt[22227]['field']         = 'id';
+         $sopt[22227]['name']          = _x('quantity', 'Number of purchase request', 'purchaserequest');
+         $sopt[22227]['forcegroupby']  = true;
+         $sopt[22227]['usehaving']     = true;
+         $sopt[22227]['datatype']      = 'count';
+         $sopt[22227]['massiveaction'] = false;
+         $sopt[22227]['joinparams']    = ['jointype' => 'child'];
       }
    }
    return $sopt;

@@ -36,6 +36,7 @@ class PluginPurchaserequestPurchaseRequestState extends CommonDropdown {
    public static function getTypeName($nb = 0) {
       return __("Purchase request status", "purchaserequest");
    }
+
    public static function install(Migration $migration) {
       global $DB;
 

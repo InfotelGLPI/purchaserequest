@@ -40,11 +40,11 @@ class PluginPurchaserequestMenu extends CommonGLPI {
       $menu['page']  = PluginPurchaserequestPurchaseRequest::getSearchURL(false);
 
       if (PluginPurchaserequestPurchaseRequest::canView()) {
-         $menu['options']['purchaserequest']['title']                 = PluginPurchaserequestPurchaseRequest::getTypeName(2);
-         $menu['options']['purchaserequest']['page']                  = PluginPurchaserequestPurchaseRequest::getSearchURL(false);
-         $menu['options']['purchaserequest']['links']['search']       = PluginPurchaserequestPurchaseRequest::getSearchURL(false);
+         $menu['options']['purchaserequest']['title']           = PluginPurchaserequestPurchaseRequest::getTypeName(2);
+         $menu['options']['purchaserequest']['page']            = PluginPurchaserequestPurchaseRequest::getSearchURL(false);
+         $menu['options']['purchaserequest']['links']['search'] = PluginPurchaserequestPurchaseRequest::getSearchURL(false);
          if (PluginPurchaserequestPurchaseRequest::canCreate()) {
-            $menu['options']['purchaserequest']['links']['add']          = PluginPurchaserequestPurchaseRequest::getFormURL(false);
+            $menu['options']['purchaserequest']['links']['add'] = PluginPurchaserequestPurchaseRequest::getFormURL(false);
          }
       }
 

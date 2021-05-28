@@ -27,7 +27,7 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include ("../../../inc/includes.php");
+include("../../../inc/includes.php");
 
 if (!isset($_GET["id"])) {
    $_GET["id"] = "";
@@ -65,7 +65,7 @@ if ($plugin->isActivated("order")
       $purchase->restore($_POST);
       $purchase->redirectToList();
 
-   }else if (isset($_POST["purge"])) {
+   } else if (isset($_POST["purge"])) {
       $purchase->check($_POST['id'], PURGE);
       $purchase->delete($_POST, 1);
       $purchase->redirectToList();
