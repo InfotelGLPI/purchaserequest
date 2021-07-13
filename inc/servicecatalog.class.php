@@ -58,11 +58,11 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
       if ($nb > 0) {
          $btstyle = "style='color: firebrick;'";
       }
-      if (Session::getCurrentInterface() == 'central') {
+//      if (Session::getCurrentInterface() == 'central') {
          return "<span $btstyle>" . __('Validate your purchase requests', 'purchaserequest') . "<span>";
-      } else {
-         return __('Validate your purchase requests', 'purchaserequest');
-      }
+//      } else {
+//         return __('Validate your purchase requests', 'purchaserequest');
+//      }
    }
 
    /**
@@ -142,7 +142,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
       $nb       = self::countPurchasesToValidate();
       $comments = __('See your purchase requests to validate', 'purchaserequest');
       if ($nb > 0) {
-         $comments .= "<br><span style='color:firebrick;'>";
+         $comments = "<span style='color:firebrick;'>";
          $comments .= sprintf(_n('You have %d purchase request to validate !', 'You have %d purchase requests to validate !', $nb, 'servicecatalog'), $nb);
          $comments .= "</span>";
       }
