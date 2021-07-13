@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-13 14:34+0000\n"
+"POT-Creation-Date: 2021-07-13 14:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,7 +181,7 @@ msgstr ""
 msgid "No groups for this user"
 msgstr ""
 
-#: inc/servicecatalog.class.php:62 inc/servicecatalog.class.php:64
+#: inc/servicecatalog.class.php:62
 msgid "Validate your purchase requests"
 msgstr ""
 
