@@ -624,7 +624,9 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       //      echo "<tr class='tab_bg_1'><td colspan='2'>" . __('Approver') . "</td>";
       //      echo "<td class='center'>" . $dbu->getUserName($item->fields["users_id_validate"]) . "</td></tr>";
       //      echo "</td></tr>";
-      if ($validation->getFromDBByCrit(["status" => CommonITILValidation::WAITING, "users_id_validate" => Session::getLoginUserID(), "plugin_purchaserequest_purchaserequests_id" => $item->getID()])) {
+      if ($validation->getFromDBByCrit(["status" => CommonITILValidation::WAITING,
+                                        "users_id_validate" => Session::getLoginUserID(),
+                                        "plugin_purchaserequest_purchaserequests_id" => $item->getID()])) {
          echo "<tr class='tab_bg_1'>";
          echo "<td>" . __('Status of the approval request') . "</td>";
          echo "<td class='center'>";
@@ -704,14 +706,19 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                                   'ORDER' => 'submission_date DESC'
                                ]);
 
-      $colonnes    = [_x('item', 'State'), __('Request date'), __('Approval requester'),
+      $colonnes    = [_x('item', 'State'),
+                      __('Request date'),
+                      __('Approval requester'),
                       __('Approval status'),
-                      __('Approver'), __('Approval comments')];
+                      __('Approver'),
+                      __('Approval comments')];
       $nb_colonnes = count($colonnes);
 
       echo "<table class='tab_cadre_fixehov'>";
-      echo "<tr class='noHover'><th colspan='" . $nb_colonnes . "'>" . __('Approvals for the purchase request', 'purchaserequest') .
-           "</th></tr>";
+      echo "<tr class='noHover'>";
+      echo "<th colspan='" . $nb_colonnes . "'>" ;
+      echo __('Approvals for the purchase request', 'purchaserequest');
+      echo "</th></tr>";
 
       //      if ($canadd) {
       //         if (!in_array($item->fields['status'], array_merge($item->getSolvedStatusArray(),
@@ -740,7 +747,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
             $bgcolor = CommonITILValidation::getStatusColor($row['status']);
             $status  = CommonITILValidation::getStatus($row['status']);
 
-            echo "<tr class='tab_bg_1'         >";
+            echo "<tr class='tab_bg_1'>";
             echo "<td>";
             //            if ($canedit) {
             //               echo "\n<script type='text/javascript' >\n";
