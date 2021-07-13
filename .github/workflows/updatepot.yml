@@ -1,7 +1,7 @@
 name: Update POT
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - 'locales/**'
 
