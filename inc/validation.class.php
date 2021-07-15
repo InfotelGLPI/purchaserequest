@@ -149,7 +149,8 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       global $CFG_GLPI;
 
       if ($CFG_GLPI["notifications_mailing"]) {
-         if ($this->input["first"] == true) {
+         if (isset($this->input["first"])
+             && $this->input["first"] == true) {
             $purchase_request = new PluginPurchaserequestPurchaseRequest();
             $purchase_request->getFromDB($this->fields["plugin_purchaserequest_purchaserequests_id"]);
             $options = ['validation_id'     => $this->fields["id"],
@@ -249,11 +250,8 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                   NotificationEvent::raiseEvent('no_validation_purchaserequest', $purchase_request, $options);
                }
             }
-
          }
       }
-
-
    }
 
 

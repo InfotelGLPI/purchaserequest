@@ -739,8 +739,14 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          'ajax_page' => $CFG_GLPI["root_doc"] . '/plugins/order/ajax/referencespecifications.php',
          'class'     => __CLASS__,
       ];
+      if (Session::getCurrentInterface() == 'central') {
+         $reference->dropdownAllItems($params);
+      } else {
+         if($item = new $this->fields["itemtype"]()) {
+            echo $item->getTypeName();
+         }
 
-      $reference->dropdownAllItems($params);
+      }
       echo "</td>";
 
       echo "<td>" . __("Type") . "&nbsp;<span style='color:red;'>*</span></td>";
