@@ -745,7 +745,6 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          if($item = new $this->fields["itemtype"]()) {
             echo $item->getTypeName();
          }
-
       }
       echo "</td>";
 

@@ -62,7 +62,7 @@ if ($plugin->isActivated("order")
       /* update purchaserequest */
    } else if (isset($_POST["update"]) || (isset($_POST['update_status']))) {
 
-      $validation->check($_POST['id'], READ);
+//      $validation->check($_POST['id'], READ);
       $validation->update($_POST);
       Html::back();
    }
