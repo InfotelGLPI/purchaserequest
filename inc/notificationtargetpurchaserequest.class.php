@@ -381,8 +381,9 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
          $criteria['WHERE']["$validationtable.id"] = $options['validation_id'];
 
          $iterator = $DB->request($criteria);
-         while ($data = $iterator->next()) {
+         foreach ($iterator as $data) {
             $this->addToRecipientsList($data);
+            $iterator->next();
          }
       }
    }

@@ -48,13 +48,9 @@ class PluginPurchaserequestMenu extends CommonGLPI {
          }
       }
 
-      $menu['icon'] = self::getIcon();
+      $menu['icon'] = PluginPurchaserequestPurchaseRequest::getIcon();
 
       return $menu;
-   }
-
-   static function getIcon() {
-      return "fas fa-shopping-basket";
    }
 
    function install() {

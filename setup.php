@@ -27,7 +27,7 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-define('PLUGIN_PURCHASEREQUEST_VERSION', '2.1.1');
+define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.0');
 
 /**
  * Init hooks of the plugin.
@@ -103,10 +103,12 @@ function plugin_version_purchaserequest() {
            'license'      => 'GPLv2+',
            'requirements' => [
               'glpi' => [
-                 'min' => '9.5',
+                 'min' => '10.0',
+                 'max' => '11.0',
                  'dev' => false
               ]
-           ]];
+           ]
+   ];
 }
 
 /**
@@ -118,29 +120,10 @@ function plugin_version_purchaserequest() {
 function plugin_purchaserequest_check_prerequisites() {
    global $DB;
 
-   if (version_compare(GLPI_VERSION, '9.5', 'lt')
-       || version_compare(GLPI_VERSION, '9.6', 'ge')) {
-      if (method_exists('Plugin', 'messageIncompatible')) {
-         echo Plugin::messageIncompatible('core', '9.5');
-      }
-      return false;
-   }
-
    $plugin = new Plugin();
    if ($plugin->isActivated("order")
        && !$DB->tableExists("glpi_plugin_order_orders")) {
       return false;
    }
-   return true;
-}
-
-/**
- * Check configuration process
- *
- * @param boolean $verbose Whether to display message on failure. Defaults to false
- *
- * @return boolean
- */
-function plugin_purchaserequest_check_config() {
    return true;
 }

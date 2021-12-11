@@ -47,7 +47,7 @@ function plugin_purchaserequest_install() {
    echo "<tr class='tab_bg_1'>";
    echo "<td align='center'>";
 
-   $migration = new Migration("2.1.1");
+   $migration = new Migration("3.0.0");
    $classes   = ['PluginPurchaserequestNotificationTargetPurchaseRequest',
                  'PluginPurchaserequestPurchaseRequest',
                  'PluginPurchaserequestConfig',
@@ -141,12 +141,12 @@ function plugin_purchaserequest_addSelect($type, $ID, $num) {
    $table     = $searchopt[$ID]["table"];
    $field     = $searchopt[$ID]["field"];
 
-   if ($table == "glpi_plugin_purchaserequest_purchaserequests" && $num != 0) {
+   if ($table == "glpi_plugin_purchaserequest_purchaserequests"
+       && $field == "types_id") {
       return "`$table`.`itemtype`, `$table`.`$field` AS `ITEM_$num`, ";
    } else {
       return "";
    }
-
 }
 
 /* display custom fields in the search */
@@ -175,14 +175,8 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num) {
          $order = new PluginOrderOrder();
          if ($order->getFromDB($data['raw']["ITEM_" . $num])) {
             return $order->getLink();
-         }
-
-         break;
-
-      case "glpi_plugin_purchaserequest_purchaserequests.tickets_id" :
-         $ticket = new Ticket();
-         if ($ticket->getFromDB($data['raw']["ITEM_" . $num])) {
-            return $ticket->getLink();
+         } else {
+            return " ";
          }
 
          break;
@@ -207,4 +201,27 @@ function plugin_purchaserequest_getAddSearchOptions($itemtype) {
       }
    }
    return $sopt;
+}
+
+/**
+ * @param $type
+ * @param $ID
+ * @param $data
+ * @param $num
+ *
+ * @return string
+ */
+function plugin_purchaserequest_displayConfigItem($type, $ID, $data, $num) {
+
+   $searchopt =& Search::getOptions($type);
+   $table     = $searchopt[$ID]["table"];
+   $field     = $searchopt[$ID]["field"];
+
+   switch ($table . '.' . $field) {
+      case "glpi_plugin_purchaserequest_purchaserequests.status" :
+         $status_color = CommonITILValidation::getStatusColor($data[$num][0]['name']);
+         return " style=\"background-color:" . $status_color . ";\" ";
+         break;
+   }
+   return "";
 }

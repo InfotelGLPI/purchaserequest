@@ -97,7 +97,7 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
          $threshold->getEmpty();
          $threshold->getFromDBByCrit(["itemtype" => $item->getType(),
                                       "items_id" => $item->getID()]);
-         $threshold->showForm($threshold->getID(), $item);
+         $threshold->showThresholdForm($threshold->getID(), $item);
       }
 
       return true;
@@ -111,7 +111,7 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     *
     * @return bool
     */
-   public function showForm($ID, $item, $options = []) {
+   public function showThresholdForm($ID, $item, $options = []) {
       global $CFG_GLPI;
 
       $dbu = new DbUtils();
@@ -133,16 +133,15 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td colspan='2'>" . _n("Threshold", "Thresholds", 1, "purchaserequest") . "</td><td>";
       if ($canedit) {
-         Html::autocompletionTextField($this, "thresholds");
+         echo Html::input('thresholds', ['value' => $this->fields['thresholds'], 'size' => 40]);
       } else {
          echo $this->fields["thresholds"];
       }
       echo "</td></tr>";
 
-
-      echo "<input type='hidden' name='itemtype' value='" . $item->getType() . "'/>";
-      echo "<input type='hidden' name='items_id' value='" . $item->getID() . "'/>";
-      echo "<input type='hidden' name='id' value='" . $ID . "'/>";
+      echo Html::hidden('itemtype', ['value' => $item->getType()]);
+      echo Html::hidden('items_id', ['value' => $item->getID()]);
+      echo Html::hidden('id', ['value' => $ID]);
 
       if ($canedit) {
          $this->showFormButtons($options);
@@ -168,11 +167,11 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
          $migration->displayMessage("Installing $table");
          $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_thresholds` (
                     `id` INT(11) NOT NULL AUTO_INCREMENT,
-                    `itemtype` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+                    `itemtype` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
                     `items_id` INT(11) NOT NULL DEFAULT '0',
                     `thresholds` INT(11) NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
-                  ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;";
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die ($DB->error());
 
       } else {

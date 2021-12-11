@@ -88,11 +88,11 @@ class PluginPurchaserequestConfig extends CommonDBTM {
       return $ong;
    }
 
-   function showForm() {
-      global $DB, $CFG_GLPI;
+   function showForm($ID, $options = []) {
+
       echo "<form name='form' method='post' action='" .
            Toolbox::getItemTypeFormURL(self::getType()) . "'>";
-      echo "<input type='hidden' name='id' value='" . $this->fields['id'] . "'>";
+      echo Html::hidden('id', ['value' => $this->fields['id']]);
       echo "<div align='center'><table class='tab_cadre_fixe'  cellspacing='2' cellpadding='2'>";
       echo "<tr><th colspan='2'>" . __('Configuration purchase request', 'purchaserequest') . "</th></tr>";
 
@@ -107,8 +107,9 @@ class PluginPurchaserequestConfig extends CommonDBTM {
       echo "</td></tr>";
 
 
-      echo "<tr class='tab_bg_2 center'><td colspan='2'><input type=\"submit\" name=\"update_config\" class=\"submit\"
-         value=\"" . _sx('button', 'Save') . "\" ></td></tr>";
+      echo "<tr class='tab_bg_2 center'><td colspan='2'>";
+      echo Html::submit(_sx('button', 'Save'), ['name' => 'update_config', 'class' => 'btn btn-primary']);
+      echo "</td></tr>";
 
       echo "</table></div>";
       Html::closeForm();
@@ -129,7 +130,7 @@ class PluginPurchaserequestConfig extends CommonDBTM {
                     `id` INT(11) NOT NULL AUTO_INCREMENT,
                     `id_general_service_manager` INT(11) NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
-                  ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;";
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die ($DB->error());
 
 

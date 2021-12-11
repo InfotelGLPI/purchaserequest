@@ -48,11 +48,11 @@ class PluginPurchaserequestPurchaseRequestState extends CommonDropdown {
          //Install
          $query = "CREATE TABLE `glpi_plugin_purchaserequest_purchaserequeststates` (
                      `id` int(11) NOT NULL auto_increment,
-                     `name` varchar(255) collate utf8_unicode_ci default NULL,
-                     `comment` text collate utf8_unicode_ci,
+                     `name` varchar(255) collate utf8mb4_unicode_ci default NULL,
+                     `comment` text collate utf8mb4_unicode_ci,
                      PRIMARY KEY  (`id`),
                      KEY `name` (`name`)
-                  ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die($DB->error());
       }
    }

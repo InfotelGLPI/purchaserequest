@@ -283,7 +283,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td>" . __("Name") . "</td><td>";
       if ($canedit) {
-         Html::autocompletionTextField($this, "name");
+         echo Html::input('name', ['value' => $this->fields['name'], 'size' => 40]);
       } else {
          echo $this->fields["name"];
       }
@@ -341,8 +341,11 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       /* description */
       echo "<tr class='tab_bg_1'><td>" . __("Description") . "&nbsp;<span class='red'>*</span></td>";
       echo "<td colspan='3'>";
-      echo "<textarea id='comment' name='comment' rows='4' cols='100'>" . stripslashes($this->fields['comment']) . "</textarea>";
-
+      Html::textarea(['name'            => 'comment',
+                      'value'           => stripslashes($this->fields['comment']),
+                      'enable_richtext' => false,
+                      'cols'            => '100',
+                      'rows'            => '4']);
       echo "</td></tr>";
 
       /* type */
@@ -452,7 +455,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
          echo "</tr>";
       }
 
-      echo "<input type='hidden' name='users_id_creator' value='" . $_SESSION['glpiID'] . "'/>";
+      echo Html::hidden('users_id_creator', ['value' => $_SESSION['glpiID']]);
 
       if ($canedit) {
          $this->showFormButtons($options);
@@ -528,8 +531,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                   $sel = "checked";
                }
                echo "<input type='checkbox' name='item[" . $field["id"] . "]' value='1' $sel>";
-               echo "<input type='hidden' name='plugin_order_orders_id' value='" .
-                    $item->getID() . "'>";
+               echo Html::hidden('plugin_order_orders_id', ['value' => $item->getID()]);
                echo "</td>";
             }
             // Name
@@ -579,9 +581,10 @@ class PluginPurchaserequestValidation extends CommonDBTM {
             echo "<a onclick= \"if ( unMarkCheckboxes('purchaseresquet_form$rand') ) "
                  . "return false;\" href='#'>" . __("Uncheck all") . "</a>";
             echo "</td><td align='left' width='80%'>";
-            echo "<input type='hidden' name='plugin_order_orders_id' value='" . $item->getID() . "'>";
+            echo Html::hidden('plugin_order_orders_id', ['value' => $item->getID()]);
             $purchase_request->dropdownPurchaseRequestItemsActions();
-            echo "&nbsp;<input type='submit' name='action' class='submit' value='" . _sx('button', 'Post') . "'>";
+            echo "&nbsp;";
+            echo Html::submit(_sx('button', 'Post'), ['name' => 'action', 'class' => 'btn btn-primary']);
             echo "</td>";
             echo "</table>";
 
@@ -628,14 +631,14 @@ class PluginPurchaserequestValidation extends CommonDBTM {
          echo "<tr class='tab_bg_1'>";
          echo "<td>" . __('Status of the approval request') . "</td>";
          echo "<td class='center'>";
-         echo "<div style='color:forestgreen'><i id='accept_purchaserequest' class='question far fa-check-circle fa-4x'>";
+         echo "<div style='color:forestgreen'><i id='accept_purchaserequest' class='question far fa-check-circle fa-3x'>";
          echo "</i><br>" . __('Accept purchase request', 'purchaserequest') . "</div>";
-         echo "<input type='hidden' name='accept_purchaserequest' value='0'>";
+         echo Html::hidden('accept_purchaserequest', ['value' => 0]);
          echo "</td>";
          echo "<td class='center'>";
-         echo "<div style='color:darkred'><i id='refuse_purchaserequest' class='question far fa-times-circle fa-4x'>";
+         echo "<div style='color:darkred'><i id='refuse_purchaserequest' class='question far fa-times-circle fa-3x'>";
          echo "</i><br>" . __('Refuse purchase request', 'purchaserequest') . "</div>";
-         echo "<input type='hidden' name='refuse_purchaserequest' value='0'>";
+         echo Html::hidden('refuse_purchaserequest', ['value' => 0]);
          echo "</td>";
          echo "</tr>";
 
@@ -654,11 +657,14 @@ class PluginPurchaserequestValidation extends CommonDBTM {
 
          echo "<tr class='tab_bg_1'>";
          echo "<td>" . __('Approval comments') . "</td>";
-         echo "<td colspan='2'><textarea cols='90' rows='3' name='comment_validation'>" .
-              $item->fields["comment_validation"] . "</textarea>";
-         echo "<input type='hidden' name='id' value='" . $validation->fields['id'] . "'>";
-         echo "<input type='hidden' name='users_id_validate' value='" . Session::getLoginUserID() . "'>";
-         echo "<input type='hidden' name='plugin_purchaserequest_purchaserequests_id' value='" . $item->fields['id'] . "'>";
+         echo "<td colspan='2'>";
+         Html::textarea(['name'            => 'comment_validation',
+                         'enable_richtext' => false,
+                         'cols'            => '90',
+                         'rows'            => '3']);
+         echo Html::hidden('id', ['value' => $validation->fields['id']]);
+         echo Html::hidden('users_id_validate', ['value' => Session::getLoginUserID()]);
+         echo Html::hidden('plugin_purchaserequest_purchaserequests_id', ['value' => $item->fields['id']]);
          echo "</td></tr>";
       }
 
@@ -739,7 +745,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                                         sprintf(__('%1$s = %2$s'), $item->getTypeName(1),
                                                 $item->fields["name"]));
 
-         while ($row = $iterator->next()) {
+         foreach ($iterator as $row) {
             $canedit = $this->canEdit($row["id"]);
             Session::addToNavigateListItems($this->getType(), $row["id"]);
             $bgcolor = CommonITILValidation::getStatusColor($row['status']);
@@ -770,6 +776,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
             echo "<td>" . getUserName($row["users_id_validate"]) . "</td>";
             echo "<td>" . $row["comment_validation"] . "</td>";
             echo "</tr>";
+            $iterator->next();
          }
          echo $header;
       } else {
@@ -799,12 +806,11 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                     `plugin_purchaserequest_purchaserequests_id` INT(11) NOT NULL DEFAULT '0',
                     `users_id_validate` INT(11) NOT NULL DEFAULT '0',
                     `status` INT(11) NOT NULL DEFAULT '0',
-                    `comment_validation` TEXT COLLATE utf8_unicode_ci,
+                    `comment_validation` TEXT COLLATE utf8mb4_unicode_ci,
                     `submission_date` DATETIME DEFAULT NULL,
                     `validation_date` DATETIME DEFAULT NULL,
                     PRIMARY KEY (`id`)
-        
-                  ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;";
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die ($DB->error());
 
       } else {

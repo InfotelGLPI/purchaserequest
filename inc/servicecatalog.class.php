@@ -66,6 +66,29 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
    }
 
    /**
+    * @return string|\translated
+    */
+   static function getAhrefTitle() {
+
+      return __('Validate your purchase requests', 'purchaserequest');
+   }
+
+   /**
+    * @return string
+    * @throws \GlpitestSQLError
+    */
+   static function getLeftMenuLogoCss() {
+
+      $addstyle = "";
+      $nb       = self::countPurchasesToValidate();
+      if ($nb > 0) {
+         $addstyle = "color:firebrick;";
+      }
+      return $addstyle;
+
+   }
+
+   /**
     * @return string
     */
    static function getMenuLink() {
