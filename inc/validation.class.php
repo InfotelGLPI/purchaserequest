@@ -316,7 +316,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
          $params = ['users_id' => '__VALUE__',
                     'entity'   => $this->fields["entities_id"]];
          $JS     .= Ajax::updateItemJsCode("plugin_purchaserequest_group",
-                                           $CFG_GLPI["root_doc"] . "/plugins/purchaserequest/ajax/dropdownGroup.php",
+                                           PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
                                            $params, 'dropdown_users_id' . $rand_user, false);
          $JS     .= "}";
          echo Html::scriptBlock($JS);

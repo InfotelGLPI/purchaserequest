@@ -33,7 +33,7 @@
  * @return boolean
  */
 function plugin_purchaserequest_install() {
-   foreach (glob(GLPI_ROOT . '/plugins/purchaserequest/inc/*.php') as $file) {
+   foreach (glob(PLUGIN_PURCHASEREQUEST_DIR . '/inc/*.php') as $file) {
       //Do not load datainjection files (not needed and avoid missing class error message)
       if (!preg_match('/injection.class.php/', $file)) {
          include_once($file);
@@ -58,7 +58,7 @@ function plugin_purchaserequest_install() {
    foreach ($classes as $class) {
       if ($plug = isPluginItemType($class)) {
          $plugname = strtolower($plug['plugin']);
-         $dir      = GLPI_ROOT . "/plugins/$plugname/inc/";
+         $dir      = PLUGIN_PURCHASEREQUEST_DIR . "/inc/";
          $item     = strtolower($plug['class']);
          if (file_exists("$dir$item.class.php")) {
             include_once("$dir$item.class.php");
@@ -83,7 +83,7 @@ function plugin_purchaserequest_install() {
  * @return boolean
  */
 function plugin_purchaserequest_uninstall() {
-   foreach (glob(GLPI_ROOT . '/plugins/purchaserequest/inc/*.php') as $file) {
+   foreach (glob(PLUGIN_PURCHASEREQUEST_DIR . '/inc/*.php') as $file) {
       //Do not load datainjection files (not needed and avoid missing class error message)
       if (!preg_match('/injection.class.php/', $file)) {
          include_once($file);

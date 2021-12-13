@@ -105,7 +105,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
       $options['criteria'][1]['value']      = Session::getLoginUserID();
       $options['criteria'][1]['link']       = 'AND';
 
-      return $CFG_GLPI['root_doc'] . "/plugins/purchaserequest/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
+      return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
    }
 
    /**
@@ -153,7 +153,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
     */
    static function getMenuLogo() {
 
-      return "fas fa-shopping-basket";
+      return PluginPurchaserequestPurchaseRequest::getIcon();
 
    }
 

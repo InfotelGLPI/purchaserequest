@@ -29,6 +29,13 @@
 
 define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.0');
 
+if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
+   define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
+   define("PLUGIN_PURCHASEREQUEST_NOTFULL_DIR", Plugin::getPhpDir("purchaserequest",false));
+   define("PLUGIN_PURCHASEREQUEST_WEBDIR", Plugin::getWebDir("purchaserequest"));
+}
+
+
 /**
  * Init hooks of the plugin.
  * REQUIRED
