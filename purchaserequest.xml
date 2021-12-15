@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <name>Purchaserequest</name>
+   <key>purchaserequest</key>
+   <state>stable</state>
+   <logo></logo>
+   <description>
+      <short>
+         <fr><![CDATA[Plugin de demandes d'achats préalables au lancement de commandes avec le plugin order]]></fr>
+         <en><![CDATA[Plugin for purchase requests prior to launching orders with the order plugin]]></en>
+      </short>
+      <long>
+         <fr><![CDATA[Plugin de demandes d'achats préalables au lancement de commandes avec le plugin order]]></fr>
+         <en><![CDATA[Plugin for purchase requests prior to launching orders with the order plugin]]></en>
+       </long>
+   </description>
+   <homepage>https://github.com/InfotelGLPI/purchaserequest</homepage>
+   <download>https://github.com/InfotelGLPI/purchaserequest/releases</download>
+   <issues>https://github.com/InfotelGLPI/purchaserequest/issues</issues>
+   <readme>https://raw.githubusercontent.com/InfotelGLPI/purchaserequest/master/README.md</readme>
+   <authors>
+      <author>Infotel</author>
+   </authors>
+    <versions>
+    <version>
+        <num>3.0.0-rc1</num>
+        <compatibility>~10.0</compatibility>
+        <download_url>https://github.com/InfotelGLPI/purchaserequest/releases/download/3.0.0-rc1/glpi-purchaserequest-3.0.0-rc1.tar.gz</download_url>
+    </version>
+     </versions>
+    <langs>
+        <lang>en_GB</lang>
+        <lang>fr_FR</lang>
+    </langs>
+   <license><![CDATA[GPLv2+]]></license>
+      <tags>
+         <fr>
+            <tag>gestion</tag>
+            <tag>inventaire</tag>
+         </fr>
+         <en>
+            <tag>management</tag>
+            <tag>inventory</tag>
+         </en>
+   </tags>
+   <screenshots>
+   </screenshots>
+</root>
