@@ -3,7 +3,7 @@
    <name>Purchaserequest</name>
    <key>purchaserequest</key>
    <state>stable</state>
-   <logo></logo>
+    <logo>https://raw.githubusercontent.com/InfotelGLPI/purchaserequest/master/purchaserequest.png</logo>
    <description>
       <short>
          <fr><![CDATA[Plugin de demandes d'achats préalables au lancement de commandes avec le plugin order]]></fr>
