@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-16 10:05+0000\n"
+"POT-Creation-Date: 2021-12-20 11:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,11 +185,11 @@ msgstr ""
 msgid "Validate your purchase requests"
 msgstr ""
 
-#: inc/servicecatalog.class.php:166
+#: inc/servicecatalog.class.php:186
 msgid "See your purchase requests to validate"
 msgstr ""
 
-#: inc/servicecatalog.class.php:169
+#: inc/servicecatalog.class.php:189
 #, php-format
 msgid "You have %d purchase request to validate !"
 msgid_plural "You have %d purchase requests to validate !"
