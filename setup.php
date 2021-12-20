@@ -31,7 +31,7 @@ define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.0-rc1');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
    define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
-   define("PLUGIN_PURCHASEREQUEST_NOTFULL_DIR", Plugin::getPhpDir("purchaserequest",false));
+   define("PLUGIN_PURCHASEREQUEST_NOTFULL_DIR", Plugin::getPhpDir("purchaserequest", false));
    define("PLUGIN_PURCHASEREQUEST_WEBDIR", Plugin::getWebDir("purchaserequest"));
 }
 
@@ -78,9 +78,15 @@ function plugin_init_purchaserequest() {
       Plugin::registerClass(PluginPurchaserequestThreshold::getType(), ['addtabon' => $types]);
 
       //TODO create right config
-      if (Session::haveRight("PluginPurchaserequestConfig", READ)) ;
-      {
+      if (Session::haveRight("PluginPurchaserequestConfig", READ)) {
          $PLUGIN_HOOKS['config_page']['purchaserequest'] = 'front/config.form.php';
+      }
+
+      if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
+          && !class_exists('PluginServicecatalogMain')
+      ) {
+         $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_NOTFULL_DIR.'/front/purchaserequest.php';
+//         $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PluginPurchaserequestPurchaseRequest::getIcon();
       }
 
       if (PluginPurchaserequestPurchaseRequest::canView()) {

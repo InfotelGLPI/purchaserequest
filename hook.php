@@ -220,7 +220,7 @@ function plugin_purchaserequest_displayConfigItem($type, $ID, $data, $num) {
    switch ($table . '.' . $field) {
       case "glpi_plugin_purchaserequest_purchaserequests.status" :
          $status_color = CommonITILValidation::getStatusColor($data[$num][0]['name']);
-         return " style=\"background-color:" . $status_color . ";\" ";
+         return " class=\"shadow-none\" style=\"background-color:" . $status_color . ";\" ";
          break;
    }
    return "";
