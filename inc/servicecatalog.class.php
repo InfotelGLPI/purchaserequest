@@ -110,6 +110,26 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
 
    /**
     * @return string
+    */
+   static function getNavBarLink() {
+      global $CFG_GLPI;
+
+      $options['reset']                     = 'reset';
+      $options['criteria'][0]['field']      = 8; // status
+      $options['criteria'][0]['searchtype'] = 'equals';
+      $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
+      $options['criteria'][0]['link']       = 'AND';
+
+      $options['criteria'][1]['field']      = 5; // users_id_validate
+      $options['criteria'][1]['searchtype'] = 'equals';
+      $options['criteria'][1]['value']      = Session::getLoginUserID();
+      $options['criteria'][1]['link']       = 'AND';
+
+      return PLUGIN_PURCHASEREQUEST_NOTFULL_DIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
+   }
+
+   /**
+    * @return string
     * @throws \GlpitestSQLError
     */
    static function countPurchasesToValidate() {
