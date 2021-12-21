@@ -56,21 +56,20 @@ function plugin_init_purchaserequest() {
 
       Plugin::registerClass('PluginPurchaserequestProfile', ['addtabon' => ['Profile']]);
 
-      Plugin::registerClass('PluginPurchaserequestPurchaseRequest', ['addtabon' => ['PluginOrderOrder']]);
+      Plugin::registerClass('PluginPurchaserequestPurchaseRequest', ['addtabon' => ['PluginPurchaserequestThreshold']]);
       $types = [ComputerType::getType(),
                 MonitorType::getType(),
-                Peripheraltype::getType(),
-                Networkequipmenttype::getType(),
-                Printertype::getType(),
-                Phonetype::getType(),
-                Consumableitemtype::getType(),
-                Cartridgeitemtype::getType(),
-                Contracttype::getType(),
-                Softwarelicensetype::getType(),
-                Certificatetype::getType(),
-                Racktype::getType(),
-                Pdutype::getType(),
-                Enclosure::getType()];
+                PeripheralType::getType(),
+                NetworkequipmentType::getType(),
+                PrinterType::getType(),
+                PhoneType::getType(),
+                ConsumableItemType::getType(),
+                CartridgeItemType::getType(),
+                ContractType::getType(),
+                SoftwareLicenseType::getType(),
+                CertificateType::getType(),
+                RackType::getType(),
+                PDUType::getType()];
 
       if ($plugin->isActivated('order')) {
          array_push($types, "PluginOrderOtherType");

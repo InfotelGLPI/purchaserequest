@@ -50,7 +50,7 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     * @return string|\translated
     */
    public static function getTypeName($nb = 0) {
-      return _n("Threshold", "Thresholds", $nb, "purchaserequest");
+      return _n("Purchase threshold", "Purchase thresholds", $nb, "purchaserequest");
    }
 
 
@@ -74,11 +74,8 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     */
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
-      //      if ($item->getType() == ComputerType::getType()) {
-      return _n("Threshold", "Thresholds", 1, "purchaserequest");
-      //      }
+      return $this->getTypeName(1);
 
-      return '';
    }
 
 
@@ -112,9 +109,7 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     * @return bool
     */
    public function showThresholdForm($ID, $item, $options = []) {
-      global $CFG_GLPI;
 
-      $dbu = new DbUtils();
       $this->initForm($ID, $options);
       $this->showFormHeader($options);
 
@@ -131,7 +126,7 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
 
       /* title */
       echo "<tr class='tab_bg_1'>";
-      echo "<td colspan='2'>" . _n("Threshold", "Thresholds", 1, "purchaserequest") . "</td><td>";
+      echo "<td colspan='2'>" . $this->getTypeName(1) . "</td><td>";
       if ($canedit) {
          echo Html::input('thresholds', ['value' => $this->fields['thresholds'], 'size' => 40]);
       } else {
