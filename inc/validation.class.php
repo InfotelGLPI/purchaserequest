@@ -807,8 +807,8 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                     `users_id_validate` INT(11) NOT NULL DEFAULT '0',
                     `status` INT(11) NOT NULL DEFAULT '0',
                     `comment_validation` TEXT COLLATE utf8mb4_unicode_ci,
-                    `submission_date` DATETIME DEFAULT NULL,
-                    `validation_date` DATETIME DEFAULT NULL,
+                    `submission_date` timestamp NULL DEFAULT NULL,
+                    `validation_date` timestamp NULL DEFAULT NULL,
                     PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die ($DB->error());

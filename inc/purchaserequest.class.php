@@ -1671,19 +1671,19 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
                     `comment` TEXT COLLATE utf8mb4_unicode_ci,
                     `itemtype` VARCHAR(255) NOT NULL,
                     `types_id` INT(11) NOT NULL DEFAULT '0',
-                    `due_date` DATETIME DEFAULT NULL,
+                    `due_date` timestamp NULL DEFAULT NULL,
                     `users_id_validate` INT(11) NOT NULL DEFAULT '0',
                     `users_id_creator` INT(11) NOT NULL DEFAULT '0',
                     `status` INT(11) NOT NULL DEFAULT '0',
                     `comment_validation` TEXT COLLATE utf8mb4_unicode_ci,
                     `tickets_id` INT(11) NOT NULL DEFAULT '0',
                     `plugin_order_orders_id` INT(11) NOT NULL DEFAULT '0',
-                    `date_mod` DATETIME DEFAULT NULL,
-                    `date_creation` DATETIME DEFAULT NULL,
+                    `date_mod` timestamp NULL DEFAULT NULL,
+                    `date_creation` timestamp NULL DEFAULT NULL,
                     `is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
                     `locations_id` INT(11) NOT NULL DEFAULT '0',
                     `plugin_purchaserequest_purchaserequeststates_id` INT(11) NOT NULL DEFAULT '0',
-                    `processing_date` DATETIME DEFAULT NULL,
+                    `processing_date` timestamp NULL DEFAULT NULL,
                     `invoice_customer` TINYINT(1) NOT NULL DEFAULT '0',
                     `amount` INT(11) NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`),
@@ -1715,7 +1715,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          if (!$DB->fieldExists($table, 'processing_date')) {
 
             $DB->query("ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
-                     ADD `processing_date` DATETIME DEFAULT NULL;");
+                     ADD `processing_date` timestamp NULL DEFAULT NULL;");
          }
 
          if (!$DB->fieldExists($table, 'invoice_customer')) {
