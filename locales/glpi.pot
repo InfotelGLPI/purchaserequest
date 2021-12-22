@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-20 15:12+0000\n"
+"POT-Creation-Date: 2021-12-21 08:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgctxt "quantity"
 msgid "Number of purchase request"
 msgstr ""
 
-#: setup.php:113 inc/menu.class.php:33 inc/profile.class.php:63
+#: setup.php:112 inc/menu.class.php:33 inc/profile.class.php:63
 #: inc/profile.class.php:163 inc/purchaserequest.class.php:50
 msgid "Purchase request"
 msgid_plural "Purchase requests"
@@ -196,10 +196,9 @@ msgid_plural "You have %d purchase requests to validate !"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/threshold.class.php:53 inc/threshold.class.php:78
-#: inc/threshold.class.php:134
-msgid "Threshold"
-msgid_plural "Thresholds"
+#: inc/threshold.class.php:53
+msgid "Purchase threshold"
+msgid_plural "Purchase thresholds"
 msgstr[0] ""
 msgstr[1] ""
 
