@@ -161,10 +161,10 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
       if (!$DB->tableExists($table)) {
          $migration->displayMessage("Installing $table");
          $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_thresholds` (
-                    `id` INT(11) NOT NULL AUTO_INCREMENT,
+                    `id` int unsigned NOT NULL AUTO_INCREMENT,
                     `itemtype` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-                    `items_id` INT(11) NOT NULL DEFAULT '0',
-                    `thresholds` INT(11) NOT NULL DEFAULT '0',
+                    `items_id` int unsigned NOT NULL DEFAULT '0',
+                    `thresholds` int unsigned NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die ($DB->error());

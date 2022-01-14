@@ -127,8 +127,8 @@ class PluginPurchaserequestConfig extends CommonDBTM {
       if (!$DB->tableExists($table)) {
          $migration->displayMessage("Installing $table");
          $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_configs` (
-                    `id` INT(11) NOT NULL AUTO_INCREMENT,
-                    `id_general_service_manager` INT(11) NOT NULL DEFAULT '0',
+                    `id` int unsigned NOT NULL AUTO_INCREMENT,
+                    `id_general_service_manager` int unsigned NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
          $DB->query($query) or die ($DB->error());

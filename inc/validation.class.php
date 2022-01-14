@@ -800,12 +800,12 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       if (!$DB->tableExists($table)) {
          $migration->displayMessage("Installing $table");
          $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_validations` (
-                    `id` INT(11) NOT NULL AUTO_INCREMENT,
-                    `entities_id` INT(11) NOT NULL DEFAULT '0',
-                    `users_id` INT(11) NOT NULL DEFAULT '0',
-                    `plugin_purchaserequest_purchaserequests_id` INT(11) NOT NULL DEFAULT '0',
-                    `users_id_validate` INT(11) NOT NULL DEFAULT '0',
-                    `status` INT(11) NOT NULL DEFAULT '0',
+                    `id` int unsigned NOT NULL AUTO_INCREMENT,
+                    `entities_id` int unsigned NOT NULL DEFAULT '0',
+                    `users_id` int unsigned NOT NULL DEFAULT '0',
+                    `plugin_purchaserequest_purchaserequests_id` int unsigned NOT NULL DEFAULT '0',
+                    `users_id_validate` int unsigned NOT NULL DEFAULT '0',
+                    `status` int unsigned NOT NULL DEFAULT '0',
                     `comment_validation` TEXT COLLATE utf8mb4_unicode_ci,
                     `submission_date` timestamp NULL DEFAULT NULL,
                     `validation_date` timestamp NULL DEFAULT NULL,

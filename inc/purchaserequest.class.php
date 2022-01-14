@@ -1662,30 +1662,30 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       if (!$DB->tableExists($table)) {
          $migration->displayMessage("Installing $table");
          $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_purchaserequests` (
-                    `id` INT(11) NOT NULL AUTO_INCREMENT,
-                    `entities_id` INT(11) NOT NULL DEFAULT '0',
-                    `is_recursive` INT(11) NOT NULL DEFAULT '0',
+                    `id` int unsigned NOT NULL AUTO_INCREMENT,
+                    `entities_id` int unsigned NOT NULL DEFAULT '0',
+                    `is_recursive` int unsigned NOT NULL DEFAULT '0',
                     `name` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-                    `users_id` INT(11) NOT NULL DEFAULT '0',
-                    `groups_id` INT(11) NOT NULL DEFAULT '0',
+                    `users_id` int unsigned NOT NULL DEFAULT '0',
+                    `groups_id` int unsigned NOT NULL DEFAULT '0',
                     `comment` TEXT COLLATE utf8mb4_unicode_ci,
                     `itemtype` VARCHAR(255) NOT NULL,
-                    `types_id` INT(11) NOT NULL DEFAULT '0',
+                    `types_id` int unsigned NOT NULL DEFAULT '0',
                     `due_date` timestamp NULL DEFAULT NULL,
-                    `users_id_validate` INT(11) NOT NULL DEFAULT '0',
-                    `users_id_creator` INT(11) NOT NULL DEFAULT '0',
-                    `status` INT(11) NOT NULL DEFAULT '0',
+                    `users_id_validate` int unsigned NOT NULL DEFAULT '0',
+                    `users_id_creator` int unsigned NOT NULL DEFAULT '0',
+                    `status` int unsigned NOT NULL DEFAULT '0',
                     `comment_validation` TEXT COLLATE utf8mb4_unicode_ci,
-                    `tickets_id` INT(11) NOT NULL DEFAULT '0',
-                    `plugin_order_orders_id` INT(11) NOT NULL DEFAULT '0',
+                    `tickets_id` int unsigned NOT NULL DEFAULT '0',
+                    `plugin_order_orders_id` int unsigned NOT NULL DEFAULT '0',
                     `date_mod` timestamp NULL DEFAULT NULL,
                     `date_creation` timestamp NULL DEFAULT NULL,
-                    `is_deleted` TINYINT(1) NOT NULL DEFAULT '0',
-                    `locations_id` INT(11) NOT NULL DEFAULT '0',
-                    `plugin_purchaserequest_purchaserequeststates_id` INT(11) NOT NULL DEFAULT '0',
+                    `is_deleted` tinyint NOT NULL DEFAULT '0',
+                    `locations_id` int unsigned NOT NULL DEFAULT '0',
+                    `plugin_purchaserequest_purchaserequeststates_id` int unsigned NOT NULL DEFAULT '0',
                     `processing_date` timestamp NULL DEFAULT NULL,
-                    `invoice_customer` TINYINT(1) NOT NULL DEFAULT '0',
-                    `amount` INT(11) NOT NULL DEFAULT '0',
+                    `invoice_customer` tinyint NOT NULL DEFAULT '0',
+                    `amount` int unsigned NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`),
                     KEY `users_id` (`users_id`),
                     KEY `groups_id` (`groups_id`),
@@ -1700,15 +1700,15 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       } else {
          if (!$DB->fieldExists($table, 'locations_id')) {
             $DB->query("ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
-                     ADD `locations_id` INT(11) NOT NULL DEFAULT '0';");
+                     ADD `locations_id` int unsigned NOT NULL DEFAULT '0';");
          }
          if (!$DB->fieldExists($table, 'plugin_purchaserequest_purchaserequeststates_id')) {
 
             $DB->query("ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
-                     ADD `plugin_purchaserequest_purchaserequeststates_id` INT(11) NOT NULL DEFAULT '0';");
+                     ADD `plugin_purchaserequest_purchaserequeststates_id` int unsigned NOT NULL DEFAULT '0';");
 
             $DB->query("ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
-                     ADD `is_deleted` TINYINT(1) NOT NULL DEFAULT '0';");
+                     ADD `is_deleted` tinyint NOT NULL DEFAULT '0';");
 
          }
 
@@ -1721,9 +1721,9 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          if (!$DB->fieldExists($table, 'invoice_customer')) {
 
             $DB->query("ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
-                     ADD `invoice_customer` TINYINT(1) NOT NULL DEFAULT '0';");
+                     ADD `invoice_customer` tinyint NOT NULL DEFAULT '0';");
             $DB->query("ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
-                     ADD `amount` INT(11) NOT NULL DEFAULT '0';");
+                     ADD `amount` int unsigned NOT NULL DEFAULT '0';");
          }
 
       }
