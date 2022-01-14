@@ -19,7 +19,7 @@
  --------------------------------------------------------------------------
  @package   purchaserequest
  @author    the purchaserequest plugin team
- @copyright Copyright (c) 2015-2021 Purchaserequest plugin team
+ @copyright Copyright (c) 2015-2022 Purchaserequest plugin team
  @license   GPLv2+
             http://www.gnu.org/licenses/gpl.txt
  @link      https://github.com/InfotelGLPI/purchaserequest
