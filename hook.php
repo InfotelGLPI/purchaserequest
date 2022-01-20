@@ -92,7 +92,10 @@ function plugin_purchaserequest_uninstall() {
 
    $classes = ['PluginPurchaserequestNotificationTargetPurchaseRequest',
                'PluginPurchaserequestPurchaseRequest',
-               'PluginPurchaserequestPurchaseRequestState'];
+               'PluginPurchaserequestPurchaseRequestState',
+               'PluginPurchaserequestConfig',
+               'PluginPurchaserequestThreshold',
+               'PluginPurchaserequestValidation'];
    foreach ($classes as $class) {
       call_user_func([$class, 'uninstall']);
    }
