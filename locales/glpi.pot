@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-14 08:31+0000\n"
+"POT-Creation-Date: 2022-01-20 07:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,11 +22,11 @@ msgstr ""
 msgid "Plugin installation or upgrade"
 msgstr ""
 
-#: hook.php:114 inc/purchaserequeststate.class.php:37
+#: hook.php:117 inc/purchaserequeststate.class.php:37
 msgid "Purchase request status"
 msgstr ""
 
-#: hook.php:195
+#: hook.php:198
 msgctxt "quantity"
 msgid "Number of purchase request"
 msgstr ""
