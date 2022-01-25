@@ -105,7 +105,7 @@ if ($plugin->isActivated("order")
          PluginPurchaserequestPurchaseRequest::getTypeName(2),
          $_SERVER['PHP_SELF'],
          "management",
-         "PluginPurchaserequestMenu",
+         "PluginPurchaserequestPurchaseRequest",
          "purchaserequest"
       );
    } else {
@@ -120,7 +120,7 @@ if ($plugin->isActivated("order")
    Html::requireJs('tinymce');
    $purchase->display($_GET);
 } else {
-   Html::header(__('Setup'), '', "tools", "pluginpurchaserequestpurchaserequest", "config");
+   Html::header(__('Setup'), '', "tools", "pluginpurchaserequestpurchaserequest", "pluginpurchaserequestpurchaserequest");
    echo "<div class='alert alert-important alert-warning d-flex'>";
    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
 }

@@ -92,7 +92,7 @@ function plugin_init_purchaserequest() {
          Plugin::registerClass('PluginPurchaserequestPurchaseRequest',
                                ['notificationtemplates_types' => true,
                                 'addtabon'                    => ['Ticket', 'PluginOrderOrder']]);
-         $PLUGIN_HOOKS['menu_toadd']['purchaserequest']['management'] = 'PluginPurchaserequestMenu';
+         $PLUGIN_HOOKS['menu_toadd']['purchaserequest']['management'] = 'PluginPurchaserequestPurchaseRequest';
 
          if ($plugin->isActivated('servicecatalog')) {
             $PLUGIN_HOOKS['servicecatalog']['purchaserequest'] = ['PluginPurchaserequestServicecatalog'];

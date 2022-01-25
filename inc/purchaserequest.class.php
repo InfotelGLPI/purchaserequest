@@ -1741,5 +1741,19 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       }
       $DB->query("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
    }
+//
+//   static function getMenuContent() {
+//
+//      $menu                    = [];
+//      $menu['title']           = self::getMenuName();
+//      $menu['page']            = self::getSearchURL(false);
+//      $menu['links']['search'] = self::getSearchURL(false);
+//      if (self::canCreate()) {
+//         $menu['links']['add'] = self::getFormURL(false);
+//      }
+//      $menu['icon']    = self::getIcon();
+//
+//      return $menu;
+//   }
 
 }
