@@ -60,7 +60,7 @@ function plugin_init_purchaserequest() {
       $types = [ComputerType::getType(),
                 MonitorType::getType(),
                 PeripheralType::getType(),
-                NetworkequipmentType::getType(),
+                NetworkEquipmentType::getType(),
                 PrinterType::getType(),
                 PhoneType::getType(),
                 ConsumableItemType::getType(),
