@@ -87,7 +87,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
       $itemtype = $this->obj->getField("itemtype");
 
       $this->data['##lang.purchaserequest.itemtype##'] = __("Item type");
-      if (file_exists(GLPI_ROOT . "/inc/" . strtolower($itemtype) . "type.class.php")) {
+      if (file_exists(GLPI_ROOT . "/src/" . $itemtype . "Type.php")) {
          $this->data['##purchaserequest.itemtype##'] = Dropdown::getDropdownName($dbu->getTableForItemType($itemtype . "Type"),
                                                                                  $this->obj->getField("types_id"));
       } else if ($itemtype == "PluginOrderOther") {

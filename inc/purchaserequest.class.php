@@ -760,7 +760,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          } else {
             $file = $this->fields['itemtype'];
          }
-         $core_typefilename   = GLPI_ROOT . "/inc/" . strtolower($file) . "type.class.php";
+         $core_typefilename   = GLPI_ROOT . "/src/" .$file . "Type.php";
          $plugin_typefilename = GLPI_ROOT . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
          $itemtypeclass       = $this->fields['itemtype'] . "Type";
 
@@ -1022,7 +1022,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          } else {
             $file = $purchaserequest->fields['itemtype'];
          }
-         $core_typefilename   = GLPI_ROOT . "/inc/" . strtolower($file) . "type.class.php";
+         $core_typefilename   = GLPI_ROOT . "/src/" .$file . "Type.php";
          $plugin_typefilename = GLPI_ROOT . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
          $itemtypeclass       = $purchaserequest->fields['itemtype'] . "Type";
 

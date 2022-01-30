@@ -165,7 +165,7 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num) {
          if (isset($data['raw']["itemtype"]) && $data['raw']["itemtype"] == 'PluginOrderOther') {
             $file = GLPI_ROOT . "/plugins/order/inc/othertype.class.php";
          } elseif (isset($data['raw']["itemtype"])) {
-            $file = GLPI_ROOT . "/inc/" . strtolower($data['raw']["itemtype"]) . "type.class.php";
+            $file = GLPI_ROOT . "/src/" . $data['raw']["itemtype"] . "Type.php";
          }
          if (file_exists($file)) {
             return Dropdown::getDropdownName($dbu->getTableForItemType($data["itemtype"] . "Type"),
