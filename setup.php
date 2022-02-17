@@ -85,7 +85,7 @@ function plugin_init_purchaserequest() {
           && !class_exists('PluginServicecatalogMain')
       ) {
          $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_NOTFULL_DIR.'/front/purchaserequest.php';
-//         $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PluginPurchaserequestPurchaseRequest::getIcon();
+         $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PluginPurchaserequestPurchaseRequest::getIcon();
       }
 
       if (PluginPurchaserequestPurchaseRequest::canView()) {
