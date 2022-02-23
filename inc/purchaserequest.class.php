@@ -1246,12 +1246,15 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
 
          echo "<div class='center'>";
 
-         Html::printAjaxPager(PluginPurchaserequestPurchaseRequest::getTypeName(2), $start, $rows);
          echo "<form method='post' name='purchaseresquet_form$rand' id='purchaseresquet_form$rand'  " .
               "action='" . Toolbox::getItemTypeFormURL('PluginPurchaserequestPurchaseRequest') . "'>";
 
          echo "<table class='tab_cadre_fixe'>";
+         echo "<tr class='tab_bg_1 center'>";
+         echo "<th colspan='13'>" . PluginPurchaserequestPurchaseRequest::getTypeName(2) . "</th>";
+         echo "</tr>";
          echo "<tr class='tab_bg_1'>";
+
          if ($canedit) {
             echo "<th></th>";
          }
@@ -1317,8 +1320,8 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
 
          echo "</table>";
          if ($canedit) {
-            echo "<div class='center'>";
-            echo "<table width='950px' class='tab_glpi'>";
+            echo "<div class='left'>";
+            echo "<table width='950px' class='left'>";
             echo "<tr><td><img src=\"" . $CFG_GLPI["root_doc"]
                  . "/pics/arrow-left.png\" alt=''></td><td class='center'>";
             echo "<a onclick= \"if ( markCheckboxes('purchaseresquet_form$rand') ) "
