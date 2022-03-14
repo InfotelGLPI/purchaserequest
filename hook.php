@@ -163,7 +163,7 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num) {
       case "glpi_plugin_purchaserequest_purchaserequests.types_id" :
          $file = "";
          if (isset($data['raw']["itemtype"]) && $data['raw']["itemtype"] == 'PluginOrderOther') {
-            $file = GLPI_ROOT . "/plugins/order/inc/othertype.class.php";
+            $file = Plugin::getWebDir('order') . "/inc/othertype.class.php";
          } elseif (isset($data['raw']["itemtype"])) {
             $file = GLPI_ROOT . "/src/" . $data['raw']["itemtype"] . "Type.php";
          }

@@ -739,7 +739,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          'myname'    => 'itemtype',
          'value'     => $this->fields["itemtype"],
          'entity'    => $_SESSION["glpiactive_entity"],
-         'ajax_page' => $CFG_GLPI["root_doc"] . '/plugins/order/ajax/referencespecifications.php',
+         'ajax_page' => Plugin::getWebDir('order') . '/ajax/referencespecifications.php',
          'class'     => __CLASS__,
       ];
       if (Session::getCurrentInterface() == 'central') {
@@ -754,6 +754,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       echo "<td>" . __("Type") . "&nbsp;<span style='color:red;'>*</span></td>";
       echo "<td>";
       echo "<span id='show_types_id'>";
+
       if ($this->fields['itemtype']) {
          if ($this->fields['itemtype'] == 'PluginOrderOther') {
             $file = 'other';
@@ -761,7 +762,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
             $file = $this->fields['itemtype'];
          }
          $core_typefilename   = GLPI_ROOT . "/src/" .$file . "Type.php";
-         $plugin_typefilename = GLPI_ROOT . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
+         $plugin_typefilename = Plugin::getWebDir('order') . "/inc/" . strtolower($file) . "type.class.php";
          $itemtypeclass       = $this->fields['itemtype'] . "Type";
 
          if (file_exists($core_typefilename)
@@ -1005,7 +1006,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
             'myname'    => 'itemtype',
             'value'     => $purchaserequest->fields["itemtype"],
             'entity'    => $_SESSION["glpiactive_entity"],
-            'ajax_page' => $CFG_GLPI["root_doc"] . '/plugins/order/ajax/referencespecifications.php',
+            'ajax_page' => Plugin::getWebDir('order') . '/ajax/referencespecifications.php',
             'class'     => __CLASS__,
          ];
 
@@ -1023,7 +1024,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
             $file = $purchaserequest->fields['itemtype'];
          }
          $core_typefilename   = GLPI_ROOT . "/src/" .$file . "Type.php";
-         $plugin_typefilename = GLPI_ROOT . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
+         $plugin_typefilename = Plugin::getWebDir('order') . "/inc/" . strtolower($file) . "type.class.php";
          $itemtypeclass       = $purchaserequest->fields['itemtype'] . "Type";
 
          if (file_exists($core_typefilename)
