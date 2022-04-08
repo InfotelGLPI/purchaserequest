@@ -51,7 +51,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
    }
 
    static function getIcon() {
-      return "ti ti-basket";
+      return "fas fa-basket-shopping";
    }
 
    /**
