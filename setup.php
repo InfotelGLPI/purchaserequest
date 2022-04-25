@@ -27,7 +27,7 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.0-rc3');
+define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.0');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
    define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
@@ -77,7 +77,7 @@ function plugin_init_purchaserequest() {
       Plugin::registerClass(PluginPurchaserequestThreshold::getType(), ['addtabon' => $types]);
 
       //TODO create right config
-      if (Session::haveRight("PluginPurchaserequestConfig", READ)) {
+      if (Session::haveRight("plugin_purchaserequest_config", READ)) {
          $PLUGIN_HOOKS['config_page']['purchaserequest'] = 'front/config.form.php';
       }
 
