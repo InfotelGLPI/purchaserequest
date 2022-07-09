@@ -27,7 +27,7 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.0');
+define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.1');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
    define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
