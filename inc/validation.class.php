@@ -404,7 +404,10 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       echo "</td></tr>";
       echo "<tr class='tab_bg_1'><td>" . __("Amount", "purchaserequest") . "</td>";
       echo "<td>";
-      echo Html::input("amount", ['value' => $this->fields["amount"]]);
+      Dropdown::showNumber("amount", ['value' => $this->fields["amount"],
+                                      'min'   => 1,
+                                      'max'   => 10000,
+      ]);
       echo "</td>";
 
       echo "<td>" . __("To be rebilled to the customer", "purchaserequest") . "&nbsp;</td>";

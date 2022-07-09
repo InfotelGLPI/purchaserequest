@@ -63,17 +63,17 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
       $this->data['##purchaserequest.name##']      = $this->obj->getField("name");
 
       $this->data['##lang.purchaserequest.amount##'] = __("Amount", "purchaserequest");
-      $this->data['##purchaserequest.amount##']      = $this->obj->getField("amount");
+      $this->data['##purchaserequest.amount##']      = Dropdown::getValueWithUnit($this->obj->getField("amount"), "€");
 
       $this->data['##lang.purchaserequest.rebill##'] = __("To be rebilled to the customer", "purchaserequest");
       $this->data['##purchaserequest.rebill##']      = Dropdown::getYesNo($this->obj->getField("invoice_customer"));
 
       $this->data['##lang.purchaserequest.requester##'] = __("Requester");
-      $this->data['##purchaserequest.requester##']      = Html::clean($dbu->getUserName($this->obj->getField('users_id')));
+      $this->data['##purchaserequest.requester##']      = getUserName($this->obj->getField('users_id'));
 
       $this->data['##lang.purchaserequest.group##'] = __("Requester group");
-      $this->data['##purchaserequest.group##']      = Html::clean(Dropdown::getDropdownName('glpi_groups',
-                                                                                            $this->obj->getField('groups_id')));
+      $this->data['##purchaserequest.group##']      = Dropdown::getDropdownName('glpi_groups',
+                                                                                            $this->obj->getField('groups_id'));
 
       $this->data['##lang.purchaserequest.duedate##'] = __("Due date", "purchaserequest");
       $this->data['##purchaserequest.duedate##']      = Html::convDate($this->obj->getField("due_date"));
@@ -113,7 +113,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
             break;
 
       }
-      $this->data['##purchaserequest.users_validation##'] = Html::clean($dbu->getUserName($this->obj->getField('users_id_validation')));
+      $this->data['##purchaserequest.users_validation##'] = getUserName($this->obj->getField('users_id_validation'));
 
       $restrict            = ['plugin_purchaserequest_purchaserequests_id' => $this->obj->getField("id")];
       $dbu                 = new DbUtils();

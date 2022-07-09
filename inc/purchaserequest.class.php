@@ -240,23 +240,22 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
                                        "items_id" => $this->fields["types_id"]])) {
          $th = intval($threshold->fields["thresholds"]);
          if ($th != -1) {
-            if ($th < intval($this->fields["amount"])) {
-               $validation = new PluginPurchaserequestValidation();
-               $config     = new PluginPurchaserequestConfig();
-               $config->getFromDB(1);
-               if (!empty($config->fields["id_general_service_manager"])) {
+            $config     = new PluginPurchaserequestConfig();
+            $config->getFromDB(1);
 
-                  $input                                               = [];
-                  $input["entities_id"]                                = $this->fields["entities_id"];
-                  $input["users_id"]                                   = $this->fields["users_id_creator"];
-                  $input["plugin_purchaserequest_purchaserequests_id"] = $this->fields["id"];
-                  $input["users_id_validate"]                          = $config->fields["id_general_service_manager"];
-                  $input["comment_validation"]                         = "";
-                  $input["submission_date"]                            = $_SESSION["glpi_currenttime"];
-                  $input["status"]                                     = CommonITILValidation::WAITING;
-                  $input["first"]                                      = false;
-                  $validation->add($input);
-               }
+            if ($th < intval($this->fields["amount"])
+                && $config->fields["id_general_service_manager"] > 0) {
+               $validation = new PluginPurchaserequestValidation();
+               $input                                               = [];
+               $input["entities_id"]                                = $this->fields["entities_id"];
+               $input["users_id"]                                   = $this->fields["users_id_creator"];
+               $input["plugin_purchaserequest_purchaserequests_id"] = $this->fields["id"];
+               $input["users_id_validate"]                          = $config->fields["id_general_service_manager"];
+               $input["comment_validation"]                         = "";
+               $input["submission_date"]                            = $_SESSION["glpi_currenttime"];
+               $input["status"]                                     = CommonITILValidation::WAITING;
+               $input["first"]                                      = false;
+               $validation->add($input);
             }
          }
       }
@@ -521,7 +520,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          'table'    => $this->getTable(),
          'field'    => 'amount',
          'name'     => __("Amount", "purchaserequest"),
-         'datatype' => 'text'
+         'datatype' => 'number'
       ];
 
       /* rebill */
@@ -761,7 +760,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          } else {
             $file = $this->fields['itemtype'];
          }
-         $core_typefilename   = GLPI_ROOT . "/src/" .$file . "Type.php";
+         $core_typefilename   = GLPI_ROOT . "/src/" . $file . "Type.php";
          $plugin_typefilename = Plugin::getWebDir('order') . "/inc/" . strtolower($file) . "type.class.php";
          $itemtypeclass       = $this->fields['itemtype'] . "Type";
 
@@ -792,7 +791,10 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       echo "</td></tr>";
       echo "<tr class='tab_bg_1'><td>" . __("Amount", "purchaserequest") . "&nbsp;<span style='color:red;'>*</span></td>";
       echo "<td>";
-      echo Html::input("amount", ['value' => $this->fields["amount"]]);
+      Dropdown::showNumber("amount", ['value' => $this->fields["amount"],
+                                      'min'   => 1,
+                                      'max'   => 10000,
+      ]);
       echo "</td>";
 
       echo "<td>" . __("To be rebilled to the customer", "purchaserequest") . "&nbsp;</td>";
@@ -1023,7 +1025,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          } else {
             $file = $purchaserequest->fields['itemtype'];
          }
-         $core_typefilename   = GLPI_ROOT . "/src/" .$file . "Type.php";
+         $core_typefilename   = GLPI_ROOT . "/src/" . $file . "Type.php";
          $plugin_typefilename = Plugin::getWebDir('order') . "/inc/" . strtolower($file) . "type.class.php";
          $itemtypeclass       = $purchaserequest->fields['itemtype'] . "Type";
 
@@ -1057,7 +1059,10 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       echo "</tr>";
       echo "<tr class='tab_bg_1'><td>" . __("Amount", "purchaserequest") . "&nbsp;<span style='color:red;'>*</span></td>";
       echo "<td>";
-      echo Html::input("amount", ['value' => $purchaserequest->fields["amount"]]);
+      Dropdown::showNumber("amount", ['value' => $purchaserequest->fields["amount"],
+                                      'min'   => 1,
+                                      'max'   => 10000,
+      ]);
       echo "</td>";
 
       echo "<td>" . __("To be rebilled to the customer", "purchaserequest") . "&nbsp;</td>";
@@ -1154,7 +1159,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
          //traited
          echo "<td>" . Html::convDate($field['processing_date']) . "</td>";
          //amount
-         echo "<td>" . $field["amount"] . "</td>";
+         echo "<td>" . Dropdown::getValueWithUnit($field["amount"], "€") . "</td>";
          //rebill
          echo "<td>" . Dropdown::getYesNo($field['invoice_customer']) . "</td>";
          // validation
@@ -1756,9 +1761,9 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
    //      $menu['links']['add'] = self::getFormURL(false);
    //   }
    //   $menu['icon']    = self::getIcon();
-      //Entry icon in breadcrumb
+   //Entry icon in breadcrumb
    //    $menu['links']['config']                      = PluginPurchaserequestConfig::getFormURL(false);
-       //Link to config page in admin plugins list
+   //Link to config page in admin plugins list
    //    $menu['config_page']                          = PluginPurchaserequestConfig::getFormURL(false);
 
    //   return $menu;
