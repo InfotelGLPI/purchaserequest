@@ -112,8 +112,7 @@ function plugin_purchaserequest_uninstall() {
 /* define dropdown tables to be manage in GLPI : */
 function plugin_purchaserequest_getDropdown() {
    /* table => name */
-   $plugin = new Plugin();
-   if ($plugin->isActivated("purchaserequest")) {
+   if (Plugin::isPluginActive("purchaserequest")) {
       return ['PluginPurchaserequestPurchaseRequestState' => __("Purchase request status", "purchaserequest")];
    } else {
       return [];
@@ -122,8 +121,8 @@ function plugin_purchaserequest_getDropdown() {
 
 /* define dropdown relations */
 function plugin_purchaserequest_getDatabaseRelations() {
-   $plugin = new Plugin();
-   if ($plugin->isActivated("purchaserequest")) {
+
+   if (Plugin::isPluginActive("purchaserequest")) {
       return ["glpi_entities"                                     => ["glpi_plugin_purchaserequest_purchaserequests" => "entities_id"],
               "glpi_profiles"                                     => ["glpi_plugin_purchaserequest_profiles" => "profiles_id"],
               "glpi_users"                                        => ["glpi_plugin_purchaserequest_purchaserequests" => "users_id",

@@ -51,8 +51,7 @@ function plugin_init_purchaserequest() {
    /* Init current profile */
    $PLUGIN_HOOKS['change_profile']['purchaserequest'] = ['PluginPurchaserequestProfile', 'initProfile'];
 
-   $plugin = new Plugin();
-   if ($plugin->isActivated('purchaserequest')) {
+   if (Plugin::isPluginActive('purchaserequest')) {
 
       Plugin::registerClass('PluginPurchaserequestProfile', ['addtabon' => ['Profile']]);
 
@@ -71,7 +70,7 @@ function plugin_init_purchaserequest() {
                 RackType::getType(),
                 PDUType::getType()];
 
-      if ($plugin->isActivated('order')) {
+      if (Plugin::isPluginActive('order')) {
          array_push($types, "PluginOrderOtherType");
       }
       Plugin::registerClass(PluginPurchaserequestThreshold::getType(), ['addtabon' => $types]);
@@ -94,7 +93,7 @@ function plugin_init_purchaserequest() {
                                 'addtabon'                    => ['Ticket', 'PluginOrderOrder']]);
          $PLUGIN_HOOKS['menu_toadd']['purchaserequest']['management'] = 'PluginPurchaserequestPurchaseRequest';
 
-         if ($plugin->isActivated('servicecatalog')) {
+         if (Plugin::isPluginActive('servicecatalog')) {
             $PLUGIN_HOOKS['servicecatalog']['purchaserequest'] = ['PluginPurchaserequestServicecatalog'];
          }
       }
@@ -132,8 +131,7 @@ function plugin_version_purchaserequest() {
 function plugin_purchaserequest_check_prerequisites() {
    global $DB;
 
-   $plugin = new Plugin();
-   if ($plugin->isActivated("order")
+   if (Plugin::isPluginActive("order")
        && !$DB->tableExists("glpi_plugin_order_orders")) {
       return false;
    }

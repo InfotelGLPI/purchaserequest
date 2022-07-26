@@ -127,8 +127,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
     */
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
 
-      $plugin = new Plugin();
-      if (!$plugin->isActivated('order')) {
+      if (!Plugin::isPluginActive('order')) {
          echo "<div class='alert alert-important alert-warning d-flex'>";
          echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
          return false;
@@ -890,8 +889,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
 
       //Purchase request linked to the ticket
       if (!empty($datas) || count($datas) > 0) {
-         $plugin = new Plugin();
-         if ($plugin->isActivated('order')) {
+         if (Plugin::isPluginActive('order')) {
             $purchaserequest->listItems($datas, $canedit, $start, $rows);
          }
       } else {
@@ -1001,8 +999,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM {
       echo "<tr class='tab_bg_1'><td>" . __("Item type");
       echo "&nbsp;<span style='color:red;'>*</span></td>";
       echo "<td>";
-      $plugin = new Plugin();
-      if ($plugin->isActivated('order')) {
+      if (Plugin::isPluginActive('order')) {
          $reference = new PluginOrderReference();
          $params    = [
             'myname'    => 'itemtype',

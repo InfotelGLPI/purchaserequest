@@ -33,8 +33,7 @@ if (!isset($_GET["id"])) {
    $_GET["id"] = "";
 }
 
-$plugin = new Plugin();
-if ($plugin->isActivated("order")
+if (Plugin::isPluginActive("order")
     && $DB->tableExists("glpi_plugin_order_orders")) {
    $validation = new PluginPurchaserequestValidation();
 

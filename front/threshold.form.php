@@ -33,8 +33,6 @@ if (!isset($_GET["id"])) {
    $_GET["id"] = "";
 }
 
-$plugin = new Plugin();
-
 $threshold = new PluginPurchaserequestThreshold();
 
 if (isset($_POST["add"])) {

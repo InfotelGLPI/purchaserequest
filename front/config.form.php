@@ -29,10 +29,8 @@
 
 include('../../../inc/includes.php');
 Session::checkLoginUser();
-$plugin = new Plugin();
 
-
-if ($plugin->isActivated("purchaserequest")) {
+if (Plugin::isPluginActive("purchaserequest")) {
    if (Session::haveRight("plugin_purchaserequest_config", READ)) {
       $config = new PluginPurchaserequestConfig();
 

@@ -29,7 +29,6 @@
 
 include("../../../inc/includes.php");
 
-$plugin = new Plugin();
 if (Session::getCurrentInterface() == 'central') {
    Html::header(
       PluginPurchaserequestPurchaseRequest::getTypeName(2),
@@ -39,7 +38,7 @@ if (Session::getCurrentInterface() == 'central') {
       "purchaserequest"
    );
 } else {
-   if ($plugin->isActivated('servicecatalog')) {
+   if (Plugin::isPluginActive('servicecatalog')) {
       PluginServicecatalogMain::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2));
       echo "<br>";
    } else {
@@ -47,7 +46,7 @@ if (Session::getCurrentInterface() == 'central') {
    }
 }
 
-if ($plugin->isActivated("order")
+if (Plugin::isPluginActive("order")
     && $DB->tableExists("glpi_plugin_order_orders")) {
 
    $purchase = new PluginPurchaserequestPurchaseRequest();
@@ -65,7 +64,7 @@ if ($plugin->isActivated("order")
 }
 
 if (Session::getCurrentInterface() != 'central'
-    && $plugin->isActivated('servicecatalog')) {
+    && Plugin::isPluginActive('servicecatalog')) {
 
    PluginServicecatalogMain::showNavBarFooter('purchaserequest');
 }
