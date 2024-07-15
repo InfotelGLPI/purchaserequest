@@ -33,6 +33,7 @@
  * @return boolean
  */
 function plugin_purchaserequest_install() {
+
    foreach (glob(PLUGIN_PURCHASEREQUEST_DIR . '/inc/*.php') as $file) {
       //Do not load datainjection files (not needed and avoid missing class error message)
       if (!preg_match('/injection.class.php/', $file)) {
@@ -47,7 +48,7 @@ function plugin_purchaserequest_install() {
    echo "<tr class='tab_bg_1'>";
    echo "<td align='center'>";
 
-   $migration = new Migration("3.0.0");
+   $migration = new Migration("3.0.2");
    $classes   = ['PluginPurchaserequestNotificationTargetPurchaseRequest',
                  'PluginPurchaserequestPurchaseRequest',
                  'PluginPurchaserequestConfig',

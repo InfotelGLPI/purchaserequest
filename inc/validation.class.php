@@ -274,7 +274,11 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       // Data saved in session
       if (isset($_SESSION['glpi_plugin_purchaserequests_fields'])) {
          foreach ($_SESSION['glpi_plugin_purchaserequests_fields'] as $key => $value) {
-            $this->fields[$key] = $value;
+             if ($key == "comment") {
+                 $this->fields[$key] = Glpi\RichText\RichText::getEnhancedHtml($value);
+             } else {
+                 $this->fields[$key] = $value;
+             }
          }
          unset($_SESSION['glpi_plugin_purchaserequests_fields']);
       }
@@ -404,10 +408,11 @@ class PluginPurchaserequestValidation extends CommonDBTM {
       echo "</td></tr>";
       echo "<tr class='tab_bg_1'><td>" . __("Amount", "purchaserequest") . "</td>";
       echo "<td>";
-      Dropdown::showNumber("amount", ['value' => $this->fields["amount"],
-                                      'min'   => 1,
-                                      'max'   => 10000,
-      ]);
+       $params = [
+           'type' => 'text',
+           'value' => number_format($this->fields['amount'], 2, '.', ' ')
+       ];
+       echo Html::input('amount', $params);
       echo "</td>";
 
       echo "<td>" . __("To be rebilled to the customer", "purchaserequest") . "&nbsp;</td>";
