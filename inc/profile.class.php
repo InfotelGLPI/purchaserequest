@@ -213,18 +213,20 @@ class PluginPurchaserequestProfile extends Profile {
          return true;
       }
 
-      foreach ($DB->request('glpi_plugin_purchaserequest_profiles',
-                            "`profiles_id`='$profiles_id'") as $profile_data) {
-
+       $it = $DB->request([
+           'FROM' => 'glpi_plugin_purchaserequest_profiles',
+           'WHERE' => ['profiles_id' => $profiles_id]
+       ]);
+       foreach ($it as $profile_data) {
          $matching       = ['show_purchaserequest_tab' => 'plugin_purchaserequest_purchaserequest',
                             'validation'               => 'plugin_purchaserequest_validate'];
          $current_rights = ProfileRight::getProfileRights($profiles_id, array_values($matching));
          foreach ($matching as $old => $new) {
             if (!isset($current_rights[$old])) {
-               $query = "UPDATE `glpi_profilerights` 
-                         SET `rights`='" . self::translateARight($profile_data[$old]) . "' 
-                         WHERE `name`='$new' AND `profiles_id`='$profiles_id'";
-               $DB->query($query);
+                $DB->update('glpi_profilerights', ['rights' => self::translateARight($profile_data[$old])], [
+                    'name'        => $new,
+                    'profiles_id' => $profiles_id
+                ]);
             }
          }
       }
@@ -246,13 +248,21 @@ class PluginPurchaserequestProfile extends Profile {
       }
 
       //Migration old rights in new ones
-      foreach ($DB->request("SELECT `id` FROM `glpi_profiles`") as $prof) {
+       $it = $DB->request([
+           'SELECT' => ['id'],
+           'FROM' => 'glpi_profiles'
+       ]);
+       foreach ($it as $prof) {
          self::migrateOneProfile($prof['id']);
       }
-      foreach ($DB->request("SELECT *
-                           FROM `glpi_profilerights` 
-                           WHERE `profiles_id`='" . $_SESSION['glpiactiveprofile']['id'] . "' 
-                              AND `name` LIKE '%plugin_purchaserequest_purchaserequest%'") as $prof) {
+       $it = $DB->request([
+           'FROM' => 'glpi_profilerights',
+           'WHERE' => [
+               'profiles_id' => $_SESSION['glpiactiveprofile']['id'],
+               'name' => ['LIKE', '%plugin_purchaserequest%']
+           ]
+       ]);
+       foreach ($it as $prof) {
          $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
       }
    }
