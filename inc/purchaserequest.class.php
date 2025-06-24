@@ -1317,7 +1317,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             $query .= " LIMIT " . intval($params['start']) . "," . intval($params['limit']);
         }
 
-        $result = $DB->query($query);
+        $result = $DB->doQuery($query);
         if ($DB->numrows($result)) {
             while ($data = $DB->fetchAssoc($result)) {
                 $output[$data['id']] = $data;
@@ -1764,7 +1764,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
                    FROM `glpi_plugin_purchaserequest_purchaserequests`
                    WHERE `id` = '$ID'";
 
-            if ($result = $DB->query($query)) {
+            if ($result = $DB->doQuery($query)) {
                 if ($DB->numrows($result)) {
                     $data = $DB->fetchAssoc($result);
                     $data = Toolbox::addslashes_deep($data);
@@ -1830,45 +1830,45 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
                     KEY `is_deleted` (`is_deleted`),
                     KEY `date_mod` (`date_mod`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-            $DB->query($query) or die ($DB->error());
+            $DB->doQuery($query) or die ($DB->error());
         } else {
             if (!$DB->fieldExists($table, 'locations_id')) {
-                $DB->query(
+                $DB->doQuery(
                     "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                      ADD `locations_id` int unsigned NOT NULL DEFAULT '0';"
                 );
             }
             if (!$DB->fieldExists($table, 'plugin_purchaserequest_purchaserequeststates_id')) {
-                $DB->query(
+                $DB->doQuery(
                     "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                      ADD `plugin_purchaserequest_purchaserequeststates_id` int unsigned NOT NULL DEFAULT '0';"
                 );
 
-                $DB->query(
+                $DB->doQuery(
                     "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                      ADD `is_deleted` tinyint NOT NULL DEFAULT '0';"
                 );
             }
 
             if (!$DB->fieldExists($table, 'processing_date')) {
-                $DB->query(
+                $DB->doQuery(
                     "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                      ADD `processing_date` timestamp NULL DEFAULT NULL;"
                 );
             }
 
             if (!$DB->fieldExists($table, 'invoice_customer')) {
-                $DB->query(
+                $DB->doQuery(
                     "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                      ADD `invoice_customer` tinyint NOT NULL DEFAULT '0';"
                 );
-                $DB->query(
+                $DB->doQuery(
                     "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                      ADD `amount` int unsigned NOT NULL DEFAULT '0';"
                 );
             }
 
-            $DB->query(
+            $DB->doQuery(
                 "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
                    CHANGE `amount` `amount` decimal(20, 4) NOT NULL DEFAULT '0.0000';"
             );
@@ -1883,9 +1883,9 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         $table = $dbu->getTableForItemType(__CLASS__);
         foreach (["displaypreferences", "documents_items", "savedsearches", "logs"] as $t) {
             $query = "DELETE FROM `glpi_$t` WHERE `itemtype` = '" . __CLASS__ . "'";
-            $DB->query($query);
+            $DB->doQuery($query);
         }
-        $DB->query("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
+        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
     }
 
     //static function getMenuContent() {

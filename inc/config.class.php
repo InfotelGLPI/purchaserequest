@@ -131,11 +131,11 @@ class PluginPurchaserequestConfig extends CommonDBTM {
                     `id_general_service_manager` int unsigned NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-         $DB->query($query) or die ($DB->error());
+         $DB->doQuery($query) or die ($DB->error());
 
 
          $queryInsert = "INSERT INTO glpi_plugin_purchaserequest_configs VALUES ('1','0')";
-         $DB->query($queryInsert) or die ($DB->error());
+         $DB->doQuery($queryInsert) or die ($DB->error());
       } else {
 
       }
@@ -147,7 +147,7 @@ class PluginPurchaserequestConfig extends CommonDBTM {
 
       $dbu   = new DbUtils();
       $table = $dbu->getTableForItemType(__CLASS__);
-      $DB->query("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
+      $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
    }
 
 

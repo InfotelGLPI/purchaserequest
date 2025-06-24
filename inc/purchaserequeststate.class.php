@@ -53,7 +53,7 @@ class PluginPurchaserequestPurchaseRequestState extends CommonDropdown {
                      PRIMARY KEY (`id`),
                      KEY `name` (`name`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-         $DB->query($query) or die($DB->error());
+         $DB->doQuery($query) or die($DB->error());
       }
    }
 
@@ -61,6 +61,6 @@ class PluginPurchaserequestPurchaseRequestState extends CommonDropdown {
       global $DB;
       //New table
       $dbu = new DbUtils();
-      $DB->query("DROP TABLE IF EXISTS `" . $dbu->getTableForItemType(__CLASS__) . "`") or die ($DB->error());
+      $DB->doQuery("DROP TABLE IF EXISTS `" . $dbu->getTableForItemType(__CLASS__) . "`") or die ($DB->error());
    }
 }

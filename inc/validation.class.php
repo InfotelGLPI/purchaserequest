@@ -819,7 +819,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
                     `validation_date` timestamp NULL DEFAULT NULL,
                     PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-         $DB->query($query) or die ($DB->error());
+         $DB->doQuery($query) or die ($DB->error());
 
       } else {
 
@@ -832,7 +832,7 @@ class PluginPurchaserequestValidation extends CommonDBTM {
 
       $dbu   = new DbUtils();
       $table = $dbu->getTableForItemType(__CLASS__);
-      $DB->query("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
+      $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
    }
 
 }

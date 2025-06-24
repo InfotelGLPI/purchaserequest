@@ -208,7 +208,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
                        FROM `glpi_notificationtemplates`
                        WHERE `itemtype`='PluginPurchaserequestPurchaseRequest'
                        AND `name` = 'Purchase Request Validation'";
-      $result = $DB->query($query_id) or die ($DB->error());
+      $result = $DB->doQuery($query_id) or die ($DB->error());
 
       if ($DB->numrows($result) > 0) {
          $templates_id = $DB->result($result, 0, 'id');

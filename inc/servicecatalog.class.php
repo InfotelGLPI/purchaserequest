@@ -137,16 +137,26 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
 
       $dbu     = new DbUtils();
       $nb      = 0;
-      $query   = "SELECT DISTINCT `glpi_plugin_purchaserequest_purchaserequests`.`id`
-                      FROM `glpi_plugin_purchaserequest_purchaserequests`
-                              WHERE `users_id_validate` = '" . Session::getLoginUserID() . "'
-                                    AND `glpi_plugin_purchaserequest_purchaserequests`.`status` = '" . CommonITILValidation::WAITING . "' " .
-                 $dbu->getEntitiesRestrictRequest("AND", "glpi_plugin_purchaserequest_purchaserequests");
-      $result  = $DB->query($query);
-      $numrows = $DB->numrows($result);
-      if ($numrows > 0) {
-         $nb = $numrows;
-      }
+
+       $criteria = [
+           'SELECT' => 'glpi_plugin_purchaserequest_purchaserequests.id',
+           'DISTINCT'        => true,
+           'FROM' => 'glpi_plugin_purchaserequest_purchaserequests',
+           'WHERE' => [
+               'users_id_validate' => Session::getLoginUserID(),
+               'glpi_plugin_purchaserequest_purchaserequests' => CommonITILValidation::WAITING,
+           ]
+       ];
+       $criteria['WHERE'] = $criteria['WHERE'] + getEntitiesRestrictCriteria(
+               'glpi_plugin_purchaserequest_purchaserequests'
+           );
+
+       $iterator = $DB->request($criteria);
+
+       if (count($iterator) > 0) {
+           $nb = count($iterator);
+       }
+
 
       return $nb;
 
