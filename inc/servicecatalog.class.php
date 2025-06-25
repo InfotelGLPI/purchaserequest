@@ -144,7 +144,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
            'FROM' => 'glpi_plugin_purchaserequest_purchaserequests',
            'WHERE' => [
                'users_id_validate' => Session::getLoginUserID(),
-               'glpi_plugin_purchaserequest_purchaserequests' => CommonITILValidation::WAITING,
+               'status' => CommonITILValidation::WAITING,
            ]
        ];
        $criteria['WHERE'] = $criteria['WHERE'] + getEntitiesRestrictCriteria(

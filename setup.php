@@ -27,12 +27,17 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+use Glpi\Plugin\Hooks;
+
+Global $CFG_GLPI;
+
 define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.2');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
    define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
    define("PLUGIN_PURCHASEREQUEST_NOTFULL_DIR", Plugin::getPhpDir("purchaserequest", false));
-   define("PLUGIN_PURCHASEREQUEST_WEBDIR", Plugin::getWebDir("purchaserequest"));
+    $root = $CFG_GLPI['root_doc'] . '/plugins/purchaserequest';
+    define("PLUGIN_PURCHASEREQUEST_WEBDIR", $root);
 }
 
 
@@ -114,8 +119,8 @@ function plugin_version_purchaserequest() {
            'license'      => 'GPLv2+',
            'requirements' => [
               'glpi' => [
-                 'min' => '10.0',
-                 'max' => '11.0',
+                 'min' => '11.0',
+                 'max' => '12.0',
                  'dev' => false
               ]
            ]

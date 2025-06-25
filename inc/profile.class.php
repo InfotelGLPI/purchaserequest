@@ -47,23 +47,19 @@ class PluginPurchaserequestProfile extends Profile {
       return __('Rights management');
    }
 
-   /**
-    * Get tab name for item
-    *
-    * @param CommonGLPI $item
-    * @param type       $withtemplate
-    *
-    * @return string
-    */
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if ($item->getType() == 'Profile') {
+            return self::createTabEntry(_n("Purchase request", "Purchase requests", 2, "purchaserequest"));
+        }
+        return '';
+    }
 
-      if ($item->getType() == 'Profile'
-         //          && $item->fields['interface'] == 'central'
-      ) {
-         return _n("Purchase request", "Purchase requests", 2, "purchaserequest");
-      }
-      return '';
-   }
+    static function getIcon()
+    {
+        return "fas fa-basket-shopping";
+    }
+
 
    /**
     * display tab content for item

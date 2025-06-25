@@ -131,8 +131,9 @@ function plugin_purchaserequest_getDatabaseRelations() {
                                                                       "glpi_plugin_purchaserequest_purchaserequests" => "users_id_creator"],
               "glpi_groups"                                       => ["glpi_plugin_purchaserequest_purchaserequests" => "groups_id"],
               "glpi_tickets"                                      => ["glpi_plugin_purchaserequest_purchaserequests" => "tickets_id"],
-              "glpi_plugin_purchaserequest_purchaserequeststates" => [
-                 "glpi_plugin_purchaserequest_purchaserequests" => "plugin_purchaserequest_purchaserequeststates_id"]];
+//              "glpi_plugin_purchaserequest_purchaserequeststates" => [
+//                 "glpi_plugin_purchaserequest_purchaserequests" => "plugin_purchaserequest_purchaserequeststates_id"]
+];
    } else {
       return [];
    }
@@ -140,7 +141,7 @@ function plugin_purchaserequest_getDatabaseRelations() {
 
 function plugin_purchaserequest_addSelect($type, $ID, $num) {
 
-   $searchopt = &Search::getOptions($type);
+   $searchopt = Search::getOptions($type);
    $table     = $searchopt[$ID]["table"];
    $field     = $searchopt[$ID]["field"];
 
@@ -154,7 +155,7 @@ function plugin_purchaserequest_addSelect($type, $ID, $num) {
 
 /* display custom fields in the search */
 function plugin_purchaserequest_giveItem($type, $ID, $data, $num) {
-   $searchopt = &Search::getOptions($type);
+   $searchopt = Search::getOptions($type);
    $table     = $searchopt[$ID]["table"];
    $field     = $searchopt[$ID]["field"];
    $dbu       = new DbUtils();
@@ -216,7 +217,7 @@ function plugin_purchaserequest_getAddSearchOptions($itemtype) {
  */
 function plugin_purchaserequest_displayConfigItem($type, $ID, $data, $num) {
 
-   $searchopt =& Search::getOptions($type);
+   $searchopt = Search::getOptions($type);
    $table     = $searchopt[$ID]["table"];
    $field     = $searchopt[$ID]["field"];
 
