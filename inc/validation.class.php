@@ -788,9 +788,9 @@ class PluginPurchaserequestValidation extends CommonDBTM {
          }
          echo $header;
       } else {
-         //echo "<div class='center b'>".__('No item found')."</div>";
+         //echo "<div class='center b'>".__('No results found')."</div>";
          echo "<tr class='tab_bg_1 noHover'><th colspan='" . $nb_colonnes . "'>";
-         echo __('No item found') . "</th></tr>\n";
+         echo __('No results found') . "</th></tr>\n";
       }
       echo "</table>";
    }
