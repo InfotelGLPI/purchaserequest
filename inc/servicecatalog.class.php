@@ -125,7 +125,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
       $options['criteria'][1]['value']      = Session::getLoginUserID();
       $options['criteria'][1]['link']       = 'AND';
 
-      return PLUGIN_PURCHASEREQUEST_NOTFULL_DIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
+      return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
    }
 
    /**

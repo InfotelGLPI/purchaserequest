@@ -35,7 +35,7 @@ define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.2');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
    define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
-   define("PLUGIN_PURCHASEREQUEST_NOTFULL_DIR", Plugin::getPhpDir("purchaserequest", false));
+//   define("PLUGIN_PURCHASEREQUEST_WEBDIR", Plugin::getPhpDir("purchaserequest", false));
     $root = $CFG_GLPI['root_doc'] . '/plugins/purchaserequest';
     define("PLUGIN_PURCHASEREQUEST_WEBDIR", $root);
 }
@@ -88,7 +88,7 @@ function plugin_init_purchaserequest() {
       if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
           && !class_exists('PluginServicecatalogMain')
       ) {
-         $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_NOTFULL_DIR.'/front/purchaserequest.php';
+         $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR.'/front/purchaserequest.php';
          $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PluginPurchaserequestPurchaseRequest::getIcon();
       }
 
