@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-10 10:58+0000\n"
+"POT-Creation-Date: 2025-09-12 07:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,7 +42,7 @@ msgstr[1] ""
 msgid "Please activate the plugin"
 msgstr ""
 
-#: front/purchaserequest.form.php:123 front/purchaserequest.php:63
+#: front/purchaserequest.form.php:125 front/purchaserequest.php:67
 #: front/validation.form.php:72 inc/purchaserequest.class.php:139
 msgid "Please activate the plugin order"
 msgstr ""
