@@ -86,7 +86,7 @@ function plugin_init_purchaserequest() {
       }
 
       if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
-          && !class_exists('PluginServicecatalogMain')
+          && !class_exists('GlpiPlugin\Servicecatalog\Main')
       ) {
          $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR.'/front/purchaserequest.php';
          $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PluginPurchaserequestPurchaseRequest::getIcon();

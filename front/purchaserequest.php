@@ -27,7 +27,11 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+use GlpiPlugin\Servicecatalog\Main;
+
 include("../../../inc/includes.php");
+
+global $DB;
 
 if (Session::getCurrentInterface() == 'central') {
    Html::header(
@@ -39,7 +43,7 @@ if (Session::getCurrentInterface() == 'central') {
    );
 } else {
    if (Plugin::isPluginActive('servicecatalog')) {
-      PluginServicecatalogMain::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2));
+      Main::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2));
       echo "<br>";
    } else {
       Html::helpHeader(PluginPurchaserequestPurchaseRequest::getTypeName(2));
@@ -66,7 +70,7 @@ if (Plugin::isPluginActive("order")
 if (Session::getCurrentInterface() != 'central'
     && Plugin::isPluginActive('servicecatalog')) {
 
-   PluginServicecatalogMain::showNavBarFooter('purchaserequest');
+   Main::showNavBarFooter('purchaserequest');
 }
 
 if (Session::getCurrentInterface() == 'central') {

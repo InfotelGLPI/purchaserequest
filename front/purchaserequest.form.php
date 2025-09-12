@@ -27,6 +27,8 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+use GlpiPlugin\Servicecatalog\Main;
+
 include("../../../inc/includes.php");
 
 if (!isset($_GET["id"])) {
@@ -108,7 +110,7 @@ if (Plugin::isPluginActive("order")
       );
    } else {
       if (Plugin::isPluginActive('servicecatalog')) {
-         PluginServicecatalogMain::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2), true);
+         Main::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2), true);
          echo "<br>";
       } else {
          Html::helpHeader(PluginPurchaserequestPurchaseRequest::getTypeName(2));
@@ -126,7 +128,7 @@ if (Plugin::isPluginActive("order")
 if (Session::getCurrentInterface() != 'central'
     && Plugin::isPluginActive('servicecatalog')) {
 
-   PluginServicecatalogMain::showNavBarFooter('purchaserequest');
+   Main::showNavBarFooter('purchaserequest');
 }
 
 if (Session::getCurrentInterface() == 'central') {
