@@ -88,7 +88,7 @@ class Threshold extends CommonDBTM {
 
     public static function getIcon()
     {
-        return "fas fa-basket-shopping";
+        return "ti ti-basket";
     }
 
 

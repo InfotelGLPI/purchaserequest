@@ -149,6 +149,8 @@ function plugin_purchaserequest_addSelect($type, $ID, $num)
 /* display custom fields in the search */
 function plugin_purchaserequest_giveItem($type, $ID, $data, $num)
 {
+    global $CFG_GLPI;
+
     $searchopt = Search::getOptions($type);
     $table     = $searchopt[$ID]["table"];
     $field     = $searchopt[$ID]["field"];
@@ -158,7 +160,7 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num)
         case "glpi_plugin_purchaserequest_purchaserequests.types_id":
             $file = "";
             if (isset($data['raw']["itemtype"]) && $data['raw']["itemtype"] == 'PluginOrderOther') {
-                $file = Plugin::getWebDir('order') . "/inc/othertype.class.php";
+                $file = $CFG_GLPI['root_doc'] . "/plugins/order/inc/othertype.class.php";
             } elseif (isset($data['raw']["itemtype"])) {
                 $file = GLPI_ROOT . "/src/" . $data['raw']["itemtype"] . "Type.php";
             }

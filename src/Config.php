@@ -75,7 +75,7 @@ class Config extends CommonDBTM
 
     public static function getIcon()
     {
-        return "fas fa-basket-shopping";
+        return "ti ti-basket";
     }
 
     static function getMenuContent()
