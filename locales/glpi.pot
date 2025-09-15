@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-12 07:53+0000\n"
+"POT-Creation-Date: 2025-09-15 15:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,196 +18,194 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: hook.php:46
+#: hook.php:48
 msgid "Plugin installation or upgrade"
 msgstr ""
 
-#: hook.php:117 inc/purchaserequeststate.class.php:37
+#: hook.php:108 src/Purchaserequeststate.php:43
 msgid "Purchase request status"
 msgstr ""
 
-#: hook.php:199
+#: hook.php:196
 msgctxt "quantity"
 msgid "Number of purchase request"
 msgstr ""
 
-#: setup.php:116 inc/profile.class.php:53 inc/profile.class.php:159
-#: inc/purchaserequest.class.php:52
+#: setup.php:121 src/Profile.php:63 src/Profile.php:174
+#: src/Purchaserequest.php:78
 msgid "Purchase request"
 msgid_plural "Purchase requests"
 msgstr[0] ""
 msgstr[1] ""
 
-#: front/config.form.php:62
+#: front/config.form.php:63
 msgid "Please activate the plugin"
 msgstr ""
 
-#: front/purchaserequest.form.php:125 front/purchaserequest.php:67
-#: front/validation.form.php:72 inc/purchaserequest.class.php:139
+#: front/purchaserequest.form.php:122 front/purchaserequest.php:65
+#: front/validation.form.php:75 src/Purchaserequest.php:165
 msgid "Please activate the plugin order"
 msgstr ""
 
-#: inc/config.class.php:53
+#: src/Config.php:68
 msgid "Plugin setup"
 msgstr ""
 
-#: inc/config.class.php:97
+#: src/Config.php:121
 msgid "Configuration purchase request"
 msgstr ""
 
-#: inc/config.class.php:100
+#: src/Config.php:124
 msgid "General Services Manager"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:42
+#: src/Notificationtargetpurchaserequest.php:56
 msgid "Request for validation of the purchase request"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:43
+#: src/Notificationtargetpurchaserequest.php:57
 msgid "Refusal of validation request"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:44
-#: inc/notificationtargetpurchaserequest.class.php:103
-#: inc/profile.class.php:122 inc/profile.class.php:165
+#: src/Notificationtargetpurchaserequest.php:58
+#: src/Notificationtargetpurchaserequest.php:117 src/Profile.php:136
+#: src/Profile.php:180
 msgid "Purchase request validation"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:65
-#: inc/notificationtargetpurchaserequest.class.php:168
-#: inc/purchaserequest.class.php:359 inc/purchaserequest.class.php:556
-#: inc/purchaserequest.class.php:850 inc/purchaserequest.class.php:1150
-#: inc/purchaserequest.class.php:1222 inc/validation.class.php:409
+#: src/Notificationtargetpurchaserequest.php:79
+#: src/Notificationtargetpurchaserequest.php:182 src/Purchaserequest.php:385
+#: src/Purchaserequest.php:582 src/Purchaserequest.php:876
+#: src/Purchaserequest.php:1176 src/Purchaserequest.php:1248
+#: src/Validation.php:470
 msgid "Amount"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:68
-#: inc/notificationtargetpurchaserequest.class.php:169
-#: inc/purchaserequest.class.php:565 inc/purchaserequest.class.php:863
-#: inc/purchaserequest.class.php:1162 inc/purchaserequest.class.php:1223
-#: inc/validation.class.php:418
+#: src/Notificationtargetpurchaserequest.php:82
+#: src/Notificationtargetpurchaserequest.php:183 src/Purchaserequest.php:591
+#: src/Purchaserequest.php:889 src/Purchaserequest.php:1188
+#: src/Purchaserequest.php:1249 src/Validation.php:479
 msgid "To be rebilled to the customer"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:78
-#: inc/notificationtargetpurchaserequest.class.php:164
-#: inc/purchaserequest.class.php:455 inc/purchaserequest.class.php:835
-#: inc/purchaserequest.class.php:1133 inc/purchaserequest.class.php:1220
-#: inc/purchaserequest.class.php:1380 inc/validation.class.php:397
-#: inc/validation.class.php:526
+#: src/Notificationtargetpurchaserequest.php:92
+#: src/Notificationtargetpurchaserequest.php:178 src/Purchaserequest.php:481
+#: src/Purchaserequest.php:861 src/Purchaserequest.php:1159
+#: src/Purchaserequest.php:1246 src/Purchaserequest.php:1406
+#: src/Validation.php:458 src/Validation.php:588
 msgid "Due date"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:107
+#: src/Notificationtargetpurchaserequest.php:121
 msgid "Purchase request is validated"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:111
+#: src/Notificationtargetpurchaserequest.php:125
 msgid "Purchase request canceled"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:170
+#: src/Notificationtargetpurchaserequest.php:184
 msgid "Editor of validation"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:340
+#: src/Notificationtargetpurchaserequest.php:354
 msgid "Validator of the purchase request"
 msgstr ""
 
-#: inc/notificationtargetpurchaserequest.class.php:341
+#: src/Notificationtargetpurchaserequest.php:355
 msgid "Author of the purchase request"
 msgstr ""
 
-#: inc/purchaserequest.class.php:360 inc/purchaserequest.class.php:840
-#: inc/purchaserequest.class.php:1138 inc/validation.class.php:402
+#: src/Purchaserequest.php:386 src/Purchaserequest.php:866
+#: src/Purchaserequest.php:1164 src/Validation.php:463
 msgid "To be validated by"
 msgstr ""
 
-#: inc/purchaserequest.class.php:538 inc/purchaserequest.class.php:912
-#: inc/purchaserequest.class.php:1221 inc/purchaserequest.class.php:1381
-#: inc/validation.class.php:459 inc/validation.class.php:527
+#: src/Purchaserequest.php:564 src/Purchaserequest.php:938
+#: src/Purchaserequest.php:1247 src/Purchaserequest.php:1407
+#: src/Validation.php:520 src/Validation.php:589
 msgid "Treated on"
 msgstr ""
 
-#: inc/purchaserequest.class.php:878 inc/validation.class.php:428
+#: src/Purchaserequest.php:904 src/Validation.php:489
 msgid "Linked to the order"
 msgstr ""
 
-#: inc/purchaserequest.class.php:888 inc/validation.class.php:438
+#: src/Purchaserequest.php:914 src/Validation.php:499
 msgid "Linked to ticket"
 msgstr ""
 
-#: inc/purchaserequest.class.php:906 inc/validation.class.php:453
+#: src/Purchaserequest.php:932 src/Validation.php:514
 msgid "Treated"
 msgstr ""
 
-#: inc/purchaserequest.class.php:998
+#: src/Purchaserequest.php:1024
 msgid "Add a purchase request"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1015
+#: src/Purchaserequest.php:1041
 msgid "Validated by"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1468 inc/validation.class.php:610
+#: src/Purchaserequest.php:1494 src/Validation.php:675
 msgid "Delete link with order"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1486
+#: src/Purchaserequest.php:1512
 msgid "Do you approve this purchase request ?"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1512 inc/validation.class.php:643
+#: src/Purchaserequest.php:1538 src/Validation.php:709
 msgid "Accept purchase request"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1517 inc/validation.class.php:648
+#: src/Purchaserequest.php:1543 src/Validation.php:714
 msgid "Refuse purchase request"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1616
+#: src/Purchaserequest.php:1642
 msgid "Link to an order"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1617
+#: src/Purchaserequest.php:1643
 msgid "Delete link to order"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1620
+#: src/Purchaserequest.php:1646
 msgid "Validate purchasing requests"
 msgstr ""
 
-#: inc/purchaserequest.class.php:1725
+#: src/Purchaserequest.php:1751
 msgid "No groups for this user"
 msgstr ""
 
-#: inc/servicecatalog.class.php:62 inc/servicecatalog.class.php:73
+#: src/Servicecatalog.php:70 src/Servicecatalog.php:81
 msgid "Validate your purchase requests"
 msgstr ""
 
-#: inc/servicecatalog.class.php:196
+#: src/Servicecatalog.php:204
 msgid "See your purchase requests to validate"
 msgstr ""
 
-#: inc/servicecatalog.class.php:199
+#: src/Servicecatalog.php:207
 #, php-format
 msgid "You have %d purchase request to validate !"
 msgid_plural "You have %d purchase requests to validate !"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/threshold.class.php:53
+#: src/Threshold.php:61
 msgid "Purchase threshold"
 msgid_plural "Purchase thresholds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/validation.class.php:50
+#: src/Validation.php:74
 msgid "Validation"
 msgid_plural "Validations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/validation.class.php:732
+#: src/Validation.php:799
 msgid "Approvals for the purchase request"
 msgstr ""
