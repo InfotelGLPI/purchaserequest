@@ -27,14 +27,22 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+namespace GlpiPlugin\Purchaserequest;
+
+use CommonDBTM;
+use CommonGLPI;
+use DbUtils;
+use Html;
+use Migration;
+
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
 /**
- * Class PluginPurchaserequestPurchaseRequest
+ * Class Threshold
  */
-class PluginPurchaserequestThreshold extends CommonDBTM {
+class Threshold extends CommonDBTM {
    public static $rightname = 'plugin_purchaserequest_purchaserequest';
    public        $dohistory = true;
 
@@ -74,9 +82,14 @@ class PluginPurchaserequestThreshold extends CommonDBTM {
     */
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
 
-      return $this->getTypeName(1);
+      return self::createTabEntry($this->getTypeName(1));
 
    }
+
+    public static function getIcon()
+    {
+        return "fas fa-basket-shopping";
+    }
 
 
    /**

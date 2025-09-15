@@ -27,15 +27,23 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+namespace GlpiPlugin\Purchaserequest;
+
+use CommonGLPI;
+use CommonITILValidation;
+use DbUtils;
+use Session;
+use Toolbox;
+
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
 
 /**
- * Class PluginPurchaserequestServicecatalog
+ * Class Servicecatalog
  */
-class PluginPurchaserequestServicecatalog extends CommonGLPI {
+class Servicecatalog extends CommonGLPI {
 
    static $rightname = 'plugin_purchaserequest_purchaserequest';
 
@@ -183,7 +191,7 @@ class PluginPurchaserequestServicecatalog extends CommonGLPI {
     */
    static function getMenuLogo() {
 
-      return PluginPurchaserequestPurchaseRequest::getIcon();
+      return PurchaseRequest::getIcon();
 
    }
 

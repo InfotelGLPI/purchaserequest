@@ -26,15 +26,41 @@
  @link      http://www.glpi-project.org/
  @since     2009
  ---------------------------------------------------------------------- */
+namespace GlpiPlugin\Purchaserequest;
+
+use Ajax;
+use CommonDBTM;
+use CommonGLPI;
+use CommonITILActor;
+use CommonITILValidation;
+use DbUtils;
+use Dropdown;
+use Glpi\RichText\RichText;
+use Ticket;
+use Group;
+use Group_User;
+use Html;
+use Location;
+use Log;
+use MassiveAction;
+use Migration;
+use Plugin;
+use PluginOrderOrder;
+use PluginOrderOrder_Item;
+use PluginOrderReference;
+use Session;
+use Ticket_User;
+use Toolbox;
+use User;
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
 /**
- * Class PluginPurchaserequestPurchaseRequest
+ * Class PurchaseRequest
  */
-class PluginPurchaserequestPurchaseRequest extends CommonDBTM
+class PurchaseRequest extends CommonDBTM
 {
     public static $rightname = 'plugin_purchaserequest_purchaserequest';
     public $dohistory = true;
@@ -89,25 +115,25 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
      */
     function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if ($item->getType() == "PluginPurchaserequestPurchaseRequest") {
-            return __('Approval');
+        if ($item->getType() == PurchaseRequest::class) {
+            return self::createTabEntry(__('Approval'));
         } elseif ($item->getType() == "Ticket" && Session::getCurrentInterface() == 'central') {
             if ($_SESSION['glpishow_count_on_tabs']) {
                 return self::createTabEntry(self::getTypeName(2), self::countForTicket($item));
             }
-            return self::getTypeName();
+            return self::createTabEntry(self::getTypeName());
         } elseif ($item->getType() == "PluginOrderOrder"
             && Session::haveRight(self::$rightname, READ)) {
             if ($_SESSION['glpishow_count_on_tabs']) {
                 return self::createTabEntry(self::getTypeName(2), self::countForPluginOrderOrder($item));
             }
-            return self::getTypeName();
+            return self::createTabEntry(self::getTypeName());
         }
 
         return '';
     }
 
-    static function countForTicket(Ticket $item)
+    static function countForTicket(\Ticket $item)
     {
         $dbu = new DbUtils();
         $restrict = ["tickets_id" => $item->getField('id')];
@@ -139,8 +165,8 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
             return false;
         }
-        if ($item->getType() == "PluginPurchaserequestPurchaseRequest") {
-            PluginPurchaserequestValidation::showValidation($item);
+        if ($item->getType() == PurchaseRequest::class) {
+            Validation::showValidation($item);
         } elseif ($item->getType() == "Ticket") {
             self::showForTicket($item);
         } elseif ($item->getType() == "PluginOrderOrder"
@@ -188,7 +214,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
 
         if (isset($input['update_status'])) {
             //         if ($CFG_GLPI["notifications_mailing"]) {
-            //            $purchase_request = new PluginPurchaserequestPurchaseRequest();
+            //            $purchase_request = new PurchaseRequest();
             //            $purchase_request->getFromDB($input['id']);
             //            $purchase_request->fields['status']             = $input['status'];
             //            $purchase_request->fields['comment_validation'] = $input['comment_validation'];
@@ -223,14 +249,14 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
     public function post_addItem()
     {
         global $CFG_GLPI;
-        $list = PluginPurchaserequestThreshold::$list_type_allowed;
+        $list = Threshold::$list_type_allowed;
 
         //      if ($CFG_GLPI["notifications_mailing"]) {
         //         NotificationEvent::raiseEvent('ask_purchaserequest', $this);
         //      }
 
         if (isset($this->input["users_id_validate"])) {
-            $validation = new PluginPurchaserequestValidation();
+            $validation = new Validation();
             $input = [];
             $input["entities_id"] = $this->fields["entities_id"];
             $input["users_id"] = $this->fields["users_id_creator"];
@@ -242,20 +268,20 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             $input["status"] = CommonITILValidation::WAITING;
             $validation->add($input);
         }
-        $threshold = new PluginPurchaserequestThreshold();
-        $itemtype = PluginPurchaserequestThreshold::getObject($this->fields["itemtype"]);
+        $threshold = new Threshold();
+        $itemtype = Threshold::getObject($this->fields["itemtype"]);
         if ($threshold->getFromDBByCrit([
             "itemtype" => $itemtype,
             "items_id" => $this->fields["types_id"]
         ])) {
             $th = intval($threshold->fields["thresholds"]);
             if ($th != -1) {
-                $config = new PluginPurchaserequestConfig();
+                $config = new Config();
                 $config->getFromDB(1);
 
                 if ($th < intval($this->fields["amount"])
                     && $config->fields["id_general_service_manager"] > 0) {
-                    $validation = new PluginPurchaserequestValidation();
+                    $validation = new Validation();
                     $input = [];
                     $input["entities_id"] = $this->fields["entities_id"];
                     $input["users_id"] = $this->fields["users_id_creator"];
@@ -321,7 +347,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         }
 
         if (isset($this->oldvalues['users_id_validate'])) {
-            $validation = new PluginPurchaserequestValidation();
+            $validation = new Validation();
             $validation->deleteByCriteria(
                 [
                     "users_id_validate" => $this->oldvalues['users_id_validate'],
@@ -491,7 +517,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             'field' => 'name',
             'datatype' => 'itemlink',
             'massiveaction' => false,
-            'name' => Ticket::getTypeName(),
+            'name' => \Ticket::getTypeName(),
             'linkfield' => 'tickets_id',
         ];
 
@@ -506,7 +532,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
 
         $tab[] = [
             'id' => 12,
-            'table' => getTableForItemType('PluginPurchaserequestPurchaseRequestState'),
+            'table' => getTableForItemType(PurchaseRequestState::class),
             'field' => 'name',
             'name' => __("Status"),
             'linkfield' => 'plugin_purchaserequest_purchaserequeststates_id',
@@ -605,7 +631,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             'massiveaction' => false,
             'joinparams' => [
                 'beforejoin' => [
-                    'table' => PluginPurchaserequestValidation::getTable(),
+                    'table' => Validation::getTable(),
                     'joinparams' => [
                         'jointype' => 'child'
                     ]
@@ -689,7 +715,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         if (isset($_SESSION['glpi_plugin_purchaserequests_fields'])) {
             foreach ($_SESSION['glpi_plugin_purchaserequests_fields'] as $key => $value) {
                 if ($key == "comment") {
-                    $this->fields[$key] = Glpi\RichText\RichText::getEnhancedHtml($value);
+                    $this->fields[$key] = RichText::getEnhancedHtml($value);
                 } else {
                     $this->fields[$key] = $value;
                 }
@@ -716,7 +742,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
                 'name' => "users_id",
                 'value' => $this->fields["users_id"],
                 'entity' => $this->fields["entities_id"],
-                'on_change' => "pluginPurchaserequestLoadGroups();",
+                'on_change' => "PurchaserequestLoadGroups();",
                 'right' => 'all'
             ]);
         } else {
@@ -733,7 +759,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
                 self::displayGroup($this->fields['users_id']);
             }
 
-            $JS = "function pluginPurchaserequestLoadGroups(){";
+            $JS = "function PurchaserequestLoadGroups(){";
             $params = [
                 'users_id' => '__VALUE__',
                 'entity' => $this->fields["entities_id"]
@@ -763,7 +789,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         echo "<td>" . __("Status") . "&nbsp;</td>";
         echo "<td>";
         Dropdown::show(
-            'PluginPurchaserequestPurchaseRequestState',
+            PurchaseRequestState::class,
             [
                 'value' => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
                 'entity' => $this->fields["entities_id"]
@@ -884,7 +910,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         }
         PluginOrderOrder::dropdown($options);
         echo "</td>";
-        $ticket = new Ticket();
+        $ticket = new \Ticket();
         echo "<td>" . __("Linked to ticket", "purchaserequest") . "</td>";
         echo "<td>";
         $options = [];
@@ -892,7 +918,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             $options['value'] = $this->fields['tickets_id'];
         }
         $options['entity'] = $this->fields["entities_id"];
-        Ticket::dropdown($options);
+        \Ticket::dropdown($options);
         echo "</td>";
         if ($hidden != false) {
             echo "<td colspan='2'></td>";
@@ -948,7 +974,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
 
         //form
         if ($canedit) {
-            $purchaserequest = new PluginPurchaserequestPurchaseRequest();
+            $purchaserequest = new PurchaseRequest();
             $purchaserequest->showFormPurchase($item->fields['id']);
         }
 
@@ -973,7 +999,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         $purchaserequest = new self();
         $purchaserequest->getEmpty();
 
-        $ticket = new Ticket();
+        $ticket = new \Ticket();
         $ticket->getFromDB($tickets_id);
 
         $purchaserequest->fields['entities_id'] = $ticket->fields['entities_id'];
@@ -991,7 +1017,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         }
 
         echo "<form name='form' method='post' action='" . Toolbox::getItemTypeFormURL(
-                'PluginPurchaserequestPurchaseRequest'
+                PurchaseRequest::class
             ) . "'>";
 
         echo "<div align='center'><table class='tab_cadre_fixe'>";
@@ -1022,7 +1048,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             'name' => "users_id",
             'value' => $purchaserequest->fields["users_id"],
             'entity' => $purchaserequest->fields["entities_id"],
-            'on_change' => "pluginPurchaserequestLoadGroups();",
+            'on_change' => "PurchaserequestLoadGroups();",
             'right' => 'all'
         ]);
 
@@ -1036,7 +1062,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             self::displayGroup($purchaserequest->fields['users_id']);
         }
 
-        $JS = "function pluginPurchaserequestLoadGroups(){";
+        $JS = "function PurchaserequestLoadGroups(){";
         $params = [
             'users_id' => '__VALUE__',
             'entity' => $purchaserequest->fields["entities_id"]
@@ -1064,7 +1090,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         echo "<td>" . __("Status") . "&nbsp;</td>";
         echo "<td>";
         Dropdown::show(
-            'PluginPurchaserequestPurchaseRequestState',
+            PurchaseRequestState::class,
             [
                 'value' => $purchaserequest->fields["plugin_purchaserequest_purchaserequeststates_id"],
                 'entity' => $purchaserequest->fields["entities_id"]
@@ -1192,7 +1218,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         $rand = mt_rand();
         $dbu = new DbUtils();
 
-        Html::printAjaxPager(PluginPurchaserequestPurchaseRequest::getTypeName(2), $start, $rows);
+        Html::printAjaxPager(PurchaseRequest::getTypeName(2), $start, $rows);
 
         echo "<div class='left'>";
         if ($canedit) {
@@ -1234,7 +1260,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             }
             echo "</td>";
             // Name
-            $purchase_request = new PluginPurchaserequestPurchaseRequest();
+            $purchase_request = new PurchaseRequest();
             $purchase_request->getFromDB($field['id']);
             echo "<td>" . $purchase_request->getLink() . "</td>";
             // requester
@@ -1343,7 +1369,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             $start = 0;
         }
 
-        $purchase_request = new PluginPurchaserequestPurchaseRequest();
+        $purchase_request = new PurchaseRequest();
         $data = $purchase_request->find(['plugin_order_orders_id' => $item->fields['id']]);
 
         $rows = count($data);
@@ -1359,11 +1385,11 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             echo "<div class='center'>";
 
             echo "<form method='post' name='purchaseresquet_form$rand' id='purchaseresquet_form$rand'  " .
-                "action='" . Toolbox::getItemTypeFormURL('PluginPurchaserequestPurchaseRequest') . "'>";
+                "action='" . Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "'>";
 
             echo "<table class='tab_cadre_fixe'>";
             echo "<tr class='tab_bg_1 center'>";
-            echo "<th colspan='13'>" . PluginPurchaserequestPurchaseRequest::getTypeName(2) . "</th>";
+            echo "<th colspan='13'>" . PurchaseRequest::getTypeName(2) . "</th>";
             echo "</tr>";
             echo "<tr class='tab_bg_1'>";
 
@@ -1397,7 +1423,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
                     echo "</td>";
                 }
                 // Name
-                $purchase_request = new PluginPurchaserequestPurchaseRequest();
+                $purchase_request = new PurchaseRequest();
                 $purchase_request->getFromDB($field['id']);
                 echo "<td>" . $purchase_request->getLink() . "</td>";
                 // requester
@@ -1478,7 +1504,7 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
         $validator = ($item->fields["users_id_validate"] == Session::getLoginUserID());
 
         echo "<form name='form' id='formvalidation' method='post' action='" . Toolbox::getItemTypeFormURL(
-                'PluginPurchaserequestPurchaseRequest'
+                PurchaseRequest::class
             ) . "'>";
 
         echo "<div align='center'><table class='tab_cadre_fixe'>";
@@ -1613,10 +1639,10 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
      */
     function getSpecificMassiveActions($checkitem = null)
     {
-        $actions['PluginPurchaserequestPurchaseRequest:link'] = __("Link to an order", "purchaserequest");
-        $actions['PluginPurchaserequestPurchaseRequest:delete_link'] = __("Delete link to order", "purchaserequest");
+        $actions['GlpiPlugin\Purchaserequest\PurchaseRequest:link'] = __("Link to an order", "purchaserequest");
+        $actions['GlpiPlugin\Purchaserequest\PurchaseRequest:delete_link'] = __("Delete link to order", "purchaserequest");
         if (self::canValidation()) {
-            $actions['PluginPurchaserequestPurchaseRequest:validate'] = __(
+            $actions['GlpiPlugin\Purchaserequest\PurchaseRequest:validate'] = __(
                 "Validate purchasing requests",
                 "purchaserequest"
             );
@@ -1767,7 +1793,6 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
             if ($result = $DB->doQuery($query)) {
                 if ($DB->numrows($result)) {
                     $data = $DB->fetchAssoc($result);
-                    $data = Toolbox::addslashes_deep($data);
                     $input['name'] = $data['name'];
                     $input['entities_id'] = $entity;
                     $temp = new self();
@@ -1899,9 +1924,9 @@ class PluginPurchaserequestPurchaseRequest extends CommonDBTM
     //   }
     //   $menu['icon']    = self::getIcon();
     //Entry icon in breadcrumb
-    //    $menu['links']['config']                      = PluginPurchaserequestConfig::getFormURL(false);
+    //    $menu['links']['config']                      = Config::getFormURL(false);
     //Link to config page in admin plugins list
-    //    $menu['config_page']                          = PluginPurchaserequestConfig::getFormURL(false);
+    //    $menu['config_page']                          = Config::getFormURL(false);
 
     //   return $menu;
     //}

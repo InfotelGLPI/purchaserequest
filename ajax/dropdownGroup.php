@@ -27,7 +27,7 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include('../../../inc/includes.php');
+use GlpiPlugin\Purchaserequest\PurchaseRequest;
 
 header("Content-Type: text/html; charset=UTF-8");
 Html::header_nocache();
@@ -36,6 +36,6 @@ Session::checkLoginUser();
 
 if (isset($_POST["users_id"])) {
 
-   PluginPurchaserequestPurchaseRequest::displayGroup($_POST['users_id']);
+   PurchaseRequest::displayGroup($_POST['users_id']);
 
 }

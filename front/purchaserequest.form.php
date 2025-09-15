@@ -27,112 +27,108 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
 
 include("../../../inc/includes.php");
 
+global $DB;
+
 if (!isset($_GET["id"])) {
-   $_GET["id"] = "";
+    $_GET["id"] = "";
 }
 
 if (Plugin::isPluginActive("order")
     && $DB->tableExists("glpi_plugin_order_orders")) {
-   $purchase = new PluginPurchaserequestPurchaseRequest();
+    $purchase = new PurchaseRequest();
 
-   if (isset($_POST["add"])) {
-      $purchase->check(-1, CREATE, $_POST);
-      $newID = $purchase->add($_POST);
-      $url   = Toolbox::getItemTypeFormURL('PluginPurchaserequestPurchaseRequest') . "?id=$newID";
-      if ($_SESSION['glpibackcreated']) {
-         Html::redirect($purchase->getFormURL() . "?id=" . $newID);
-      } else {
-         Html::redirect($url);
-      }
+    if (isset($_POST["add"])) {
+        $purchase->check(-1, CREATE, $_POST);
+        $newID = $purchase->add($_POST);
+        $url   = Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "?id=$newID";
+        if ($_SESSION['glpibackcreated']) {
+            Html::redirect($purchase->getFormURL() . "?id=" . $newID);
+        } else {
+            Html::redirect($url);
+        }
+    } elseif (isset($_POST["add_tickets"])) {
+        $purchase->check(-1, CREATE, $_POST);
+        $newID = $purchase->add($_POST);
+        Html::back();
 
-   } else if (isset($_POST["add_tickets"])) {
-      $purchase->check(-1, CREATE, $_POST);
-      $newID = $purchase->add($_POST);
-      Html::back();
+       /* delete purchaserequest */
+    } elseif (isset($_POST["delete"])) {
+        $purchase->check($_POST['id'], DELETE);
+        $purchase->delete($_POST);
+        $purchase->redirectToList();
+    } elseif (isset($_POST["restore"])) {
+        $purchase->check($_POST['id'], DELETE);
+        $purchase->restore($_POST);
+        $purchase->redirectToList();
+    } elseif (isset($_POST["purge"])) {
+        $purchase->check($_POST['id'], PURGE);
+        $purchase->delete($_POST, 1);
+        $purchase->redirectToList();
 
-      /* delete purchaserequest */
-   } else if (isset($_POST["delete"])) {
+       /* update purchaserequest */
+    } elseif (isset($_POST["update"]) || (isset($_POST['update_status']))) {
+        $purchase->check($_POST['id'], UPDATE);
+        $purchase->update($_POST);
+        Html::back();
+    }
 
-      $purchase->check($_POST['id'], DELETE);
-      $purchase->delete($_POST);
-      $purchase->redirectToList();
-   } else if (isset($_POST["restore"])) {
+    if (isset($_POST['action'])) {
+       // Retrieve configuration for generate assets feature
 
-      $purchase->check($_POST['id'], DELETE);
-      $purchase->restore($_POST);
-      $purchase->redirectToList();
+        $purchase_request = new PurchaseRequest();
+        switch ($_POST['chooseAction']) {
+            case 'delete_link':
+                if (isset($_POST["item"])) {
+                    foreach ($_POST["item"] as $key => $val) {
+                        if ($val == 1) {
+                            $tmp['id']                     = $key;
+                            $tmp['plugin_order_orders_id'] = 0;
+                            $purchase_request->update($tmp);
+                        }
+                    }
+                }
+                break;
+        }
+        Html::back();
+    }
 
-   } else if (isset($_POST["purge"])) {
-      $purchase->check($_POST['id'], PURGE);
-      $purchase->delete($_POST, 1);
-      $purchase->redirectToList();
+    if (Session::getCurrentInterface() == 'central') {
+        Html::header(
+            PurchaseRequest::getTypeName(2),
+            $_SERVER['PHP_SELF'],
+            "management",
+            PurchaseRequest::class,
+            "purchaserequest"
+        );
+    } else {
+        if (Plugin::isPluginActive('servicecatalog')) {
+            Main::showDefaultHeaderHelpdesk(PurchaseRequest::getTypeName(2), true);
+            echo "<br>";
+        } else {
+            Html::helpHeader(PurchaseRequest::getTypeName(2));
+        }
+    }
 
-      /* update purchaserequest */
-   } else if (isset($_POST["update"]) || (isset($_POST['update_status']))) {
-
-      $purchase->check($_POST['id'], UPDATE);
-      $purchase->update($_POST);
-      Html::back();
-   }
-
-   if (isset($_POST['action'])) {
-      // Retrieve configuration for generate assets feature
-
-      $purchase_request = new PluginPurchaserequestPurchaseRequest();
-      switch ($_POST['chooseAction']) {
-         case 'delete_link':
-            if (isset ($_POST["item"])) {
-               foreach ($_POST["item"] as $key => $val) {
-                  if ($val == 1) {
-                     $tmp['id']                     = $key;
-                     $tmp['plugin_order_orders_id'] = 0;
-                     $purchase_request->update($tmp);
-
-                  }
-               }
-            }
-            break;
-      }
-      Html::back();
-   }
-
-   if (Session::getCurrentInterface() == 'central') {
-      Html::header(
-         PluginPurchaserequestPurchaseRequest::getTypeName(2),
-         $_SERVER['PHP_SELF'],
-         "management",
-         "PluginPurchaserequestPurchaseRequest",
-         "purchaserequest"
-      );
-   } else {
-      if (Plugin::isPluginActive('servicecatalog')) {
-         Main::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2), true);
-         echo "<br>";
-      } else {
-         Html::helpHeader(PluginPurchaserequestPurchaseRequest::getTypeName(2));
-      }
-   }
-
-   Html::requireJs('tinymce');
-   $purchase->display($_GET);
+    Html::requireJs('tinymce');
+    $purchase->display($_GET);
 } else {
-   Html::header(__('Setup'), '', "tools", "pluginpurchaserequestpurchaserequest", "pluginpurchaserequestpurchaserequest");
-   echo "<div class='alert alert-important alert-warning d-flex'>";
-   echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+    Html::header(__('Setup'), '', "tools", PurchaseRequest::class);
+    echo "<div class='alert alert-important alert-warning d-flex'>";
+    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
 }
 
 if (Session::getCurrentInterface() != 'central'
     && Plugin::isPluginActive('servicecatalog')) {
-
-   Main::showNavBarFooter('purchaserequest');
+    Main::showNavBarFooter('purchaserequest');
 }
 
 if (Session::getCurrentInterface() == 'central') {
-   Html::footer();
+    Html::footer();
 } else {
-   Html::helpFooter();
+    Html::helpFooter();
 }

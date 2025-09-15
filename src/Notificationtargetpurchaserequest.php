@@ -27,12 +27,26 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+namespace GlpiPlugin\Purchaserequest;
+
+use CommonITILValidation;
+use DbUtils;
+use Dropdown;
+use Html;
+use Migration;
+use Notification;
+use Notification_NotificationTemplate;
+use NotificationTarget;
+use NotificationTemplate;
+use NotificationTemplateTranslation;
+use User;
+
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-// Class PluginPurchaserequestNotificationTargetPurchaseRequest
-class PluginPurchaserequestNotificationTargetPurchaseRequest extends NotificationTarget {
+// Class NotificationTargetPurchaseRequest
+class NotificationTargetPurchaseRequest extends NotificationTarget {
    const PURCHASE_VALIDATOR = 30;
    const PURCHASE_AUTHOR    = 31;
 
@@ -127,7 +141,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
          $this->data['##lang.validation.comment##']        = __('Approval comments');
          $this->data['##lang.validation.datevalidation##'] = __('Approval date');
 
-         $validation = new PluginPurchaserequestValidation();
+         $validation = new Validation();
          foreach ($validations as $row) {
 
             $tmp = [];
@@ -151,7 +165,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
       }
       $this->data['##lang.purchaserequest.url##'] = "URL";
 
-      $url                                   = $CFG_GLPI["url_base"] . "/index.php?redirect=PluginPurchaserequestPurchaserequest_" . $this->obj->getField("id");
+      $url                                   = $CFG_GLPI["url_base"] . "/index.php?redirect=GlpiPlugin\Purchaserequest\Purchaserequest_" . $this->obj->getField("id");
       $this->data['##purchaserequest.url##'] = urldecode($url);
 
    }
@@ -200,13 +214,13 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
    public static function install(Migration $migration) {
       global $DB;
 
-      $migration->displayMessage("Migrate PluginPurchaserequestPurchaserequest notifications");
+      $migration->displayMessage("Migrate Purchaserequest notifications");
 
       $template     = new NotificationTemplate();
       $templates_id = false;
       $query_id     = "SELECT `id`
                        FROM `glpi_notificationtemplates`
-                       WHERE `itemtype`='PluginPurchaserequestPurchaseRequest'
+                       WHERE `itemtype`='GlpiPlugin\\Purchaserequest\\PurchaseRequest'
                        AND `name` = 'Purchase Request Validation'";
       $result = $DB->doQuery($query_id) or die ($DB->error());
 
@@ -215,7 +229,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
       } else {
          $tmp          = [
             'name'     => 'Purchase Request Validation',
-            'itemtype' => 'PluginPurchaserequestPurchaseRequest',
+            'itemtype' => PurchaseRequest::class,
             'date_mod' => $_SESSION['glpi_currenttime'],
             'comment'  => '',
             'css'      => '',
@@ -235,7 +249,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
                ##IFpurchaserequest.name####lang.purchaserequest.name## : ##purchaserequest.name##
                ##ENDIFpurchaserequest.name##
                ##IFpurchaserequest.requester####lang.purchaserequest.requester## : ##purchaserequest.requester##
-               ##ENDIFpurchaserequest.requester##               
+               ##ENDIFpurchaserequest.requester##
                ##IFpurchaserequest.group####lang.purchaserequest.group## : ##purchaserequest.group##
                ##ENDIFpurchaserequest.group##
                ##IFpurchaserequest.due_date####lang.purchaserequest.due_date##  : ##purchaserequest.due_date####ENDIFpurchaserequest.due_date##
@@ -273,12 +287,12 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
          $notificationtemplate = new Notification_NotificationTemplate();
          foreach ($notifs as $label => $name) {
             if (!$dbu->countElementsInTable("glpi_notifications",
-                                            ["itemtype" => "PluginPurchaserequestPurchaserequest",
+                                            ["itemtype" => Purchaserequest::class,
                                              "event"    => $name])) {
                $tmp             = [
                   'name'         => $label,
                   'entities_id'  => 0,
-                  'itemtype'     => 'PluginPurchaserequestPurchaseRequest',
+                  'itemtype'     => PurchaseRequest::class,
                   'event'        => $name,
                   'comment'      => '',
                   'is_recursive' => 1,
@@ -303,7 +317,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
 
       foreach (['ask_purchaserequest', 'validation_purchaserequest', 'no_validation_purchaserequest'] as $event) {
          $options = [
-            'itemtype' => 'PluginPurchaserequestPurchaseRequest',
+            'itemtype' => PurchaseRequest::class,
             'event'    => $event,
             'FIELDS'   => 'id',
          ];
@@ -317,7 +331,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
       $template       = new NotificationTemplate();
       $translation    = new NotificationTemplateTranslation();
       $notif_template = new Notification_NotificationTemplate();
-      $options        = ['itemtype' => 'PluginPurchaserequestPurchaseRequest', 'FIELDS' => 'id'];
+      $options        = ['itemtype' => PurchaseRequest::class, 'FIELDS' => 'id'];
 
       foreach ($DB->request('glpi_notificationtemplates', $options) as $data) {
          $options_template = ['notificationtemplates_id' => $data['id'], 'FIELDS' => 'id'];
@@ -367,7 +381,7 @@ class PluginPurchaserequestNotificationTargetPurchaseRequest extends Notificatio
       global $DB;
 
       if (isset($options['validation_id'])) {
-         $validationtable = getTableForItemType('PluginPurchaserequestValidation');
+         $validationtable = getTableForItemType(Validation::class);
 
          $criteria                                 = ['LEFT JOIN' => [
                User::getTable() => [

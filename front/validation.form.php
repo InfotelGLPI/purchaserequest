@@ -27,15 +27,18 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include("../../../inc/includes.php");
+use GlpiPlugin\Purchaserequest\PurchaseRequest;
+use GlpiPlugin\Purchaserequest\Validation;
 
 if (!isset($_GET["id"])) {
    $_GET["id"] = "";
 }
 
+global $DB;
+
 if (Plugin::isPluginActive("order")
     && $DB->tableExists("glpi_plugin_order_orders")) {
-   $validation = new PluginPurchaserequestValidation();
+   $validation = new Validation();
 
    if (isset($_POST["add"])) {
       $validation->check(-1, CREATE, $_POST);
@@ -67,7 +70,7 @@ if (Plugin::isPluginActive("order")
    }
    Html::back();
 } else {
-   Html::header(__('Setup'), '', "tools", "pluginpurchaserequestpurchaserequest", "config");
+   Html::header(__('Setup'), '', "tools", PurchaseRequest::class, "config");
    echo "<div class='alert alert-important alert-warning d-flex'>";
    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
 }

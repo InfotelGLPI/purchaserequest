@@ -27,15 +27,17 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-use Glpi\Plugin\Hooks;
+use GlpiPlugin\Purchaserequest\Config;
+use GlpiPlugin\Purchaserequest\Profile;
+use GlpiPlugin\Purchaserequest\PurchaseRequest;
+use GlpiPlugin\Purchaserequest\Threshold;
 
-Global $CFG_GLPI;
+global $CFG_GLPI;
 
 define('PLUGIN_PURCHASEREQUEST_VERSION', '3.0.2');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
-   define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
-//   define("PLUGIN_PURCHASEREQUEST_WEBDIR", Plugin::getPhpDir("purchaserequest", false));
+    define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
     $root = $CFG_GLPI['root_doc'] . '/plugins/purchaserequest';
     define("PLUGIN_PURCHASEREQUEST_WEBDIR", $root);
 }
@@ -47,21 +49,21 @@ if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
  *
  * @return void
  */
-function plugin_init_purchaserequest() {
-   global $PLUGIN_HOOKS, $CFG_GLPI;
+function plugin_init_purchaserequest()
+{
+    global $PLUGIN_HOOKS, $CFG_GLPI;
 
-   Plugin::registerClass('PluginPurchaserequestProfile');
-   $PLUGIN_HOOKS['csrf_compliant']['purchaserequest'] = true;
+
+    $PLUGIN_HOOKS['csrf_compliant']['purchaserequest'] = true;
 
    /* Init current profile */
-   $PLUGIN_HOOKS['change_profile']['purchaserequest'] = ['PluginPurchaserequestProfile', 'initProfile'];
+    $PLUGIN_HOOKS['change_profile']['purchaserequest'] = [Profile::class, 'initProfile'];
 
-   if (Plugin::isPluginActive('purchaserequest')) {
+    if (Plugin::isPluginActive('purchaserequest')) {
+        Plugin::registerClass(Profile::class, ['addtabon' => ['Profile']]);
 
-      Plugin::registerClass('PluginPurchaserequestProfile', ['addtabon' => ['Profile']]);
-
-      Plugin::registerClass('PluginPurchaserequestPurchaseRequest', ['addtabon' => ['PluginPurchaserequestThreshold']]);
-      $types = [ComputerType::getType(),
+        Plugin::registerClass(PurchaseRequest::class, ['addtabon' => [Threshold::class]]);
+        $types = [ComputerType::getType(),
                 MonitorType::getType(),
                 PeripheralType::getType(),
                 NetworkEquipmentType::getType(),
@@ -75,35 +77,37 @@ function plugin_init_purchaserequest() {
                 RackType::getType(),
                 PDUType::getType()];
 
-      if (Plugin::isPluginActive('order')) {
-         array_push($types, "PluginOrderOtherType");
-      }
-      Plugin::registerClass(PluginPurchaserequestThreshold::getType(), ['addtabon' => $types]);
+        if (Plugin::isPluginActive('order')) {
+            array_push($types, "PluginOrderOtherType");
+        }
+        Plugin::registerClass(Threshold::getType(), ['addtabon' => $types]);
 
-      //TODO create right config
-      if (Session::haveRight("plugin_purchaserequest_config", READ)) {
-         $PLUGIN_HOOKS['config_page']['purchaserequest'] = 'front/config.form.php';
-      }
+       //TODO create right config
+        if (Session::haveRight("plugin_purchaserequest_config", READ)) {
+            $PLUGIN_HOOKS['config_page']['purchaserequest'] = 'front/config.form.php';
+        }
 
-      if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
+        if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
           && !class_exists('GlpiPlugin\Servicecatalog\Main')
-      ) {
-         $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR.'/front/purchaserequest.php';
-         $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PluginPurchaserequestPurchaseRequest::getIcon();
-      }
+        ) {
+            $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR.'/front/purchaserequest.php';
+            $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PurchaseRequest::getIcon();
+        }
 
-      if (PluginPurchaserequestPurchaseRequest::canView()) {
-         Plugin::registerClass('PluginPurchaserequestPurchaseRequest',
-                               ['notificationtemplates_types' => true,
-                                'addtabon'                    => ['Ticket', 'PluginOrderOrder']]);
-         $PLUGIN_HOOKS['menu_toadd']['purchaserequest']['management'] = 'PluginPurchaserequestPurchaseRequest';
+        if (PurchaseRequest::canView()) {
+            Plugin::registerClass(
+                PurchaseRequest::class,
+                ['notificationtemplates_types' => true,
+                'addtabon'                    => ['Ticket',
+                'PluginOrderOrder']]
+            );
+            $PLUGIN_HOOKS['menu_toadd']['purchaserequest']['management'] = PurchaseRequest::class;
 
-         if (Plugin::isPluginActive('servicecatalog')) {
-            $PLUGIN_HOOKS['servicecatalog']['purchaserequest'] = ['PluginPurchaserequestServicecatalog'];
-         }
-      }
-
-   }
+            if (Plugin::isPluginActive('servicecatalog')) {
+                $PLUGIN_HOOKS['servicecatalog']['purchaserequest'] = [Servicecatalog::class];
+            }
+        }
+    }
 }
 
 /**
@@ -112,8 +116,9 @@ function plugin_init_purchaserequest() {
  *
  * @return array
  */
-function plugin_version_purchaserequest() {
-   return ['name'         => _n("Purchase request", "Purchase requests", 1, "purchaserequest"),
+function plugin_version_purchaserequest()
+{
+    return ['name'         => _n("Purchase request", "Purchase requests", 1, "purchaserequest"),
            'version'      => PLUGIN_PURCHASEREQUEST_VERSION,
            'author'       => "<a href='https://blogglpi.infotel.com'>Infotel</a>",
            'license'      => 'GPLv2+',
@@ -124,7 +129,7 @@ function plugin_version_purchaserequest() {
                  'dev' => false
               ]
            ]
-   ];
+    ];
 }
 
 /**
@@ -133,12 +138,13 @@ function plugin_version_purchaserequest() {
  *
  * @return boolean
  */
-function plugin_purchaserequest_check_prerequisites() {
-   global $DB;
+function plugin_purchaserequest_check_prerequisites()
+{
+    global $DB;
 
-   if (Plugin::isPluginActive("order")
+    if (Plugin::isPluginActive("order")
        && !$DB->tableExists("glpi_plugin_order_orders")) {
-      return false;
-   }
-   return true;
+        return false;
+    }
+    return true;
 }

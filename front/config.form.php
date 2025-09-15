@@ -27,12 +27,13 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include('../../../inc/includes.php');
+use GlpiPlugin\Purchaserequest\Config;
+
 Session::checkLoginUser();
 
 if (Plugin::isPluginActive("purchaserequest")) {
    if (Session::haveRight("plugin_purchaserequest_config", READ)) {
-      $config = new PluginPurchaserequestConfig();
+      $config = new Config();
 
       if (isset($_POST["update_config"])) {
          Session::checkRight("plugin_purchaserequest_config", READ);
@@ -41,7 +42,7 @@ if (Plugin::isPluginActive("purchaserequest")) {
 
       } else {
          $_SESSION['glpi_js_toload']["tinymce"][] = 'lib/tiny_mce/lib/tinymce.js';
-         Html::header(__('Setup'), '', "config", PluginPurchaserequestConfig::getType());
+         Html::header(__('Setup'), '', "config", Config::getType());
          $config->GetFromDB(1);
          $config->display($_GET);
          //         $config->showForm();

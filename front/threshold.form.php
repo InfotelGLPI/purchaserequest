@@ -27,18 +27,19 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
-include("../../../inc/includes.php");
+use GlpiPlugin\Purchaserequest\PurchaseRequest;
+use GlpiPlugin\Purchaserequest\Threshold;
 
 if (!isset($_GET["id"])) {
    $_GET["id"] = "";
 }
 
-$threshold = new PluginPurchaserequestThreshold();
+$threshold = new Threshold();
 
 if (isset($_POST["add"])) {
    $threshold->check(-1, CREATE, $_POST);
    $newID = $threshold->add($_POST);
-   $url   = Toolbox::getItemTypeFormURL('PluginPurchaserequestPurchaseRequest') . "?id=$newID";
+   $url   = Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "?id=$newID";
    Html::back();
 
 } else if (isset($_POST["add_tickets"])) {

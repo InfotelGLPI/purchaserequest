@@ -27,54 +27,51 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
-
-include("../../../inc/includes.php");
 
 global $DB;
 
 if (Session::getCurrentInterface() == 'central') {
-   Html::header(
-      PluginPurchaserequestPurchaseRequest::getTypeName(2),
-      $_SERVER['PHP_SELF'],
-      "management",
-      "PluginPurchaserequestPurchaseRequest",
-      "purchaserequest"
-   );
+    Html::header(
+        PurchaseRequest::getTypeName(2),
+        $_SERVER['PHP_SELF'],
+        "management",
+        PurchaseRequest::class,
+        "purchaserequest"
+    );
 } else {
-   if (Plugin::isPluginActive('servicecatalog')) {
-      Main::showDefaultHeaderHelpdesk(PluginPurchaserequestPurchaseRequest::getTypeName(2));
-      echo "<br>";
-   } else {
-      Html::helpHeader(PluginPurchaserequestPurchaseRequest::getTypeName(2));
-   }
+    if (Plugin::isPluginActive('servicecatalog')) {
+        Main::showDefaultHeaderHelpdesk(PurchaseRequest::getTypeName(2));
+        echo "<br>";
+    } else {
+        Html::helpHeader(PurchaseRequest::getTypeName(2));
+    }
 }
 
 if (Plugin::isPluginActive("order")
     && $DB->tableExists("glpi_plugin_order_orders")) {
+    $purchase = new PurchaseRequest();
 
-   $purchase = new PluginPurchaserequestPurchaseRequest();
-
-   if (PluginPurchaserequestPurchaseRequest::canView()) {
-      Search::show("PluginPurchaserequestPurchaseRequest");
-   } else {
-      echo "<div class='alert alert-important alert-warning d-flex'>";
-      echo "<b>" . __("Access denied") . "</b></div>";
-   }
+    if (PurchaseRequest::canView()) {
+        Search::show(PurchaseRequest::class);
+    } else {
+        echo "<div class='alert alert-important alert-warning d-flex'>";
+        echo "<b>" . __("Access denied") . "</b></div>";
+    }
 } else {
-   Html::header(__('Setup'), '', "tools", "pluginpurchaserequestpurchaserequest", "pluginpurchaserequestpurchaserequest");
-   echo "<div class='alert alert-important alert-warning d-flex'>";
-   echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+    Html::header(__('Setup'), '', "tools", PurchaseRequest::class);
+    echo "<div class='alert alert-important alert-warning d-flex'>";
+    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
 }
 
 if (Session::getCurrentInterface() != 'central'
     && Plugin::isPluginActive('servicecatalog')) {
-
-   Main::showNavBarFooter('purchaserequest');
+    Main::showNavBarFooter('purchaserequest');
 }
 
 if (Session::getCurrentInterface() == 'central') {
-   Html::footer();
+    Html::footer();
 } else {
-   Html::helpFooter();
+    Html::helpFooter();
 }
