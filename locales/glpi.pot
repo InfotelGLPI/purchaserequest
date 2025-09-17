@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - PurchaseRequest plugin 2.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-15 16:10+0000\n"
+"POT-Creation-Date: 2025-09-17 09:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,21 +18,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: hook.php:48
+#: hook.php:49
 msgid "Plugin installation or upgrade"
 msgstr ""
 
-#: hook.php:108 src/Purchaserequeststate.php:43
+#: hook.php:109 src/Purchaserequeststate.php:43
 msgid "Purchase request status"
 msgstr ""
 
-#: hook.php:198
+#: hook.php:199
 msgctxt "quantity"
 msgid "Number of purchase request"
 msgstr ""
 
 #: setup.php:121 src/Profile.php:63 src/Profile.php:174
-#: src/Purchaserequest.php:79
+#: src/Purchaserequest.php:81
 msgid "Purchase request"
 msgid_plural "Purchase requests"
 msgstr[0] ""
@@ -43,19 +43,19 @@ msgid "Please activate the plugin"
 msgstr ""
 
 #: front/purchaserequest.form.php:122 front/purchaserequest.php:65
-#: front/validation.form.php:75 src/Purchaserequest.php:166
+#: front/validation.form.php:70 src/Purchaserequest.php:168
 msgid "Please activate the plugin order"
 msgstr ""
 
-#: src/Config.php:68
+#: src/Config.php:66
 msgid "Plugin setup"
 msgstr ""
 
-#: src/Config.php:121
+#: src/Config.php:119
 msgid "Configuration purchase request"
 msgstr ""
 
-#: src/Config.php:124
+#: src/Config.php:122
 msgid "General Services Manager"
 msgstr ""
 
@@ -74,25 +74,25 @@ msgid "Purchase request validation"
 msgstr ""
 
 #: src/Notificationtargetpurchaserequest.php:79
-#: src/Notificationtargetpurchaserequest.php:182 src/Purchaserequest.php:386
-#: src/Purchaserequest.php:583 src/Purchaserequest.php:877
-#: src/Purchaserequest.php:1177 src/Purchaserequest.php:1249
-#: src/Validation.php:470
+#: src/Notificationtargetpurchaserequest.php:182 src/Purchaserequest.php:388
+#: src/Purchaserequest.php:585 src/Purchaserequest.php:879
+#: src/Purchaserequest.php:1179 src/Purchaserequest.php:1251
+#: src/Validation.php:460
 msgid "Amount"
 msgstr ""
 
 #: src/Notificationtargetpurchaserequest.php:82
-#: src/Notificationtargetpurchaserequest.php:183 src/Purchaserequest.php:592
-#: src/Purchaserequest.php:890 src/Purchaserequest.php:1189
-#: src/Purchaserequest.php:1250 src/Validation.php:479
+#: src/Notificationtargetpurchaserequest.php:183 src/Purchaserequest.php:594
+#: src/Purchaserequest.php:892 src/Purchaserequest.php:1191
+#: src/Purchaserequest.php:1252 src/Validation.php:469
 msgid "To be rebilled to the customer"
 msgstr ""
 
 #: src/Notificationtargetpurchaserequest.php:92
-#: src/Notificationtargetpurchaserequest.php:178 src/Purchaserequest.php:482
-#: src/Purchaserequest.php:862 src/Purchaserequest.php:1160
-#: src/Purchaserequest.php:1247 src/Purchaserequest.php:1407
-#: src/Validation.php:458 src/Validation.php:588
+#: src/Notificationtargetpurchaserequest.php:178 src/Purchaserequest.php:484
+#: src/Purchaserequest.php:864 src/Purchaserequest.php:1162
+#: src/Purchaserequest.php:1249 src/Purchaserequest.php:1409
+#: src/Validation.php:448 src/Validation.php:577
 msgid "Due date"
 msgstr ""
 
@@ -116,66 +116,66 @@ msgstr ""
 msgid "Author of the purchase request"
 msgstr ""
 
-#: src/Purchaserequest.php:387 src/Purchaserequest.php:867
-#: src/Purchaserequest.php:1165 src/Validation.php:463
+#: src/Purchaserequest.php:389 src/Purchaserequest.php:869
+#: src/Purchaserequest.php:1167 src/Validation.php:453
 msgid "To be validated by"
 msgstr ""
 
-#: src/Purchaserequest.php:565 src/Purchaserequest.php:939
-#: src/Purchaserequest.php:1248 src/Purchaserequest.php:1408
-#: src/Validation.php:520 src/Validation.php:589
+#: src/Purchaserequest.php:567 src/Purchaserequest.php:941
+#: src/Purchaserequest.php:1250 src/Purchaserequest.php:1410
+#: src/Validation.php:510 src/Validation.php:578
 msgid "Treated on"
 msgstr ""
 
-#: src/Purchaserequest.php:905 src/Validation.php:489
+#: src/Purchaserequest.php:907 src/Validation.php:479
 msgid "Linked to the order"
 msgstr ""
 
-#: src/Purchaserequest.php:915 src/Validation.php:499
+#: src/Purchaserequest.php:917 src/Validation.php:489
 msgid "Linked to ticket"
 msgstr ""
 
-#: src/Purchaserequest.php:933 src/Validation.php:514
+#: src/Purchaserequest.php:935 src/Validation.php:504
 msgid "Treated"
 msgstr ""
 
-#: src/Purchaserequest.php:1025
+#: src/Purchaserequest.php:1027
 msgid "Add a purchase request"
 msgstr ""
 
-#: src/Purchaserequest.php:1042
+#: src/Purchaserequest.php:1044
 msgid "Validated by"
 msgstr ""
 
-#: src/Purchaserequest.php:1495 src/Validation.php:675
+#: src/Purchaserequest.php:1497 src/Validation.php:663
 msgid "Delete link with order"
 msgstr ""
 
-#: src/Purchaserequest.php:1513
+#: src/Purchaserequest.php:1515
 msgid "Do you approve this purchase request ?"
 msgstr ""
 
-#: src/Purchaserequest.php:1539 src/Validation.php:709
+#: src/Purchaserequest.php:1541 src/Validation.php:696
 msgid "Accept purchase request"
 msgstr ""
 
-#: src/Purchaserequest.php:1544 src/Validation.php:714
+#: src/Purchaserequest.php:1546 src/Validation.php:701
 msgid "Refuse purchase request"
 msgstr ""
 
-#: src/Purchaserequest.php:1643
+#: src/Purchaserequest.php:1645
 msgid "Link to an order"
 msgstr ""
 
-#: src/Purchaserequest.php:1644
+#: src/Purchaserequest.php:1646
 msgid "Delete link to order"
 msgstr ""
 
-#: src/Purchaserequest.php:1647
+#: src/Purchaserequest.php:1649
 msgid "Validate purchasing requests"
 msgstr ""
 
-#: src/Purchaserequest.php:1752
+#: src/Purchaserequest.php:1754
 msgid "No groups for this user"
 msgstr ""
 
@@ -194,7 +194,7 @@ msgid_plural "You have %d purchase requests to validate !"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Threshold.php:61
+#: src/Threshold.php:64
 msgid "Purchase threshold"
 msgid_plural "Purchase thresholds"
 msgstr[0] ""
@@ -206,6 +206,6 @@ msgid_plural "Validations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Validation.php:799
+#: src/Validation.php:786
 msgid "Approvals for the purchase request"
 msgstr ""
