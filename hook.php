@@ -1,4 +1,5 @@
 <?php
+
 /*
  LICENSE
 
@@ -27,9 +28,9 @@
  @since     2009
  ---------------------------------------------------------------------- */
 
+use GlpiPlugin\Purchaserequest\Config;
 use GlpiPlugin\Purchaserequest\NotificationTargetPurchaseRequest;
 use GlpiPlugin\Purchaserequest\Profile;
-use GlpiPlugin\Purchaserequest\Config;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\PurchaseRequestState;
 use GlpiPlugin\Purchaserequest\Threshold;
@@ -52,11 +53,11 @@ function plugin_purchaserequest_install()
 
     $migration = new Migration("3.0.2");
     $classes   = [NotificationTargetPurchaseRequest::class,
-                 PurchaseRequest::class,
-                 Config::class,
-                 Threshold::class,
-                 Validation::class,
-                 PurchaseRequestState::class];
+        PurchaseRequest::class,
+        Config::class,
+        Threshold::class,
+        Validation::class,
+        PurchaseRequestState::class];
 
     foreach ($classes as $class) {
         call_user_func([$class, 'install'], $migration);
@@ -91,7 +92,7 @@ function plugin_purchaserequest_uninstall()
         call_user_func([$class, 'uninstall']);
     }
 
-   //Delete rights associated with the plugin
+    //Delete rights associated with the plugin
     $profileRight = new ProfileRight();
     foreach (Profile::getAllRights() as $right) {
         $profileRight->deleteByCriteria(['name' => $right['field']]);
@@ -103,7 +104,7 @@ function plugin_purchaserequest_uninstall()
 /* define dropdown tables to be manage in GLPI : */
 function plugin_purchaserequest_getDropdown()
 {
-   /* table => name */
+    /* table => name */
     if (Plugin::isPluginActive("purchaserequest")) {
         return [PurchaseRequestState::class => __("Purchase request status", "purchaserequest")];
     } else {
@@ -117,14 +118,14 @@ function plugin_purchaserequest_getDatabaseRelations()
 
     if (Plugin::isPluginActive("purchaserequest")) {
         return ["glpi_entities"                                     => ["glpi_plugin_purchaserequest_purchaserequests" => "entities_id"],
-              "glpi_profiles"                                     => ["glpi_plugin_purchaserequest_profiles" => "profiles_id"],
-              "glpi_users"                                        => ["glpi_plugin_purchaserequest_purchaserequests" => "users_id",
-                                                                      "glpi_plugin_purchaserequest_purchaserequests" => "users_id_validate",
-                                                                      "glpi_plugin_purchaserequest_purchaserequests" => "users_id_creator"],
-              "glpi_groups"                                       => ["glpi_plugin_purchaserequest_purchaserequests" => "groups_id"],
-              "glpi_tickets"                                      => ["glpi_plugin_purchaserequest_purchaserequests" => "tickets_id"],
-//              "glpi_plugin_purchaserequest_purchaserequeststates" => [
-//                 "glpi_plugin_purchaserequest_purchaserequests" => "plugin_purchaserequest_purchaserequeststates_id"]
+            "glpi_profiles"                                     => ["glpi_plugin_purchaserequest_profiles" => "profiles_id"],
+            "glpi_users"                                        => ["glpi_plugin_purchaserequest_purchaserequests" => "users_id",
+                "glpi_plugin_purchaserequest_purchaserequests" => "users_id_validate",
+                "glpi_plugin_purchaserequest_purchaserequests" => "users_id_creator"],
+            "glpi_groups"                                       => ["glpi_plugin_purchaserequest_purchaserequests" => "groups_id"],
+            "glpi_tickets"                                      => ["glpi_plugin_purchaserequest_purchaserequests" => "tickets_id"],
+            //              "glpi_plugin_purchaserequest_purchaserequeststates" => [
+            //                 "glpi_plugin_purchaserequest_purchaserequests" => "plugin_purchaserequest_purchaserequeststates_id"]
         ];
     } else {
         return [];
@@ -156,7 +157,7 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num)
     $field     = $searchopt[$ID]["field"];
     $dbu       = new DbUtils();
     switch ($table . '.' . $field) {
-       /* display associated items with order */
+        /* display associated items with order */
         case "glpi_plugin_purchaserequest_purchaserequests.types_id":
             $file = "";
             if (isset($data['raw']["itemtype"]) && $data['raw']["itemtype"] == 'PluginOrderOther') {
@@ -225,7 +226,7 @@ function plugin_purchaserequest_displayConfigItem($type, $ID, $data, $num)
         case "glpi_plugin_purchaserequest_purchaserequests.status":
             $status_color = CommonITILValidation::getStatusColor($data[$num][0]['name']);
             return " class=\"shadow-none\" style=\"background-color:" . $status_color . ";\" ";
-         break;
+            break;
     }
     return "";
 }

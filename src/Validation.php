@@ -167,9 +167,7 @@ class Validation extends CommonDBTM
         }
 
         if (isset($input['update_status'])) {
-
             $input['validation_date'] = $_SESSION["glpi_currenttime"];
-
         }
 
         return $input;
@@ -193,11 +191,9 @@ class Validation extends CommonDBTM
                     'validation_status' => $this->fields["status"]];
                 NotificationEvent::raiseEvent('ask_purchaserequest', $purchase_request, $options);
             }
-
         }
 
         if (isset($this->fields['tickets_id'])) {
-
             $changes[0] = 0;
             $changes[1] = '';
             $changes[2] = $this->fields["id"];
@@ -231,7 +227,6 @@ class Validation extends CommonDBTM
                     __CLASS__,
                     Log::HISTORY_PLUGIN + self::HISTORY_DELLINK
                 );
-
             }
             if (!empty($this->fields['tickets_id'])) {
                 {
@@ -272,7 +267,6 @@ class Validation extends CommonDBTM
                 }
             }
             if ($CFG_GLPI["notifications_mailing"]) {
-
                 $purchase_request->getFromDB($this->fields["plugin_purchaserequest_purchaserequests_id"]);
 
                 if (count($this->updates)) {
@@ -284,7 +278,6 @@ class Validation extends CommonDBTM
                         if ($validation == true && $purchase_request->fields["status"] == CommonITILValidation::ACCEPTED) {
                             NotificationEvent::raiseEvent('validation_purchaserequest', $purchase_request, $options);
                         } elseif ($purchase_request->fields["status"] == CommonITILValidation::WAITING) {
-
                             $items = $this->find(["plugin_purchaserequest_purchaserequests_id" => $this->fields["plugin_purchaserequest_purchaserequests_id"]]);
 
                             foreach ($items as $item) {
@@ -294,9 +287,7 @@ class Validation extends CommonDBTM
                                     NotificationEvent::raiseEvent('ask_purchaserequest', $purchase_request, $options);
                                 }
                             }
-
                         }
-
                     } elseif (isset($this->input['status'])
                                && $this->input['status'] == CommonITILValidation::REFUSED) {
                         NotificationEvent::raiseEvent('no_validation_purchaserequest', $purchase_request, $options);
@@ -449,7 +440,6 @@ class Validation extends CommonDBTM
                         'value' => $this->fields["types_id"],
                     ]
                 );
-
             }
         }
         echo "</span>";
@@ -563,7 +553,6 @@ class Validation extends CommonDBTM
         if (!$rows || !$canread) {
             echo __('No item to display');
         } else {
-
             $canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]);
             $rand    = mt_rand();
 
@@ -659,7 +648,6 @@ class Validation extends CommonDBTM
                 echo Html::submit(_sx('button', 'Post'), ['name' => 'action', 'class' => 'btn btn-primary']);
                 echo "</td>";
                 echo "</table>";
-
             }
             Html::closeForm();
             echo "</div>";
@@ -674,7 +662,6 @@ class Validation extends CommonDBTM
 
         $action['delete_link'] = __("Delete link with order", "purchaserequest");
         Dropdown::showFromArray('chooseAction', $action);
-
     }
 
     /**
@@ -687,7 +674,7 @@ class Validation extends CommonDBTM
         $validation = new self();
         echo "<form name='form' id='formvalidation' method='post' action='" . Toolbox::getItemTypeFormURL(Validation::class) . "'>";
 
-        echo "<div align='center'><table class='tab_cadre_fixe'>";
+        echo "<div class='center'><table class='tab_cadre_fixe'>";
         //      echo "<tr class='tab_bg_2'>";
         //      echo "<th colspan='3'>" . __('Do you approve this purchase request ?', 'purchaserequest') . "</th>";
         //      echo "</tr>";
@@ -893,11 +880,8 @@ class Validation extends CommonDBTM
                     PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
             $DB->doQuery($query) or die($DB->error());
-
         } else {
-
         }
-
     }
 
     public static function uninstall()
@@ -908,5 +892,4 @@ class Validation extends CommonDBTM
         $table = $dbu->getTableForItemType(__CLASS__);
         $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die($DB->error());
     }
-
 }

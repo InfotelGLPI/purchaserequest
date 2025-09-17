@@ -40,35 +40,33 @@ use User;
 
 class Config extends CommonDBTM
 {
-    static $rightname         = "plugin_purchaserequest_config";
-    var    $can_be_translated = true;
+    public static $rightname         = "plugin_purchaserequest_config";
+    public $can_be_translated = true;
 
-   /**
-    * Config constructor.
-    */
-    public function __construct()
-    {
-    }
+    /**
+     * Config constructor.
+     */
+    public function __construct() {}
 
-    static function canView(): bool
+    public static function canView(): bool
     {
 
         return (Session::haveRight(self::$rightname, READ));
     }
 
-    static function canCreate(): bool
+    public static function canCreate(): bool
     {
 
         return (Session::haveRight(self::$rightname, READ));
     }
 
-    static function getTypeName($nb = 0)
+    public static function getTypeName($nb = 0)
     {
 
         return self::createTabEntry(__('Plugin setup', 'purchaserequest'));
     }
 
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         return self::createTabEntry($this->getTypeName(1));
     }
@@ -78,7 +76,7 @@ class Config extends CommonDBTM
         return "ti ti-basket";
     }
 
-    static function getMenuContent()
+    public static function getMenuContent()
     {
 
         $menu['title']           = self::getMenuName(2);
@@ -91,7 +89,7 @@ class Config extends CommonDBTM
         return $menu;
     }
 
-    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
 
 
@@ -101,21 +99,21 @@ class Config extends CommonDBTM
         return true;
     }
 
-    function defineTabs($options = [])
+    public function defineTabs($options = [])
     {
 
         $ong = [];
         $this->addDefaultFormTab($ong);
-       //      $this->addStandardTab(__CLASS__, $ong, $options);
+        //      $this->addStandardTab(__CLASS__, $ong, $options);
 
         return $ong;
     }
 
-    function showForm($ID, $options = [])
+    public function showForm($ID, $options = [])
     {
 
-        echo "<form name='form' method='post' action='" .
-           Toolbox::getItemTypeFormURL(self::getType()) . "'>";
+        echo "<form name='form' method='post' action='"
+           . Toolbox::getItemTypeFormURL(self::getType()) . "'>";
         echo Html::hidden('id', ['value' => $this->fields['id']]);
         echo "<div class='center'><table class='tab_cadre_fixe'  cellspacing='2' cellpadding='2'>";
         echo "<tr><th colspan='2'>" . __('Configuration purchase request', 'purchaserequest') . "</th></tr>";
@@ -124,9 +122,9 @@ class Config extends CommonDBTM
         echo "<tr class='tab_bg_1 top'><td>" . __('General Services Manager', 'purchaserequest') . "</td>";
         echo "<td>";
         User::dropdown(['name'   => "id_general_service_manager",
-                      'value'  => $this->fields["id_general_service_manager"],
-                      'entity' => -1,
-                      'right'  => 'plugin_purchaserequest_validate']);
+            'value'  => $this->fields["id_general_service_manager"],
+            'entity' => -1,
+            'right'  => 'plugin_purchaserequest_validate']);
 
         echo "</td></tr>";
 
@@ -139,9 +137,9 @@ class Config extends CommonDBTM
         Html::closeForm();
     }
 
-   /**
-    * @param \Migration $migration
-    */
+    /**
+     * @param Migration $migration
+     */
     public static function install(Migration $migration)
     {
         global $DB;

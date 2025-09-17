@@ -31,48 +31,43 @@ use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\Validation;
 
 if (!isset($_GET["id"])) {
-   $_GET["id"] = "";
+    $_GET["id"] = "";
 }
 
 global $DB;
 
 if (Plugin::isPluginActive("order")
     && $DB->tableExists("glpi_plugin_order_orders")) {
-   $validation = new Validation();
+    $validation = new Validation();
 
-   if (isset($_POST["add"])) {
-      $validation->check(-1, CREATE, $_POST);
-      $newID = $validation->add($_POST);
-      Html::back();
+    if (isset($_POST["add"])) {
+        $validation->check(-1, CREATE, $_POST);
+        $newID = $validation->add($_POST);
+        Html::back();
+    } elseif (isset($_POST["delete"])) {
+        $validation->check($_POST['id'], DELETE);
+        $validation->delete($_POST);
+        $validation->redirectToList();
+    } elseif (isset($_POST["restore"])) {
+        $validation->check($_POST['id'], DELETE);
+        $validation->restore($_POST);
+        $validation->redirectToList();
+    } elseif (isset($_POST["purge"])) {
+        $validation->check($_POST['id'], PURGE);
+        $validation->delete($_POST, 1);
+        $validation->redirectToList();
 
-   } else if (isset($_POST["delete"])) {
-
-      $validation->check($_POST['id'], DELETE);
-      $validation->delete($_POST);
-      $validation->redirectToList();
-   } else if (isset($_POST["restore"])) {
-
-      $validation->check($_POST['id'], DELETE);
-      $validation->restore($_POST);
-      $validation->redirectToList();
-
-   } else if (isset($_POST["purge"])) {
-      $validation->check($_POST['id'], PURGE);
-      $validation->delete($_POST, 1);
-      $validation->redirectToList();
-
-      /* update purchaserequest */
-   } else if (isset($_POST["update"]) || (isset($_POST['update_status']))) {
-
-//      $validation->check($_POST['id'], READ);
-      $validation->update($_POST);
-      Html::back();
-   }
-   Html::back();
+        /* update purchaserequest */
+    } elseif (isset($_POST["update"]) || (isset($_POST['update_status']))) {
+        //      $validation->check($_POST['id'], READ);
+        $validation->update($_POST);
+        Html::back();
+    }
+    Html::back();
 } else {
-   Html::header(__('Setup'), '', "tools", PurchaseRequest::class, "config");
-   echo "<div class='alert alert-important alert-warning d-flex'>";
-   echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+    Html::header(__('Setup'), '', "tools", PurchaseRequest::class, "config");
+    echo "<div class='alert alert-important alert-warning d-flex'>";
+    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
 }
 
 Html::footer();

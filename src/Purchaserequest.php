@@ -1,4 +1,5 @@
 <?php
+
 /*
  LICENSE
 
@@ -26,6 +27,7 @@
  @link      http://www.glpi-project.org/
  @since     2009
  ---------------------------------------------------------------------- */
+
 namespace GlpiPlugin\Purchaserequest;
 
 use Ajax;
@@ -36,7 +38,6 @@ use CommonITILValidation;
 use DbUtils;
 use Dropdown;
 use Glpi\RichText\RichText;
-use Ticket;
 use Group;
 use Group_User;
 use Html;
@@ -49,6 +50,7 @@ use PluginOrderOrder;
 use PluginOrderOrder_Item;
 use PluginOrderReference;
 use Session;
+use Ticket;
 use Ticket_User;
 use TicketValidation;
 use Toolbox;
@@ -66,8 +68,8 @@ class PurchaseRequest extends CommonDBTM
     public static $rightname = 'plugin_purchaserequest_purchaserequest';
     public $dohistory = true;
 
-    const HISTORY_ADDLINK = 50;
-    const HISTORY_DELLINK = 51;
+    public const HISTORY_ADDLINK = 50;
+    public const HISTORY_DELLINK = 51;
 
     /**
      * @param int $nb
@@ -79,7 +81,7 @@ class PurchaseRequest extends CommonDBTM
         return _n("Purchase request", "Purchase requests", $nb, "purchaserequest");
     }
 
-    static function getIcon()
+    public static function getIcon()
     {
         return "ti ti-basket";
     }
@@ -97,7 +99,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @return array
      */
-    function defineTabs($options = [])
+    public function defineTabs($options = [])
     {
         $ong = [];
         $this->addDefaultFormTab($ong);
@@ -109,12 +111,12 @@ class PurchaseRequest extends CommonDBTM
     }
 
     /**
-     * @param \CommonGLPI $item
+     * @param CommonGLPI $item
      * @param int $withtemplate
      *
      * @return string|\translated
      */
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == PurchaseRequest::class) {
             return self::createTabEntry(__('Approval'));
@@ -134,7 +136,7 @@ class PurchaseRequest extends CommonDBTM
         return '';
     }
 
-    static function countForTicket(\Ticket $item)
+    public static function countForTicket(Ticket $item)
     {
         $dbu = new DbUtils();
         $restrict = ["tickets_id" => $item->getField('id')];
@@ -143,7 +145,7 @@ class PurchaseRequest extends CommonDBTM
         return $nb;
     }
 
-    static function countForPluginOrderOrder(PluginOrderOrder $item)
+    public static function countForPluginOrderOrder(PluginOrderOrder $item)
     {
         $dbu = new DbUtils();
         $restrict = ["plugin_order_orders_id" => $item->getField('id')];
@@ -153,13 +155,13 @@ class PurchaseRequest extends CommonDBTM
     }
 
     /**
-     * @param \CommonGLPI $item
+     * @param CommonGLPI $item
      * @param int $tabnum
      * @param int $withtemplate
      *
      * @return bool
      */
-    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
         if (!Plugin::isPluginActive('order')) {
             echo "<div class='alert alert-important alert-warning d-flex'>";
@@ -273,7 +275,7 @@ class PurchaseRequest extends CommonDBTM
         $itemtype = Threshold::getObject($this->fields["itemtype"]);
         if ($threshold->getFromDBByCrit([
             "itemtype" => $itemtype,
-            "items_id" => $this->fields["types_id"]
+            "items_id" => $this->fields["types_id"],
         ])) {
             $th = intval($threshold->fields["thresholds"]);
             if ($th != -1) {
@@ -316,7 +318,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @return nothing
      **/
-    function post_updateItem($history = 1)
+    public function post_updateItem($history = 1)
     {
         if (isset($this->oldvalues['tickets_id'])) {
             if ($this->oldvalues['tickets_id'] != 0) {
@@ -352,7 +354,7 @@ class PurchaseRequest extends CommonDBTM
             $validation->deleteByCriteria(
                 [
                     "users_id_validate" => $this->oldvalues['users_id_validate'],
-                    "plugin_purchaserequest_purchaserequests_id" => $this->fields["id"]
+                    "plugin_purchaserequest_purchaserequests_id" => $this->fields["id"],
                 ]
             );
             $input = [];
@@ -373,7 +375,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @return bool
      */
-    function checkMandatoryFields($input)
+    public function checkMandatoryFields($input)
     {
         $msg = [];
         $checkKo = false;
@@ -384,7 +386,7 @@ class PurchaseRequest extends CommonDBTM
             'itemtype' => __('Item type'),
             'types_id' => __('Type'),
             'amount' => __("Amount", "purchaserequest"),
-            'users_id_validate' => __('To be validated by', 'purchaserequest')
+            'users_id_validate' => __('To be validated by', 'purchaserequest'),
         ];
 
         foreach ($input as $key => $value) {
@@ -428,7 +430,7 @@ class PurchaseRequest extends CommonDBTM
 
         $tab[] = [
             'id' => 'common',
-            'name' => self::getTypeName()
+            'name' => self::getTypeName(),
         ];
 
         $tab[] = [
@@ -437,7 +439,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'name',
             'name' => __('Name'),
             'datatype' => 'itemlink',
-            'itemlink_type' => $this->getType()
+            'itemlink_type' => $this->getType(),
         ];
 
         $tab[] = [
@@ -446,7 +448,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'name',
             'name' => __("Requester"),
             'linkfield' => 'users_id',
-            'datatype' => 'dropdown'
+            'datatype' => 'dropdown',
         ];
 
         $tab = array_merge($tab, Location::rawSearchOptionsToAdd());
@@ -461,7 +463,7 @@ class PurchaseRequest extends CommonDBTM
             'itemtype_list' => 'plugin_order_types',
             'checktype' => 'itemtype',
             'searchtype' => ['equals'],
-            'injectable' => true
+            'injectable' => true,
         ];
 
         $tab[] = [
@@ -471,7 +473,7 @@ class PurchaseRequest extends CommonDBTM
             'linkfield' => 'users_id_validate',
             'name' => __("Approver"),
             'datatype' => 'dropdown',
-            'right' => 'plugin_purchaserequest_validate'
+            'right' => 'plugin_purchaserequest_validate',
         ];
 
         $tab[] = [
@@ -480,7 +482,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'due_date',
             'massiveaction' => false,
             'name' => __("Due date", "purchaserequest"),
-            'datatype' => 'datetime'
+            'datatype' => 'datetime',
         ];
 
         $tab[] = [
@@ -491,7 +493,7 @@ class PurchaseRequest extends CommonDBTM
             'massiveaction' => false,
             'checktype' => 'text',
             'searchtype' => ['equals'],
-            'nosearch' => true
+            'nosearch' => true,
         ];
 
         $tab[] = [
@@ -500,7 +502,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'status',
             'name' => __('Approval status'),
             'searchtype' => 'equals',
-            'datatype' => 'specific'
+            'datatype' => 'specific',
         ];
 
         $tab[] = [
@@ -509,7 +511,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'plugin_order_orders_id',
             'datatype' => 'itemlink',
             'massiveaction' => false,
-            'name' => PluginOrderOrder::getTypeName()
+            'name' => PluginOrderOrder::getTypeName(),
         ];
 
         $tab[] = [
@@ -518,7 +520,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'name',
             'datatype' => 'itemlink',
             'massiveaction' => false,
-            'name' => \Ticket::getTypeName(),
+            'name' => Ticket::getTypeName(),
             'linkfield' => 'tickets_id',
         ];
 
@@ -528,7 +530,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'name',
             'name' => __("Requester group"),
             'linkfield' => 'groups_id',
-            'datatype' => 'dropdown'
+            'datatype' => 'dropdown',
         ];
 
         $tab[] = [
@@ -537,7 +539,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'name',
             'name' => __("Status"),
             'linkfield' => 'plugin_purchaserequest_purchaserequeststates_id',
-            'datatype' => 'dropdown'
+            'datatype' => 'dropdown',
         ];
 
         $tab[] = [
@@ -546,7 +548,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'date_mod',
             'name' => __('Last update'),
             'datatype' => 'datetime',
-            'massiveaction' => false
+            'massiveaction' => false,
         ];
 
         $tab[] = [
@@ -555,7 +557,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'date_creation',
             'name' => __('Creation date'),
             'datatype' => 'datetime',
-            'massiveaction' => false
+            'massiveaction' => false,
         ];
 
         $tab[] = [
@@ -564,7 +566,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'processing_date',
             'name' => __('Treated on', "purchaserequest"),
             'datatype' => 'datetime',
-            'massiveaction' => false
+            'massiveaction' => false,
         ];
 
         /* comments */
@@ -573,7 +575,7 @@ class PurchaseRequest extends CommonDBTM
             'table' => $this->getTable(),
             'field' => 'comment',
             'name' => __("Description"),
-            'datatype' => 'text'
+            'datatype' => 'text',
         ];
         /* amount */
         $tab[] = [
@@ -581,7 +583,7 @@ class PurchaseRequest extends CommonDBTM
             'table' => $this->getTable(),
             'field' => 'amount',
             'name' => __("Amount", "purchaserequest"),
-            'datatype' => 'decimal'
+            'datatype' => 'decimal',
         ];
 
         /* rebill */
@@ -590,7 +592,7 @@ class PurchaseRequest extends CommonDBTM
             'table' => $this->getTable(),
             'field' => 'invoice_customer',
             'name' => __("To be rebilled to the customer", "purchaserequest"),
-            'datatype' => 'bool'
+            'datatype' => 'bool',
         ];
         /* ID */
         $tab[] = [
@@ -598,7 +600,7 @@ class PurchaseRequest extends CommonDBTM
             'table' => $this->getTable(),
             'field' => 'id',
             'name' => __("ID"),
-            'datatype' => 'number'
+            'datatype' => 'number',
         ];
 
         /* entity */
@@ -607,7 +609,7 @@ class PurchaseRequest extends CommonDBTM
             'table' => 'glpi_entities',
             'field' => 'completename',
             'name' => __("Entity"),
-            'datatype' => 'dropdown'
+            'datatype' => 'dropdown',
         ];
 
         /* entity */
@@ -617,7 +619,7 @@ class PurchaseRequest extends CommonDBTM
             'field' => 'is_recursive',
             'name' => __("Child entities"),
             'datatype' => 'bool',
-            'massiveaction' => false
+            'massiveaction' => false,
         ];
 
         $tab[] = [
@@ -634,10 +636,10 @@ class PurchaseRequest extends CommonDBTM
                 'beforejoin' => [
                     'table' => Validation::getTable(),
                     'joinparams' => [
-                        'jointype' => 'child'
-                    ]
-                ]
-            ]
+                        'jointype' => 'child',
+                    ],
+                ],
+            ],
         ];
 
         return $tab;
@@ -648,7 +650,7 @@ class PurchaseRequest extends CommonDBTM
      * @param $values
      * @param $options   array
      **/
-    static function getSpecificValueToDisplay($field, $values, array $options = [])
+    public static function getSpecificValueToDisplay($field, $values, array $options = [])
     {
         if (!is_array($values)) {
             $values = [$field => $values];
@@ -656,7 +658,7 @@ class PurchaseRequest extends CommonDBTM
         switch ($field) {
             case 'status':
                 return CommonITILValidation::getStatus($values[$field]);
-            case 'itemtype' :
+            case 'itemtype':
                 $item = new $values['itemtype']();
                 return $item->getTypeName();
                 break;
@@ -671,7 +673,7 @@ class PurchaseRequest extends CommonDBTM
      * @param $values (default '')
      * @param $options   array
      **/
-    static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
+    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
     {
         if (!is_array($values)) {
             $values = [$field => $values];
@@ -679,7 +681,7 @@ class PurchaseRequest extends CommonDBTM
         $options['display'] = false;
 
         switch ($field) {
-            case 'status' :
+            case 'status':
                 $options['value'] = $values[$field];
                 return CommonITILValidation::dropdownStatus($name, $options);
             case 'itemtype':
@@ -744,7 +746,7 @@ class PurchaseRequest extends CommonDBTM
                 'value' => $this->fields["users_id"],
                 'entity' => $this->fields["entities_id"],
                 'on_change' => "PurchaserequestLoadGroups();",
-                'right' => 'all'
+                'right' => 'all',
             ]);
         } else {
             echo Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"]);
@@ -763,7 +765,7 @@ class PurchaseRequest extends CommonDBTM
             $JS = "function PurchaserequestLoadGroups(){";
             $params = [
                 'users_id' => '__VALUE__',
-                'entity' => $this->fields["entities_id"]
+                'entity' => $this->fields["entities_id"],
             ];
             $JS .= Ajax::updateItemJsCode(
                 "plugin_purchaserequest_group",
@@ -784,7 +786,7 @@ class PurchaseRequest extends CommonDBTM
         echo "<td>";
         Dropdown::show('Location', [
             'value' => $this->fields["locations_id"],
-            'entity' => $this->fields["entities_id"]
+            'entity' => $this->fields["entities_id"],
         ]);
         echo "</td>";
         echo "<td>" . __("Status") . "&nbsp;</td>";
@@ -793,7 +795,7 @@ class PurchaseRequest extends CommonDBTM
             PurchaseRequestState::class,
             [
                 'value' => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
-                'entity' => $this->fields["entities_id"]
+                'entity' => $this->fields["entities_id"],
             ]
         );
         echo "</td></tr>";
@@ -870,19 +872,19 @@ class PurchaseRequest extends CommonDBTM
             'name' => "users_id_validate",
             'value' => $this->fields["users_id_validate"],
             'entity' => $this->fields["entities_id"],
-            'right' => 'plugin_purchaserequest_validate'
+            'right' => 'plugin_purchaserequest_validate',
         ]);
         echo "</td></tr>";
         echo "<tr class='tab_bg_1'><td>" . __(
-                "Amount",
-                "purchaserequest"
-            ) . "&nbsp;<span style='color:red;'>*</span></td>";
+            "Amount",
+            "purchaserequest"
+        ) . "&nbsp;<span style='color:red;'>*</span></td>";
         echo "<td>";
 
         $amount = $this->fields['amount'] ?? number_format($this->fields['amount'], 2, '.', ' ');
         $params = [
             'type' => 'text',
-            'value' => $amount
+            'value' => $amount,
         ];
         echo Html::input('amount', $params);
         echo "</td>";
@@ -891,7 +893,7 @@ class PurchaseRequest extends CommonDBTM
         echo "<td>";
         Html::showCheckbox([
             'name' => "invoice_customer",
-            'checked' => $this->fields["invoice_customer"]
+            'checked' => $this->fields["invoice_customer"],
         ]);
 
         echo "</td>";
@@ -911,7 +913,7 @@ class PurchaseRequest extends CommonDBTM
         }
         PluginOrderOrder::dropdown($options);
         echo "</td>";
-        $ticket = new \Ticket();
+        $ticket = new Ticket();
         echo "<td>" . __("Linked to ticket", "purchaserequest") . "</td>";
         echo "<td>";
         $options = [];
@@ -919,7 +921,7 @@ class PurchaseRequest extends CommonDBTM
             $options['value'] = $this->fields['tickets_id'];
         }
         $options['entity'] = $this->fields["entities_id"];
-        \Ticket::dropdown($options);
+        Ticket::dropdown($options);
         echo "</td>";
         if ($hidden != false) {
             echo "<td colspan='2'></td>";
@@ -959,7 +961,7 @@ class PurchaseRequest extends CommonDBTM
     /**
      * @param $item
      */
-    static function showForTicket($item)
+    public static function showForTicket($item)
     {
         $purchaserequest = new self();
 
@@ -992,7 +994,7 @@ class PurchaseRequest extends CommonDBTM
     /**
      * @param $tickets_id
      */
-    static function showFormPurchase($tickets_id)
+    public static function showFormPurchase($tickets_id)
     {
         global $CFG_GLPI;
 
@@ -1000,7 +1002,7 @@ class PurchaseRequest extends CommonDBTM
         $purchaserequest = new self();
         $purchaserequest->getEmpty();
 
-        $ticket = new \Ticket();
+        $ticket = new Ticket();
         $ticket->getFromDB($tickets_id);
 
         $purchaserequest->fields['entities_id'] = $ticket->fields['entities_id'];
@@ -1012,14 +1014,14 @@ class PurchaseRequest extends CommonDBTM
             $count = count($actors[CommonITILActor::REQUESTER]);
         }
         if ($count == 1 && $actor->getFromDBByCrit(
-                ["`tickets_id` = $tickets_id AND `type` = " . CommonITILActor::REQUESTER]
-            )) {
+            ["`tickets_id` = $tickets_id AND `type` = " . CommonITILActor::REQUESTER]
+        )) {
             $purchaserequest->fields['users_id'] = $actor->fields['users_id'];
         }
 
         echo "<form name='form' method='post' action='" . Toolbox::getItemTypeFormURL(
-                PurchaseRequest::class
-            ) . "'>";
+            PurchaseRequest::class
+        ) . "'>";
 
         echo "<div align='center'><table class='tab_cadre_fixe'>";
         echo "<tr><th colspan='4'>" . __('Add a purchase request', 'purchaserequest') . "</th></tr>";
@@ -1032,7 +1034,7 @@ class PurchaseRequest extends CommonDBTM
         $ticket_validation = new TicketValidation();
         $ticket_validations = $ticket_validation->find([
             'tickets_id' => $tickets_id,
-            'status' => CommonITILValidation::ACCEPTED
+            'status' => CommonITILValidation::ACCEPTED,
         ]);
         $users_validations = [];
         foreach ($ticket_validations as $validation) {
@@ -1050,7 +1052,7 @@ class PurchaseRequest extends CommonDBTM
             'value' => $purchaserequest->fields["users_id"],
             'entity' => $purchaserequest->fields["entities_id"],
             'on_change' => "PurchaserequestLoadGroups();",
-            'right' => 'all'
+            'right' => 'all',
         ]);
 
         echo "</td>";
@@ -1066,7 +1068,7 @@ class PurchaseRequest extends CommonDBTM
         $JS = "function PurchaserequestLoadGroups(){";
         $params = [
             'users_id' => '__VALUE__',
-            'entity' => $purchaserequest->fields["entities_id"]
+            'entity' => $purchaserequest->fields["entities_id"],
         ];
         $JS .= Ajax::updateItemJsCode(
             "plugin_purchaserequest_group",
@@ -1085,7 +1087,7 @@ class PurchaseRequest extends CommonDBTM
         echo "<td>";
         Dropdown::show('Location', [
             'value' => $purchaserequest->fields["locations_id"],
-            'entity' => $purchaserequest->fields["entities_id"]
+            'entity' => $purchaserequest->fields["entities_id"],
         ]);
         echo "</td>";
         echo "<td>" . __("Status") . "&nbsp;</td>";
@@ -1094,7 +1096,7 @@ class PurchaseRequest extends CommonDBTM
             PurchaseRequestState::class,
             [
                 'value' => $purchaserequest->fields["plugin_purchaserequest_purchaserequeststates_id"],
-                'entity' => $purchaserequest->fields["entities_id"]
+                'entity' => $purchaserequest->fields["entities_id"],
             ]
         );
         echo "</td></tr>";
@@ -1168,20 +1170,20 @@ class PurchaseRequest extends CommonDBTM
             'name' => "users_id_validate",
             'value' => $purchaserequest->fields["users_id_validate"],
             'entity' => $purchaserequest->fields["entities_id"],
-            'right' => 'plugin_purchaserequest_validate'
+            'right' => 'plugin_purchaserequest_validate',
         ]);
         echo "</td>";
         echo "</tr>";
         echo "</tr>";
         echo "<tr class='tab_bg_1'><td>" . __(
-                "Amount",
-                "purchaserequest"
-            ) . "&nbsp;<span style='color:red;'>*</span></td>";
+            "Amount",
+            "purchaserequest"
+        ) . "&nbsp;<span style='color:red;'>*</span></td>";
         echo "<td>";
         $amount = $purchaserequest->fields['amount'] ?? number_format($purchaserequest->fields['amount'], 2, '.', ' ');
         $params = [
             'type' => 'text',
-            'value' => $amount
+            'value' => $amount,
         ];
         echo Html::input('amount', $params);
         echo "</td>";
@@ -1272,18 +1274,18 @@ class PurchaseRequest extends CommonDBTM
             echo "<td>" . Dropdown::getDropdownName('glpi_locations', $field['locations_id']) . "</td>";
             // state
             echo "<td>" . Dropdown::getDropdownName(
-                    'glpi_plugin_purchaserequest_purchaserequeststates',
-                    $field['plugin_purchaserequest_purchaserequeststates_id']
-                ) . "</td>";
+                'glpi_plugin_purchaserequest_purchaserequeststates',
+                $field['plugin_purchaserequest_purchaserequeststates_id']
+            ) . "</td>";
             // item type
             $item = new $field["itemtype"]();
             echo "<td>" . $item->getTypeName() . "</td>";
             // Model name
             $itemtypeclass = $field['itemtype'] . "Type";
             echo "<td>" . Dropdown::getDropdownName(
-                    $dbu->getTableForItemType($itemtypeclass),
-                    $field["types_id"]
-                ) . "</td>";
+                $dbu->getTableForItemType($itemtypeclass),
+                $field["types_id"]
+            ) . "</td>";
             //due date
             echo "<td>" . Html::convDate($field['due_date']) . "</td>";
             //traited
@@ -1320,7 +1322,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @return \all
      */
-    function getItems($tickets_id = 0, $options = [])
+    public function getItems($tickets_id = 0, $options = [])
     {
         global $DB;
 
@@ -1359,7 +1361,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @param $item
      */
-    static function showForOrder($item)
+    public static function showForOrder($item)
     {
         global $CFG_GLPI;
 
@@ -1385,8 +1387,8 @@ class PurchaseRequest extends CommonDBTM
 
             echo "<div class='center'>";
 
-            echo "<form method='post' name='purchaseresquet_form$rand' id='purchaseresquet_form$rand'  " .
-                "action='" . Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "'>";
+            echo "<form method='post' name='purchaseresquet_form$rand' id='purchaseresquet_form$rand'  "
+                . "action='" . Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "'>";
 
             echo "<table class='tab_cadre_fixe'>";
             echo "<tr class='tab_bg_1 center'>";
@@ -1435,18 +1437,18 @@ class PurchaseRequest extends CommonDBTM
                 echo "<td>" . Dropdown::getDropdownName('glpi_locations', $field['locations_id']) . "</td>";
                 // state
                 echo "<td>" . Dropdown::getDropdownName(
-                        'glpi_plugin_purchaserequest_purchaserequeststates',
-                        $field['plugin_purchaserequest_purchaserequeststates_id']
-                    ) . "</td>";
+                    'glpi_plugin_purchaserequest_purchaserequeststates',
+                    $field['plugin_purchaserequest_purchaserequeststates_id']
+                ) . "</td>";
                 // item type
                 $item = new $field["itemtype"]();
                 echo "<td>" . $item->getTypeName() . "</td>";
                 // Model name
                 $itemtypeclass = $field['itemtype'] . "Type";
                 echo "<td>" . Dropdown::getDropdownName(
-                        $dbu->getTableForItemType($itemtypeclass),
-                        $field["types_id"]
-                    ) . "</td>";
+                    $dbu->getTableForItemType($itemtypeclass),
+                    $field["types_id"]
+                ) . "</td>";
                 //due date
                 echo "<td>" . Html::convDate($field['due_date']) . "</td>";
                 //traited
@@ -1499,14 +1501,14 @@ class PurchaseRequest extends CommonDBTM
     /**
      * @param $item
      */
-    static function showValidation($item)
+    public static function showValidation($item)
     {
         $dbu = new DbUtils();
         $validator = ($item->fields["users_id_validate"] == Session::getLoginUserID());
 
         echo "<form name='form' id='formvalidation' method='post' action='" . Toolbox::getItemTypeFormURL(
-                PurchaseRequest::class
-            ) . "'>";
+            PurchaseRequest::class
+        ) . "'>";
 
         echo "<div align='center'><table class='tab_cadre_fixe'>";
         echo "<tr class='tab_bg_2'>";
@@ -1569,7 +1571,7 @@ class PurchaseRequest extends CommonDBTM
                 'value' => $item->fields["comment_validation"],
                 'enable_richtext' => false,
                 'cols' => '90',
-                'rows' => '3'
+                'rows' => '3',
             ]);
             echo Html::hidden('id', ['value' => $item->fields['id']]);
             echo "</td></tr>";
@@ -1604,24 +1606,24 @@ class PurchaseRequest extends CommonDBTM
      *
      * @see CommonDBTM::showMassiveActionsSubForm()
      **/
-    static function showMassiveActionsSubForm(MassiveAction $ma)
+    public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
         switch ($ma->getAction()) {
             case 'link':
                 PluginOrderOrder::dropdown();
-                echo "&nbsp;" .
-                    Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                echo "&nbsp;"
+                    . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
 
             case 'delete_link':
-                echo "&nbsp;" .
-                    Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                echo "&nbsp;"
+                    . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
 
             case 'validate':
                 CommonITILValidation::dropdownStatus('status');
-                echo "</br>" .
-                    Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+                echo "</br>"
+                    . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
                 return true;
         }
         return "";
@@ -1638,7 +1640,7 @@ class PurchaseRequest extends CommonDBTM
      * This should be overloaded in Class
      *
      */
-    function getSpecificMassiveActions($checkitem = null)
+    public function getSpecificMassiveActions($checkitem = null)
     {
         $actions['GlpiPlugin\Purchaserequest\PurchaseRequest:link'] = __("Link to an order", "purchaserequest");
         $actions['GlpiPlugin\Purchaserequest\PurchaseRequest:delete_link'] = __("Delete link to order", "purchaserequest");
@@ -1665,7 +1667,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @see CommonDBTM::processMassiveActionsForOneItemtype()
      **/
-    static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
+    public static function processMassiveActionsForOneItemtype(MassiveAction $ma, CommonDBTM $item, array $ids)
     {
         switch ($ma->getAction()) {
             case "link":
@@ -1735,7 +1737,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @param $users_id
      */
-    static function displayGroup($users_id)
+    public static function displayGroup($users_id)
     {
         //list of groups
         $group_users = Group_User::getUserGroups($users_id);
@@ -1760,17 +1762,17 @@ class PurchaseRequest extends CommonDBTM
      *
      * @return string
      **/
-    static function getHistoryEntry($data)
+    public static function getHistoryEntry($data)
     {
         switch ($data['linked_action'] - Log::HISTORY_PLUGIN) {
-            case self::HISTORY_ADDLINK :
+            case self::HISTORY_ADDLINK:
                 return sprintf(
                     __('%1$s: %2$s'),
                     __('Add a link with an item'),
                     $data["new_value"]
                 );
 
-            case self::HISTORY_DELLINK :
+            case self::HISTORY_DELLINK:
                 return sprintf(
                     __('%1$s: %2$s'),
                     __('Delete a link with an item'),
@@ -1780,7 +1782,7 @@ class PurchaseRequest extends CommonDBTM
         return '';
     }
 
-    static function transfer($ID, $entity)
+    public static function transfer($ID, $entity)
     {
         global $DB;
 
@@ -1811,7 +1813,7 @@ class PurchaseRequest extends CommonDBTM
     }
 
     /**
-     * @param \Migration $migration
+     * @param Migration $migration
      */
     public static function install(Migration $migration)
     {
@@ -1856,7 +1858,7 @@ class PurchaseRequest extends CommonDBTM
                     KEY `is_deleted` (`is_deleted`),
                     KEY `date_mod` (`date_mod`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-            $DB->doQuery($query) or die ($DB->error());
+            $DB->doQuery($query) or die($DB->error());
         } else {
             if (!$DB->fieldExists($table, 'locations_id')) {
                 $DB->doQuery(
@@ -1911,7 +1913,7 @@ class PurchaseRequest extends CommonDBTM
             $query = "DELETE FROM `glpi_$t` WHERE `itemtype` = '" . __CLASS__ . "'";
             $DB->doQuery($query);
         }
-        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
+        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die($DB->error());
     }
 
     //static function getMenuContent() {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  LICENSE
 
@@ -36,55 +37,59 @@ use Html;
 use Migration;
 
 if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access directly to this file");
+    die("Sorry. You can't access directly to this file");
 }
 
 /**
  * Class Threshold
  */
-class Threshold extends CommonDBTM {
-   public static $rightname = 'plugin_purchaserequest_purchaserequest';
-   public        $dohistory = true;
+class Threshold extends CommonDBTM
+{
+    public static $rightname = 'plugin_purchaserequest_purchaserequest';
+    public $dohistory = true;
 
 
-   static $list_type_allowed = ["ComputerType", "MonitorType", "PeripheralType", "NetworkEquipmentType", "PrinterType",
-                                "PhoneType", "ConsumableItemType", "CartridgeItemType", "ContractType", "PluginOrderOtherType",
-                                "SoftwareLicenseType", "CertificateType", "RackType", "PduType",];
+    public static $list_type_allowed = ["ComputerType", "MonitorType", "PeripheralType", "NetworkEquipmentType", "PrinterType",
+        "PhoneType", "ConsumableItemType", "CartridgeItemType", "ContractType", "PluginOrderOtherType",
+        "SoftwareLicenseType", "CertificateType", "RackType", "PduType",];
 
 
-   /**
-    * @param int $nb
-    *
-    * @return string|\translated
-    */
-   public static function getTypeName($nb = 0) {
-      return _n("Purchase threshold", "Purchase thresholds", $nb, "purchaserequest");
-   }
+    /**
+     * @param int $nb
+     *
+     * @return string|\translated
+     */
+    public static function getTypeName($nb = 0)
+    {
+        return _n("Purchase threshold", "Purchase thresholds", $nb, "purchaserequest");
+    }
 
 
-   /**
-    * @param array $options
-    *
-    * @return array
-    */
-   function defineTabs($options = []) {
-      $ong = [];
-      $this->addDefaultFormTab($ong);
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    public function defineTabs($options = [])
+    {
+        $ong = [];
+        $this->addDefaultFormTab($ong);
 
-      return $ong;
-   }
+        return $ong;
+    }
 
-   /**
-    * @param \CommonGLPI $item
-    * @param int         $withtemplate
-    *
-    * @return string|\translated
-    */
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+    /**
+     * @param CommonGLPI $item
+     * @param int         $withtemplate
+     *
+     * @return string|\translated
+     */
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
 
-      return self::createTabEntry($this->getTypeName(1));
+        return self::createTabEntry($this->getTypeName(1));
 
-   }
+    }
 
     public static function getIcon()
     {
@@ -92,113 +97,118 @@ class Threshold extends CommonDBTM {
     }
 
 
-   /**
-    * @param \CommonGLPI $item
-    * @param int         $tabnum
-    * @param int         $withtemplate
-    *
-    * @return bool
-    */
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-      $type = $item->getType();
+    /**
+     * @param CommonGLPI $item
+     * @param int         $tabnum
+     * @param int         $withtemplate
+     *
+     * @return bool
+     */
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        $type = $item->getType();
 
-      if (in_array($item->getType(), self::$list_type_allowed)) {
-         $threshold = new self();
-         $threshold->getEmpty();
-         $threshold->getFromDBByCrit(["itemtype" => $item->getType(),
-                                      "items_id" => $item->getID()]);
-         $threshold->showThresholdForm($threshold->getID(), $item);
-      }
+        if (in_array($item->getType(), self::$list_type_allowed)) {
+            $threshold = new self();
+            $threshold->getEmpty();
+            $threshold->getFromDBByCrit(["itemtype" => $item->getType(),
+                "items_id" => $item->getID()]);
+            $threshold->showThresholdForm($threshold->getID(), $item);
+        }
 
-      return true;
-   }
-
-
-   /**
-    * @param       $ID
-    * @param array $options
-    * @param item  $item
-    *
-    * @return bool
-    */
-   public function showThresholdForm($ID, $item, $options = []) {
-
-      $this->initForm($ID, $options);
-      $this->showFormHeader($options);
-
-      $canedit            = $this->can($ID, UPDATE);
-      $options['canedit'] = $canedit;
-
-      // Data saved in session
-      if (isset($_SESSION['glpi_plugin_thresholds_fields'])) {
-         foreach ($_SESSION['glpi_plugin_thresholds_fields'] as $key => $value) {
-            $this->fields[$key] = $value;
-         }
-         unset($_SESSION['glpi_plugin_thresholds_fields']);
-      }
-
-      /* title */
-      echo "<tr class='tab_bg_1'>";
-      echo "<td colspan='2'>" . $this->getTypeName(1) . "</td><td>";
-      if ($canedit) {
-         echo Html::input('thresholds', ['value' => $this->fields['thresholds'], 'size' => 40]);
-      } else {
-         echo $this->fields["thresholds"];
-      }
-      echo "</td></tr>";
-
-      echo Html::hidden('itemtype', ['value' => $item->getType()]);
-      echo Html::hidden('items_id', ['value' => $item->getID()]);
-      echo Html::hidden('id', ['value' => $ID]);
-
-      if ($canedit) {
-         $this->showFormButtons($options);
-      } else {
-         echo "</table></div>";
-         Html::closeForm();
-      }
-
-      return true;
-   }
+        return true;
+    }
 
 
-   /**
-    * @param \Migration $migration
-    */
-   public static function install(Migration $migration) {
-      global $DB;
+    /**
+     * @param       $ID
+     * @param array $options
+     * @param item  $item
+     *
+     * @return bool
+     */
+    public function showThresholdForm($ID, $item, $options = [])
+    {
 
-      $dbu   = new DbUtils();
-      $table = $dbu->getTableForItemType(__CLASS__);
+        $this->initForm($ID, $options);
+        $this->showFormHeader($options);
 
-      if (!$DB->tableExists($table)) {
-         $migration->displayMessage("Installing $table");
-         $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_thresholds` (
+        $canedit            = $this->can($ID, UPDATE);
+        $options['canedit'] = $canedit;
+
+        // Data saved in session
+        if (isset($_SESSION['glpi_plugin_thresholds_fields'])) {
+            foreach ($_SESSION['glpi_plugin_thresholds_fields'] as $key => $value) {
+                $this->fields[$key] = $value;
+            }
+            unset($_SESSION['glpi_plugin_thresholds_fields']);
+        }
+
+        /* title */
+        echo "<tr class='tab_bg_1'>";
+        echo "<td colspan='2'>" . $this->getTypeName(1) . "</td><td>";
+        if ($canedit) {
+            echo Html::input('thresholds', ['value' => $this->fields['thresholds'], 'size' => 40]);
+        } else {
+            echo $this->fields["thresholds"];
+        }
+        echo "</td></tr>";
+
+        echo Html::hidden('itemtype', ['value' => $item->getType()]);
+        echo Html::hidden('items_id', ['value' => $item->getID()]);
+        echo Html::hidden('id', ['value' => $ID]);
+
+        if ($canedit) {
+            $this->showFormButtons($options);
+        } else {
+            echo "</table></div>";
+            Html::closeForm();
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @param Migration $migration
+     */
+    public static function install(Migration $migration)
+    {
+        global $DB;
+
+        $dbu   = new DbUtils();
+        $table = $dbu->getTableForItemType(__CLASS__);
+
+        if (!$DB->tableExists($table)) {
+            $migration->displayMessage("Installing $table");
+            $query = "CREATE TABLE IF NOT EXISTS `glpi_plugin_purchaserequest_thresholds` (
                     `id` int unsigned NOT NULL AUTO_INCREMENT,
                     `itemtype` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
                     `items_id` int unsigned NOT NULL DEFAULT '0',
                     `thresholds` int unsigned NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-         $DB->doQuery($query) or die ($DB->error());
+            $DB->doQuery($query) or die($DB->error());
 
-      } else {
+        } else {
 
-      }
+        }
 
-   }
+    }
 
-   public static function uninstall() {
-      global $DB;
+    public static function uninstall()
+    {
+        global $DB;
 
-      $dbu   = new DbUtils();
-      $table = $dbu->getTableForItemType(__CLASS__);
-      $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die ($DB->error());
-   }
+        $dbu   = new DbUtils();
+        $table = $dbu->getTableForItemType(__CLASS__);
+        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die($DB->error());
+    }
 
 
-   public static function getObject($type) {
-      return $type . "Type";
-   }
+    public static function getObject($type)
+    {
+        return $type . "Type";
+    }
 
 }
