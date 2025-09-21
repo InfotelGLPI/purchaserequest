@@ -120,7 +120,7 @@ function plugin_version_purchaserequest()
 {
     return ['name'         => _n("Purchase request", "Purchase requests", 1, "purchaserequest"),
            'version'      => PLUGIN_PURCHASEREQUEST_VERSION,
-           'author'       => "<a href='https://blogglpi.infotel.com'>Infotel</a>",
+           'author'       => "<a href='https://blogglpi.infotel.com'>Infotel</a>, Xavier CAILLAUD",
            'license'      => 'GPLv2+',
            'requirements' => [
               'glpi' => [

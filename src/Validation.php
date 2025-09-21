@@ -357,7 +357,7 @@ class Validation extends CommonDBTM
 
         if ($canedit) {
             if ($this->fields['users_id']) {
-                self::displayGroup($this->fields['users_id']);
+                PurchaseRequest::displayGroup($this->fields['users_id']);
             }
 
             $JS     = "function PurchaserequestLoadGroups(){";

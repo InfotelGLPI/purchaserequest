@@ -313,38 +313,39 @@ class NotificationTargetPurchaseRequest extends NotificationTarget {
    public static function uninstall() {
       global $DB;
 
-      $notif = new Notification();
+       $notif   = new Notification();
+       $options = ['itemtype' => PurchaseRequest::class];
+       foreach ($DB->request([
+           'FROM' => 'glpi_notifications',
+           'WHERE' => $options]) as $data) {
+           $notif->delete($data);
+       }
 
-      foreach (['ask_purchaserequest', 'validation_purchaserequest', 'no_validation_purchaserequest'] as $event) {
-         $options = [
-            'itemtype' => PurchaseRequest::class,
-            'event'    => $event,
-            'FIELDS'   => 'id',
-         ];
+       //templates
+       $template       = new NotificationTemplate();
+       $translation    = new NotificationTemplateTranslation();
+       $notif_template = new Notification_NotificationTemplate();
+       $options        = ['itemtype' => PurchaseRequest::class];
+       foreach ($DB->request([
+           'FROM' => 'glpi_notificationtemplates',
+           'WHERE' => $options]) as $data) {
+           $options_template = [
+               'notificationtemplates_id' => $data['id']
+           ];
 
-         foreach ($DB->request('glpi_notifications', $options) as $data) {
-            $notif->delete($data);
-         }
-      }
+           foreach ($DB->request([
+               'FROM' => 'glpi_notificationtemplatetranslations',
+               'WHERE' => $options_template]) as $data_template) {
+               $translation->delete($data_template);
+           }
+           $template->delete($data);
 
-      //templates
-      $template       = new NotificationTemplate();
-      $translation    = new NotificationTemplateTranslation();
-      $notif_template = new Notification_NotificationTemplate();
-      $options        = ['itemtype' => PurchaseRequest::class, 'FIELDS' => 'id'];
-
-      foreach ($DB->request('glpi_notificationtemplates', $options) as $data) {
-         $options_template = ['notificationtemplates_id' => $data['id'], 'FIELDS' => 'id'];
-
-         foreach ($DB->request('glpi_notificationtemplatetranslations', $options_template) as $data_template) {
-            $translation->delete($data_template);
-         }
-         $template->delete($data);
-
-         foreach ($DB->request('glpi_notifications_notificationtemplates', $options_template) as $data_template) {
-            $notif_template->delete($data_template);
-         }
-      }
+           foreach ($DB->request([
+               'FROM' => 'glpi_notifications_notificationtemplates',
+               'WHERE' => $options_template]) as $data_template) {
+               $notif_template->delete($data_template);
+           }
+       }
    }
 
    /**
