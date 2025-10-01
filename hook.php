@@ -49,7 +49,7 @@ function plugin_purchaserequest_install()
     echo "<tr><th>" . __("Plugin installation or upgrade", "purchaserequest") . "<th></tr>";
 
     echo "<tr class='tab_bg_1'>";
-    echo "<td align='center'>";
+    echo "<td class='center'>";
 
     $migration = new Migration("3.0.2");
     $classes   = [NotificationTargetPurchaseRequest::class,

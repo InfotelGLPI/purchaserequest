@@ -1023,7 +1023,7 @@ class PurchaseRequest extends CommonDBTM
             PurchaseRequest::class
         ) . "'>";
 
-        echo "<div align='center'><table class='tab_cadre_fixe'>";
+        echo "<div class='center'><table class='tab_cadre_fixe'>";
         echo "<tr><th colspan='4'>" . __('Add a purchase request', 'purchaserequest') . "</th></tr>";
 
         echo "<tr class='tab_bg_1'>";
@@ -1510,7 +1510,7 @@ class PurchaseRequest extends CommonDBTM
             PurchaseRequest::class
         ) . "'>";
 
-        echo "<div align='center'><table class='tab_cadre_fixe'>";
+        echo "<div class='center'><table class='tab_cadre_fixe'>";
         echo "<tr class='tab_bg_2'>";
         echo "<th colspan='3'>" . __('Do you approve this purchase request ?', 'purchaserequest') . "</th>";
         echo "</tr>";
