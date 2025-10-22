@@ -1862,42 +1862,42 @@ class PurchaseRequest extends CommonDBTM
         } else {
             if (!$DB->fieldExists($table, 'locations_id')) {
                 $DB->doQuery(
-                    "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                    "ALTER TABLE `$table`
                      ADD `locations_id` int unsigned NOT NULL DEFAULT '0';"
                 );
             }
             if (!$DB->fieldExists($table, 'plugin_purchaserequest_purchaserequeststates_id')) {
                 $DB->doQuery(
-                    "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                    "ALTER TABLE `$table`
                      ADD `plugin_purchaserequest_purchaserequeststates_id` int unsigned NOT NULL DEFAULT '0';"
                 );
 
                 $DB->doQuery(
-                    "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                    "ALTER TABLE `$table`
                      ADD `is_deleted` tinyint NOT NULL DEFAULT '0';"
                 );
             }
 
             if (!$DB->fieldExists($table, 'processing_date')) {
                 $DB->doQuery(
-                    "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                    "ALTER TABLE `$table`
                      ADD `processing_date` timestamp NULL DEFAULT NULL;"
                 );
             }
 
             if (!$DB->fieldExists($table, 'invoice_customer')) {
                 $DB->doQuery(
-                    "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                    "ALTER TABLE `$table`
                      ADD `invoice_customer` tinyint NOT NULL DEFAULT '0';"
                 );
                 $DB->doQuery(
-                    "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                    "ALTER TABLE `$table`
                      ADD `amount` int unsigned NOT NULL DEFAULT '0';"
                 );
             }
 
             $DB->doQuery(
-                "ALTER TABLE `glpi_plugin_purchaserequest_purchaserequests`
+                "ALTER TABLE `$table`
                    CHANGE `amount` `amount` decimal(20, 4) NOT NULL DEFAULT '0.0000';"
             );
         }
