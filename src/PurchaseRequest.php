@@ -1901,6 +1901,17 @@ class PurchaseRequest extends CommonDBTM
                    CHANGE `amount` `amount` decimal(20, 4) NOT NULL DEFAULT '0.0000';"
             );
         }
+
+        $query = $DB->buildUpdate(
+            'glpi_displaypreferences',
+            [
+                'itemtype' => self::class,
+            ],
+            [
+                'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
+            ]
+        );
+        $DB->doQuery($query);
     }
 
     public static function uninstall()
