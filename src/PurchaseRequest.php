@@ -1925,6 +1925,30 @@ class PurchaseRequest extends CommonDBTM
         );
 
         $DB->doQuery($query);
+
+        $query = $DB->buildUpdate(
+            'glpi_savedsearches',
+            [
+                'itemtype' => self::class,
+            ],
+            [
+                'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
+            ]
+        );
+
+        $DB->doQuery($query);
+
+        $query = $DB->buildUpdate(
+            'glpi_savedsearches_users',
+            [
+                'itemtype' => self::class,
+            ],
+            [
+                'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
+            ]
+        );
+
+        $DB->doQuery($query);
     }
 
     public static function uninstall()
