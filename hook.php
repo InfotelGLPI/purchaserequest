@@ -52,7 +52,7 @@ function plugin_purchaserequest_install()
     echo "<tr class='tab_bg_1'>";
     echo "<td class='center'>";
 
-    $migration = new Migration("3.0.2");
+    $migration = new Migration(PLUGIN_PURCHASEREQUEST_VERSION);
     $classes   = [NotificationTargetPurchaseRequest::class,
         PurchaseRequest::class,
         Config::class,

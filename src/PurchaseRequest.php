@@ -1911,6 +1911,19 @@ class PurchaseRequest extends CommonDBTM
                 'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
             ]
         );
+
+        $DB->doQuery($query);
+
+        $query = $DB->buildUpdate(
+            'glpi_documents_items',
+            [
+                'itemtype' => self::class,
+            ],
+            [
+                'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
+            ]
+        );
+
         $DB->doQuery($query);
     }
 
