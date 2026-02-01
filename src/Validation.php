@@ -551,7 +551,7 @@ class Validation extends CommonDBTM
         $canread = Session::haveRight(self::$rightname, READ);
 
         if (!$rows || !$canread) {
-            echo __('No item to display');
+            echo __('No results found');
         } else {
             $canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]);
             $rand    = mt_rand();
