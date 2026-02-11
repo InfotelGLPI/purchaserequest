@@ -127,7 +127,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget {
             break;
 
       }
-      $this->data['##purchaserequest.users_validation##'] = getUserName($this->obj->getField('users_id_validation'));
+      $this->data['##purchaserequest.users_validation##'] = getUserName($this->obj->getField('users_id_validate'));
 
       $restrict            = ['plugin_purchaserequest_purchaserequests_id' => $this->obj->getField("id")];
       $dbu                 = new DbUtils();
@@ -164,9 +164,9 @@ class NotificationTargetPurchaseRequest extends NotificationTarget {
          $this->data["validations"] = $data["validations"];
       }
       $this->data['##lang.purchaserequest.url##'] = "URL";
+      $this->data['##purchaserequest.url##']      = urldecode($CFG_GLPI["url_base"] . "/index.php?redirect=".PurchaseRequest::class."_" .
+           $this->obj->getField("id"));
 
-      $url                                   = $CFG_GLPI["url_base"] . "/index.php?redirect=GlpiPlugin\Purchaserequest\Purchaserequest_" . $this->obj->getField("id");
-      $this->data['##purchaserequest.url##'] = urldecode($url);
 
    }
 
