@@ -34,7 +34,7 @@ use GlpiPlugin\Purchaserequest\Threshold;
 
 global $CFG_GLPI;
 
-define('PLUGIN_PURCHASEREQUEST_VERSION', '3.1.7');
+define('PLUGIN_PURCHASEREQUEST_VERSION', '3.1.8');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
     define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
