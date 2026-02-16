@@ -214,37 +214,40 @@ class NotificationTargetPurchaseRequest extends NotificationTarget {
    public static function install(Migration $migration) {
       global $DB;
 
-      $migration->displayMessage("Migrate Purchaserequest notifications");
+       $table = getTableForItemType(PurchaseRequest::class);
+       if (!$DB->tableExists($table)) {
+           $migration->displayMessage("Migrate Purchaserequest notifications");
 
-      $template     = new NotificationTemplate();
-      $templates_id = false;
-      $query_id     = "SELECT `id`
+           $template = new NotificationTemplate();
+           $templates_id = false;
+           $query_id = "SELECT `id`
                        FROM `glpi_notificationtemplates`
                        WHERE `itemtype`='GlpiPlugin\\Purchaserequest\\PurchaseRequest'
                        AND `name` = 'Purchase Request Validation'";
-      $result = $DB->doQuery($query_id) or die ($DB->error());
+           $result = $DB->doQuery($query_id) or die ($DB->error());
 
-      if ($DB->numrows($result) > 0) {
-         $templates_id = $DB->result($result, 0, 'id');
-      } else {
-         $tmp          = [
-            'name'     => 'Purchase Request Validation',
-            'itemtype' => PurchaseRequest::class,
-            'date_mod' => $_SESSION['glpi_currenttime'],
-            'comment'  => '',
-            'css'      => '',
-         ];
-         $templates_id = $template->add($tmp);
-      }
+           if ($DB->numrows($result) > 0) {
+               $templates_id = $DB->result($result, 0, 'id');
+           } else {
+               $tmp = [
+                   'name' => 'Purchase Request Validation',
+                   'itemtype' => PurchaseRequest::class,
+                   'date_mod' => $_SESSION['glpi_currenttime'],
+                   'comment' => '',
+                   'css' => '',
+               ];
+               $templates_id = $template->add($tmp);
+           }
 
-      if ($templates_id) {
-         $translation = new NotificationTemplateTranslation();
-         $dbu         = new DbUtils();
-         if (!$dbu->countElementsInTable($translation->getTable(), ["notificationtemplates_id" => $templates_id])) {
-            $tmp['notificationtemplates_id'] = $templates_id;
-            $tmp['language']                 = '';
-            $tmp['subject']                  = '##lang.purchaserequest.title##';
-            $tmp['content_text']             = '##lang.purchaserequest.url## : ##purchaserequest.url##
+           if ($templates_id) {
+               $translation = new NotificationTemplateTranslation();
+               $dbu = new DbUtils();
+               if (!$dbu->countElementsInTable($translation->getTable(), ["notificationtemplates_id" => $templates_id]
+               )) {
+                   $tmp['notificationtemplates_id'] = $templates_id;
+                   $tmp['language'] = '';
+                   $tmp['subject'] = '##lang.purchaserequest.title##';
+                   $tmp['content_text'] = '##lang.purchaserequest.url## : ##purchaserequest.url##
                ##lang.purchaserequest.entity## : ##purchaserequest.entity##
                ##IFpurchaserequest.name####lang.purchaserequest.name## : ##purchaserequest.name##
                ##ENDIFpurchaserequest.name##
@@ -258,56 +261,62 @@ class NotificationTargetPurchaseRequest extends NotificationTarget {
 
                ##IFpurchaserequest.comment####lang.purchaserequest.comment## : ##purchaserequest.comment####ENDIFpurchaserequest.comment##';
 
-            $tmp['content_html'] = '&lt;p&gt;&lt;strong&gt;##lang.purchaserequest.url##&lt;/strong&gt; : ' .
-                                   '&lt;a href=\"##purchaserequest.url##\"&gt;##purchaserequest.url##&lt;/a&gt;&lt;br /&gt;' .
-                                   '&lt;br /&gt;&lt;strong&gt;##lang.purchaserequest.entity##&lt;/strong&gt; : ##purchaserequest.entity##&lt;br /&gt;' .
-                                   ' ##IFpurchaserequest.name##&lt;strong&gt;##lang.purchaserequest.name##&lt;/strong&gt;' .
-                                   ' : ##purchaserequest.name####ENDIFpurchaserequest.name##&lt;br /&gt;' .
-                                   '##IFpurchaserequest.requester##&lt;strong&gt;##lang.purchaserequest.requester##&lt;/strong&gt;' .
-                                   ' : ##purchaserequest.requester####ENDIFpurchaserequest.requester##&lt;br /&gt;' .
-                                   '##IFpurchaserequest.group##&lt;strong&gt;##lang.purchaserequest.group##&lt;/strong&gt;' .
-                                   ' : ##purchaserequest.group####ENDIFpurchaserequest.group##&lt;br /&gt;' .
-                                   '##IFpurchaserequest.due_date##&lt;strong&gt;##lang.purchaserequest.due_date##&lt;/strong&gt;' .
-                                   ' : ##purchaserequest.due_date####ENDIFpurchaserequest.due_date##&lt;br /&gt;' .
-                                   '##IFpurchaserequest.itemtype##&lt;strong&gt;##lang.purchaserequest.itemtype##&lt;/strong&gt;' .
-                                   ' : ##purchaserequest.itemtype####ENDIFpurchaserequest.itemtype##&lt;br /&gt;' .
-                                   '##IFpurchaserequest.type##&lt;strong&gt;##lang.purchaserequest.type##&lt;/strong&gt;' .
-                                   ' : ##purchaserequest.type####ENDIFpurchaserequest.type##&lt;br /&gt;&lt;br /&gt;' .
-                                   '##IFpurchaserequest.comment##&lt;strong&gt;##lang.purchaserequest.comment##&lt;/strong&gt; :' .
-                                   '##purchaserequest.comment####ENDIFpurchaserequest.comment##&lt;/p&gt;';
-            $translation->add($tmp);
-         }
+                   $tmp['content_html'] = '&lt;p&gt;&lt;strong&gt;##lang.purchaserequest.url##&lt;/strong&gt; : ' .
+                       '&lt;a href=\"##purchaserequest.url##\"&gt;##purchaserequest.url##&lt;/a&gt;&lt;br /&gt;' .
+                       '&lt;br /&gt;&lt;strong&gt;##lang.purchaserequest.entity##&lt;/strong&gt; : ##purchaserequest.entity##&lt;br /&gt;' .
+                       ' ##IFpurchaserequest.name##&lt;strong&gt;##lang.purchaserequest.name##&lt;/strong&gt;' .
+                       ' : ##purchaserequest.name####ENDIFpurchaserequest.name##&lt;br /&gt;' .
+                       '##IFpurchaserequest.requester##&lt;strong&gt;##lang.purchaserequest.requester##&lt;/strong&gt;' .
+                       ' : ##purchaserequest.requester####ENDIFpurchaserequest.requester##&lt;br /&gt;' .
+                       '##IFpurchaserequest.group##&lt;strong&gt;##lang.purchaserequest.group##&lt;/strong&gt;' .
+                       ' : ##purchaserequest.group####ENDIFpurchaserequest.group##&lt;br /&gt;' .
+                       '##IFpurchaserequest.due_date##&lt;strong&gt;##lang.purchaserequest.due_date##&lt;/strong&gt;' .
+                       ' : ##purchaserequest.due_date####ENDIFpurchaserequest.due_date##&lt;br /&gt;' .
+                       '##IFpurchaserequest.itemtype##&lt;strong&gt;##lang.purchaserequest.itemtype##&lt;/strong&gt;' .
+                       ' : ##purchaserequest.itemtype####ENDIFpurchaserequest.itemtype##&lt;br /&gt;' .
+                       '##IFpurchaserequest.type##&lt;strong&gt;##lang.purchaserequest.type##&lt;/strong&gt;' .
+                       ' : ##purchaserequest.type####ENDIFpurchaserequest.type##&lt;br /&gt;&lt;br /&gt;' .
+                       '##IFpurchaserequest.comment##&lt;strong&gt;##lang.purchaserequest.comment##&lt;/strong&gt; :' .
+                       '##purchaserequest.comment####ENDIFpurchaserequest.comment##&lt;/p&gt;';
+                   $translation->add($tmp);
+               }
 
-         $notifs               = [
-            'New Purchase Request Validation'     => 'ask_purchaserequest',
-            'Confirm Purchase Request Validation' => 'validation_purchaserequest',
-            'Cancel Purchase Request Validation'  => 'no_validation_purchaserequest',
-         ];
-         $notification         = new Notification();
-         $notificationtemplate = new Notification_NotificationTemplate();
-         foreach ($notifs as $label => $name) {
-            if (!$dbu->countElementsInTable("glpi_notifications",
-                                            ["itemtype" => Purchaserequest::class,
-                                             "event"    => $name])) {
-               $tmp             = [
-                  'name'         => $label,
-                  'entities_id'  => 0,
-                  'itemtype'     => PurchaseRequest::class,
-                  'event'        => $name,
-                  'comment'      => '',
-                  'is_recursive' => 1,
-                  'is_active'    => 1,
-                  'date_mod'     => $_SESSION['glpi_currenttime'],
+               $notifs = [
+                   'New Purchase Request Validation' => 'ask_purchaserequest',
+                   'Confirm Purchase Request Validation' => 'validation_purchaserequest',
+                   'Cancel Purchase Request Validation' => 'no_validation_purchaserequest',
                ];
-               $notification_id = $notification->add($tmp);
+               $notification = new Notification();
+               $notificationtemplate = new Notification_NotificationTemplate();
+               foreach ($notifs as $label => $name) {
+                   if (!$dbu->countElementsInTable(
+                       "glpi_notifications",
+                       [
+                           "itemtype" => Purchaserequest::class,
+                           "event" => $name
+                       ]
+                   )) {
+                       $tmp = [
+                           'name' => $label,
+                           'entities_id' => 0,
+                           'itemtype' => PurchaseRequest::class,
+                           'event' => $name,
+                           'comment' => '',
+                           'is_recursive' => 1,
+                           'is_active' => 1,
+                           'date_mod' => $_SESSION['glpi_currenttime'],
+                       ];
+                       $notification_id = $notification->add($tmp);
 
-               $notificationtemplate->add(['notificationtemplates_id' => $templates_id,
-                                           'mode'                     => 'mailing',
-                                           'notifications_id'         => $notification_id]);
-            }
-         }
-      }
-
+                       $notificationtemplate->add([
+                           'notificationtemplates_id' => $templates_id,
+                           'mode' => 'mailing',
+                           'notifications_id' => $notification_id
+                       ]);
+                   }
+               }
+           }
+       }
    }
 
    public static function uninstall() {
