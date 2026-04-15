@@ -827,7 +827,10 @@ class PurchaseRequest extends CommonDBTM
         if (Session::getCurrentInterface() == 'central') {
             $reference->dropdownAllItems($params);
         } else {
-            if ($item = new $this->fields["itemtype"]()) {
+
+            if ($this->fields["itemtype"] != null
+                && getTableForItemType($this->fields["itemtype"])
+                && $item = new $this->fields["itemtype"]()) {
                 echo $item->getTypeName();
             }
         }
@@ -1634,7 +1637,7 @@ class PurchaseRequest extends CommonDBTM
      *
      * @param $checkitem link item to check right   (default NULL)
      *
-     * @return an array of massive actions
+     * @return $actions
      **@since version 0.84
      *
      * This should be overloaded in Class
@@ -1718,6 +1721,15 @@ class PurchaseRequest extends CommonDBTM
                                     "comment_validation" => "",
                                     "update" => __('Update'),
                                 ]);
+
+                                $validationrequest = new Validation();
+                                if ($validationrequest->getFromDBByCrit(["plugin_purchaserequest_purchaserequests_id" => $id])) {
+                                    $input["id"] = $validationrequest->fields["id"];
+                                    $input["status"] = $validation;
+                                    $validationrequest->update($input);
+                                }
+
+
                                 $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                             } else {
                                 $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
