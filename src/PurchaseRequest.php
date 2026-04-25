@@ -733,7 +733,7 @@ class PurchaseRequest extends CommonDBTM
         if ($canedit) {
             echo Html::input('name', ['value' => $this->fields['name'], 'size' => 40]);
         } else {
-            echo $this->fields["name"];
+            echo htmlescape($this->fields["name"]);
         }
         echo "</td><td colspan='2'></td></tr>";
 
@@ -1343,7 +1343,7 @@ class PurchaseRequest extends CommonDBTM
 
         $query = "SELECT *
           FROM " . $this->getTable() . "
-          WHERE !`is_deleted` AND `" . $this->getTable() . "`.`tickets_id` = $tickets_id";
+          WHERE !`is_deleted` AND `" . $this->getTable() . "`.`tickets_id` = " . (int) $tickets_id;
 
         if ($params['addLimit']) {
             $query .= " LIMIT " . intval($params['start']) . "," . intval($params['limit']);
@@ -1803,7 +1803,7 @@ class PurchaseRequest extends CommonDBTM
             // Search init item
             $query = "SELECT *
                    FROM `glpi_plugin_purchaserequest_purchaserequests`
-                   WHERE `id` = '$ID'";
+                   WHERE `id` = " . (int) $ID;
 
             if ($result = $DB->doQuery($query)) {
                 if ($DB->numrows($result)) {

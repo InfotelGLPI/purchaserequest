@@ -36,7 +36,7 @@ if (Plugin::isPluginActive("purchaserequest")) {
       $config = new Config();
 
       if (isset($_POST["update_config"])) {
-         Session::checkRight("plugin_purchaserequest_config", READ);
+         Session::checkRight("plugin_purchaserequest_config", UPDATE);
          $config->update($_POST);
          Html::back();
 

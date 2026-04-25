@@ -333,7 +333,7 @@ class Validation extends CommonDBTM
         if ($canedit) {
             echo Html::input('name', ['value' => $this->fields['name'], 'size' => 40]);
         } else {
-            echo $this->fields["name"];
+            echo htmlescape($this->fields["name"]);
         }
         echo "</td><td colspan='2'></td></tr>";
 

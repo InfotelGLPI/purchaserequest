@@ -290,10 +290,13 @@ class Profile extends \Profile
     {
         global $DB;
 
-        foreach ($DB->request("SELECT *
-                           FROM `glpi_profilerights`
-                           WHERE `profiles_id`='" . $_SESSION['glpiactiveprofile']['id'] . "'
-                              AND `name` LIKE '%plugin_purchaserequest_purchaserequest%'") as $prof) {
+        foreach ($DB->request([
+            'FROM'  => 'glpi_profilerights',
+            'WHERE' => [
+                'profiles_id' => (int) $_SESSION['glpiactiveprofile']['id'],
+                'name'        => ['LIKE', '%plugin_purchaserequest_purchaserequest%'],
+            ],
+        ]) as $prof) {
             $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
         }
 
