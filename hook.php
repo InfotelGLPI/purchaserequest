@@ -69,7 +69,7 @@ function plugin_purchaserequest_install()
     echo "</table></div>";
 
     //DisplayPreferences Migration
-    $classes = ['PluginPurchaserequestPurchaserequest' => Purchaserequest::class];
+    $classes = ['PluginPurchaserequestPurchaserequest' => PurchaseRequest::class];
 
     foreach ($classes as $old => $new) {
         $displayusers = $DB->request([
@@ -114,25 +114,14 @@ function plugin_purchaserequest_install()
                         ]);
                         if (count($iterator2) > 0) {
                             foreach ($iterator2 as $dataid) {
-                                $query = $DB->buildDelete(
-                                    'glpi_displaypreferences',
-                                    [
-                                        'id' => $dataid['id'],
-                                    ]
-                                );
-                                $DB->doQuery($query);
+                                $DB->delete('glpi_displaypreferences', ['id' => $dataid['id']]);
                             }
                         } else {
-                            $query = $DB->buildUpdate(
+                            $DB->update(
                                 'glpi_displaypreferences',
-                                [
-                                    'itemtype' => $new,
-                                ],
-                                [
-                                    'id' => $data['id'],
-                                ]
+                                ['itemtype' => $new],
+                                ['id' => $data['id']]
                             );
-                            $DB->doQuery($query);
                         }
                     }
                 }

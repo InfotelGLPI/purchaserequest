@@ -54,8 +54,6 @@ function plugin_init_purchaserequest()
     global $PLUGIN_HOOKS, $CFG_GLPI;
 
 
-    $PLUGIN_HOOKS['csrf_compliant']['purchaserequest'] = true;
-
    /* Init current profile */
     $PLUGIN_HOOKS['change_profile']['purchaserequest'] = [Profile::class, 'initProfile'];
 

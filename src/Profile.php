@@ -170,13 +170,13 @@ class Profile extends \Profile
     {
 
         $rights = [
-            ['itemtype' => Purchaserequest::class,
+            ['itemtype' => PurchaseRequest::class,
                 'label'    => __('Purchase request', 'purchaserequest'),
                 'field'    => 'plugin_purchaserequest_purchaserequest',
             ],
         ];
         if ($all) {
-            $rights[] = ['itemtype' => Purchaserequest::class,
+            $rights[] = ['itemtype' => PurchaseRequest::class,
                 'label'    => __("Purchase request validation", "purchaserequest"),
                 'field'    => 'plugin_purchaserequest_validate'];
             $rights[] = ['itemtype' => Config::class,

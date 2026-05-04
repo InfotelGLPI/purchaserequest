@@ -41,7 +41,7 @@ if (Plugin::isPluginActive("purchaserequest")) {
          Html::back();
 
       } else {
-         $_SESSION['glpi_js_toload']["tinymce"][] = 'lib/tiny_mce/lib/tinymce.js';
+         Html::requireJs('tinymce');
          Html::header(__('Setup'), '', "config", Config::getType());
          $config->GetFromDB(1);
          $config->display($_GET);

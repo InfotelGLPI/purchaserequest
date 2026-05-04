@@ -30,6 +30,8 @@
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\Threshold;
 
+Session::checkLoginUser();
+
 if (!isset($_GET["id"])) {
    $_GET["id"] = "";
 }

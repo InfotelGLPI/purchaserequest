@@ -659,8 +659,8 @@ class PurchaseRequest extends CommonDBTM
             case 'status':
                 return CommonITILValidation::getStatus($values[$field]);
             case 'itemtype':
-                $item = new $values['itemtype']();
-                return $item->getTypeName();
+                $item = getItemForItemtype($values['itemtype']);
+                return $item !== false ? $item->getTypeName() : '';
                 break;
         }
         return parent::getSpecificValueToDisplay($field, $values, $options);
@@ -808,7 +808,7 @@ class PurchaseRequest extends CommonDBTM
             "row"             => 4,
             "cols"            => 100,
             "enable_richtext" => true,
-            "value"           => html_entity_decode(stripslashes($this->fields['comment']))];
+            "value"           => $this->fields['comment']];
         Html::textarea($opt);
         echo "</td></tr>";
 
@@ -828,9 +828,8 @@ class PurchaseRequest extends CommonDBTM
             $reference->dropdownAllItems($params);
         } else {
 
-            if ($this->fields["itemtype"] != null
-                && getTableForItemType($this->fields["itemtype"])
-                && $item = new $this->fields["itemtype"]()) {
+            $item = getItemForItemtype($this->fields["itemtype"] ?? '');
+            if ($item !== false) {
                 echo $item->getTypeName();
             }
         }
@@ -969,11 +968,7 @@ class PurchaseRequest extends CommonDBTM
         $purchaserequest = new self();
 
         $canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]);
-        if (isset($_REQUEST["start"])) {
-            $start = $_REQUEST["start"];
-        } else {
-            $start = 0;
-        }
+        $start = (int) ($_REQUEST["start"] ?? 0);
 
         $datas = $purchaserequest->getItems($item->fields['id'], ['start' => $start, 'addLimit' => true]);
         $rows = count($purchaserequest->getItems($item->fields['id'], ['addLimit' => false]));
@@ -1112,7 +1107,7 @@ class PurchaseRequest extends CommonDBTM
             "row"             => 4,
             "cols"            => 100,
             "enable_richtext" => true,
-            "value"           => html_entity_decode(stripslashes($purchaserequest->fields['comment']))];
+            "value"           => $purchaserequest->fields['comment']];
         Html::textarea($opt);
         echo "</td></tr>";
 
@@ -1281,8 +1276,8 @@ class PurchaseRequest extends CommonDBTM
                 $field['plugin_purchaserequest_purchaserequeststates_id']
             ) . "</td>";
             // item type
-            $item = new $field["itemtype"]();
-            echo "<td>" . $item->getTypeName() . "</td>";
+            $item = getItemForItemtype($field["itemtype"] ?? '');
+            echo "<td>" . ($item !== false ? $item->getTypeName() : '') . "</td>";
             // Model name
             $itemtypeclass = $field['itemtype'] . "Type";
             echo "<td>" . Dropdown::getDropdownName(
@@ -1341,19 +1336,21 @@ class PurchaseRequest extends CommonDBTM
 
         $output = [];
 
-        $query = "SELECT *
-          FROM " . $this->getTable() . "
-          WHERE !`is_deleted` AND `" . $this->getTable() . "`.`tickets_id` = " . (int) $tickets_id;
+        $criteria = [
+            'FROM'  => $this->getTable(),
+            'WHERE' => [
+                'is_deleted' => 0,
+                'tickets_id' => (int) $tickets_id,
+            ],
+        ];
 
         if ($params['addLimit']) {
-            $query .= " LIMIT " . intval($params['start']) . "," . intval($params['limit']);
+            $criteria['START'] = (int) $params['start'];
+            $criteria['LIMIT'] = (int) $params['limit'];
         }
 
-        $result = $DB->doQuery($query);
-        if ($DB->numrows($result)) {
-            while ($data = $DB->fetchAssoc($result)) {
-                $output[$data['id']] = $data;
-            }
+        foreach ($DB->request($criteria) as $data) {
+            $output[$data['id']] = $data;
         }
 
         return $output;
@@ -1369,11 +1366,7 @@ class PurchaseRequest extends CommonDBTM
         global $CFG_GLPI;
 
         $dbu = new DbUtils();
-        if (isset($_REQUEST["start"])) {
-            $start = $_REQUEST["start"];
-        } else {
-            $start = 0;
-        }
+        $start = (int) ($_REQUEST["start"] ?? 0);
 
         $purchase_request = new PurchaseRequest();
         $data = $purchase_request->find(['plugin_order_orders_id' => $item->fields['id']]);
@@ -1444,8 +1437,8 @@ class PurchaseRequest extends CommonDBTM
                     $field['plugin_purchaserequest_purchaserequeststates_id']
                 ) . "</td>";
                 // item type
-                $item = new $field["itemtype"]();
-                echo "<td>" . $item->getTypeName() . "</td>";
+                $orderItem = getItemForItemtype($field["itemtype"] ?? '');
+                echo "<td>" . ($orderItem !== false ? $orderItem->getTypeName() : '') . "</td>";
                 // Model name
                 $itemtypeclass = $field['itemtype'] . "Type";
                 echo "<td>" . Dropdown::getDropdownName(
@@ -1799,26 +1792,23 @@ class PurchaseRequest extends CommonDBTM
         global $DB;
 
         if ($ID > 0) {
-            // Not already transfer
-            // Search init item
-            $query = "SELECT *
-                   FROM `glpi_plugin_purchaserequest_purchaserequests`
-                   WHERE `id` = " . (int) $ID;
+            $iterator = $DB->request([
+                'FROM'  => self::getTable(),
+                'WHERE' => ['id' => (int) $ID],
+            ]);
 
-            if ($result = $DB->doQuery($query)) {
-                if ($DB->numrows($result)) {
-                    $data = $DB->fetchAssoc($result);
-                    $input['name'] = $data['name'];
-                    $input['entities_id'] = $entity;
-                    $temp = new self();
-                    $newID = $temp->getID($input);
+            if (count($iterator)) {
+                $data              = $iterator->current();
+                $input['name']     = $data['name'];
+                $input['entities_id'] = $entity;
+                $temp  = new self();
+                $newID = $temp->getID($input);
 
-                    if ($newID < 0) {
-                        $newID = $temp->import($input);
-                    }
-
-                    return $newID;
+                if ($newID < 0) {
+                    $newID = $temp->import($input);
                 }
+
+                return $newID;
             }
         }
         return 0;

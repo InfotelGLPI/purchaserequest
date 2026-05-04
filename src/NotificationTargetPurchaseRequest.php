@@ -119,8 +119,8 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
         }
 
         $this->data['##lang.purchaserequest.type##'] = __("Type");
-        $item                                        = new $itemtype();
-        $this->data['##purchaserequest.type##']      = $item->getTypeName();
+        $item                                        = getItemForItemtype($itemtype);
+        $this->data['##purchaserequest.type##']      = $item !== false ? $item->getTypeName() : '';
 
         switch ($event) {
             case "ask_purchaserequest":
@@ -306,7 +306,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
                     if (!$dbu->countElementsInTable(
                         "glpi_notifications",
                         [
-                            "itemtype" => Purchaserequest::class,
+                            "itemtype" => PurchaseRequest::class,
                             "event" => $name,
                         ]
                     )) {

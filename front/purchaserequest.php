@@ -30,6 +30,8 @@
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
 
+Session::checkLoginUser();
+
 global $DB;
 
 if (Session::getCurrentInterface() == 'central') {

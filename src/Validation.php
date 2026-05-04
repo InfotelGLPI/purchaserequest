@@ -537,11 +537,7 @@ class Validation extends CommonDBTM
         global $CFG_GLPI;
 
         $dbu = new DbUtils();
-        if (isset($_REQUEST["start"])) {
-            $start = $_REQUEST["start"];
-        } else {
-            $start = 0;
-        }
+        $start = (int) ($_REQUEST["start"] ?? 0);
 
         $purchase_request = new PurchaseRequest();
         $data             = $purchase_request->find(['plugin_order_orders_id' => $item->fields['id']]);
@@ -609,8 +605,8 @@ class Validation extends CommonDBTM
                     $field['plugin_purchaserequest_purchaserequeststates_id']
                 ) . "</td>";
                 // item type
-                $item = new $field["itemtype"]();
-                echo "<td>" . $item->getTypeName() . "</td>";
+                $orderItem = getItemForItemtype($field["itemtype"] ?? '');
+                echo "<td>" . ($orderItem !== false ? $orderItem->getTypeName() : '') . "</td>";
                 // Model name
                 $itemtypeclass = $field['itemtype'] . "Type";
                 echo "<td>" . Dropdown::getDropdownName($dbu->getTableForItemType($itemtypeclass), $field["types_id"]) . "</td>";
@@ -841,7 +837,7 @@ class Validation extends CommonDBTM
 
                 echo "<td>" . Html::convDateTime($row["validation_date"]) . "</td>";
                 echo "<td>" . getUserName($row["users_id_validate"]) . "</td>";
-                echo "<td>" . $row["comment_validation"] . "</td>";
+                echo "<td>" . htmlescape($row["comment_validation"]) . "</td>";
                 echo "</tr>";
                 $iterator->next();
             }

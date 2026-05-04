@@ -30,7 +30,7 @@
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
 
-include("../../../inc/includes.php");
+Session::checkLoginUser();
 
 global $DB;
 
