@@ -61,7 +61,7 @@ if (Plugin::isPluginActive("order")
 
         /* update purchaserequest */
     } elseif (isset($_POST["update"]) || (isset($_POST['update_status']))) {
-        $validation->check($_POST['id'], UPDATE);
+        $validation->check($_POST['id'], READ);
         $validation->update($_POST);
         Html::back();
     }
