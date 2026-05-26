@@ -1,6 +1,4 @@
-<?php
-
-/*
+{#
  -------------------------------------------------------------------------
  purchaserequest plugin for GLPI
  Copyright (C) 2021-2026 by the purchaserequest Development Team.
@@ -25,17 +23,4 @@
  You should have received a copy of the GNU General Public License
  along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
  --------------------------------------------------------------------------
- */
-
-use GlpiPlugin\Purchaserequest\PurchaseRequest;
-
-header("Content-Type: text/html; charset=UTF-8");
-Html::header_nocache();
-
-Session::checkLoginUser();
-
-if (isset($_POST["users_id"])) {
-
-   PurchaseRequest::displayGroup($_POST['users_id']);
-
-}
+ #}
