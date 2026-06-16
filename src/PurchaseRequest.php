@@ -401,10 +401,16 @@ class PurchaseRequest extends CommonDBTM
                     }
                 }
             }
-            $_SESSION['glpi_plugin_purchaserequests_fields'][$key] = $value;
         }
 
         if ($checkKo) {
+            // Only save to session on validation failure, so the form can
+            // repopulate what the user typed. Keyed by item id to prevent
+            // cross-tab contamination when two purchase requests are open.
+            $item_id = (int) ($input['id'] ?? 0);
+            foreach ($input as $key => $value) {
+                $_SESSION['glpi_plugin_purchaserequests_fields'][$item_id][$key] = $value;
+            }
             Session::addMessageAfterRedirect(
                 sprintf(__("Mandatory fields are not filled. Please correct: %s"), implode(', ', $msg)),
                 false,
@@ -713,17 +719,20 @@ class PurchaseRequest extends CommonDBTM
         $canedit = $this->can($ID, UPDATE);
         $options['canedit'] = $canedit;
 
-        // Data saved in session
-        if (isset($_SESSION['glpi_plugin_purchaserequests_fields'])) {
-            foreach ($_SESSION['glpi_plugin_purchaserequests_fields'] as $key => $value) {
+        // Repopulate form fields saved on a previous failed submission (same item only)
+        $session_id = (int) $ID;
+        if (isset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id])) {
+            foreach ($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id] as $key => $value) {
+                if ($key === 'id') {
+                    continue; // never overwrite the item id from session
+                }
                 if ($key == "comment") {
                     $this->fields[$key] = RichText::getEnhancedHtml($value);
                 } else {
                     $this->fields[$key] = $value;
                 }
-
             }
-            unset($_SESSION['glpi_plugin_purchaserequests_fields']);
+            unset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id]);
         }
 
         /* title */

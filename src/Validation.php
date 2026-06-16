@@ -314,16 +314,20 @@ class Validation extends CommonDBTM
         $canedit            = $this->can($ID, UPDATE);
         $options['canedit'] = $canedit;
 
-        // Data saved in session
-        if (isset($_SESSION['glpi_plugin_purchaserequests_fields'])) {
-            foreach ($_SESSION['glpi_plugin_purchaserequests_fields'] as $key => $value) {
+        // Repopulate form fields saved on a previous failed submission (same item only)
+        $session_id = (int) $ID;
+        if (isset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id])) {
+            foreach ($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id] as $key => $value) {
+                if ($key === 'id') {
+                    continue; // never overwrite the item id from session
+                }
                 if ($key == "comment") {
                     $this->fields[$key] = RichText::getEnhancedHtml($value);
                 } else {
                     $this->fields[$key] = $value;
                 }
             }
-            unset($_SESSION['glpi_plugin_purchaserequests_fields']);
+            unset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id]);
         }
 
         /* title */
