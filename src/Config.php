@@ -62,13 +62,12 @@ class Config extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-
-        return self::createTabEntry(__('Plugin setup', 'purchaserequest'));
+        return __('Plugin setup', 'purchaserequest');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        return self::createTabEntry($this->getTypeName(1));
+        return self::createTabEntry(self::getTypeName(1));
     }
 
     public static function getIcon()

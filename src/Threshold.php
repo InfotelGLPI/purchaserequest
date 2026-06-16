@@ -86,7 +86,7 @@ class Threshold extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
 
-        return self::createTabEntry($this->getTypeName(1));
+        return self::createTabEntry(self::getTypeName(1));
 
     }
 
