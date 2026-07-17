@@ -162,11 +162,11 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if (!Plugin::isPluginActive('order')) {
-            echo "<div class='alert alert-important alert-warning d-flex'>";
-            echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
-            return false;
-        }
+//        if (!Plugin::isPluginActive('order')) {
+//            echo "<div class='alert  alert-warning d-flex'>";
+//            echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+//            return false;
+//        }
         if ($item->getType() == PurchaseRequest::class) {
             Validation::showValidation($item);
         } elseif ($item->getType() == "Ticket") {

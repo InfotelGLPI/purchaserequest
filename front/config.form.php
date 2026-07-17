@@ -52,14 +52,14 @@ if (Plugin::isPluginActive("purchaserequest")) {
 
    } else {
       Html::header(__('Setup'), '', "config", Plugin::getType());
-      echo "<div class='alert alert-important alert-warning d-flex'>";
+      echo "<div class='alert  alert-warning d-flex'>";
       echo "<b>" . __("You don't have permission to perform this action.") . "</b></div>";
       Html::footer();
    }
 
 } else {
    Html::header(__('Setup'), '', "config", Plugin::getType());
-   echo "<div class='alert alert-important alert-warning d-flex'>";
+   echo "<div class='alert  alert-warning d-flex'>";
    echo "<b>" . __('Please activate the plugin', 'purchaserequest') . "</b></div>";
    Html::footer();
 }

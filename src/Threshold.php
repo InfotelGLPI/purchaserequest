@@ -149,7 +149,7 @@ class Threshold extends CommonDBTM
         if ($canedit) {
             echo Html::input('thresholds', ['value' => $this->fields['thresholds'], 'size' => 40]);
         } else {
-            echo $this->fields["thresholds"];
+            echo htmlescape($this->fields["thresholds"]);
         }
         echo "</td></tr>";
 

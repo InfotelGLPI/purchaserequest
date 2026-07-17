@@ -68,7 +68,7 @@ if (Plugin::isPluginActive("order")
     Html::back();
 } else {
     Html::header(__('Setup'), '', "tools", PurchaseRequest::class, "config");
-    echo "<div class='alert alert-important alert-warning d-flex'>";
+    echo "<div class='alert  alert-warning d-flex'>";
     echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
 }
 
