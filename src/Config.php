@@ -57,7 +57,7 @@ class Config extends CommonDBTM
     public static function canCreate(): bool
     {
 
-        return (Session::haveRight(self::$rightname, READ));
+        return (Session::haveRight(self::$rightname, UPDATE));
     }
 
     public static function getTypeName($nb = 0)

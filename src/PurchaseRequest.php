@@ -190,6 +190,18 @@ class PurchaseRequest extends CommonDBTM
             return false;
         }
 
+        // Harden against mass assignment: system/structural columns must never be
+        // taken from client input. The creator is forced to the current user
+        // server-side (the hidden users_id_creator form field is spoofable), and
+        // soft-delete/recursion/date columns are managed by GLPI core, not the form.
+        unset(
+            $input['is_deleted'],
+            $input['is_recursive'],
+            $input['date_creation'],
+            $input['date_mod']
+        );
+        $input['users_id_creator'] = Session::getLoginUserID();
+
         $input['status'] = CommonITILValidation::WAITING;
 
         return $input;
@@ -205,6 +217,41 @@ class PurchaseRequest extends CommonDBTM
     public function prepareInputForUpdate($input)
     {
         global $CFG_GLPI;
+
+        // Harden against mass assignment: these columns are managed by GLPI core
+        // or set once at creation and must never be mutated through a generic
+        // update. Soft-delete/restore go through delete()/restore(), and the
+        // creator is immutable after creation.
+        unset(
+            $input['is_deleted'],
+            $input['is_recursive'],
+            $input['users_id_creator'],
+            $input['date_creation'],
+            $input['date_mod']
+        );
+
+        // Server-side enforcement of the approval workflow: only the designated
+        // validator (users_id_validate) may accept/refuse or change the status.
+        // The generic UPDATE right is not enough — without this gate any user who
+        // can edit the request could self-approve it by POSTing the accept/refuse/
+        // update_status flags (the validator check in showValidation() is UI-only).
+        $is_validation_action = isset($input['refuse_purchaserequest'])
+            || isset($input['accept_purchaserequest'])
+            || isset($input['update_status']);
+        $is_validator = (int) ($this->fields['users_id_validate'] ?? 0) === (int) Session::getLoginUserID();
+        if ($is_validation_action && !$is_validator) {
+            unset(
+                $input['refuse_purchaserequest'],
+                $input['accept_purchaserequest'],
+                $input['update_status'],
+                $input['status']
+            );
+            Session::addMessageAfterRedirect(
+                __('You are not allowed to approve or refuse this purchase request.', 'purchaserequest'),
+                false,
+                ERROR
+            );
+        }
 
         if (isset($input['refuse_purchaserequest']) && $input['refuse_purchaserequest'] == 1) {
             $input['status'] = CommonITILValidation::REFUSED;
@@ -1020,7 +1067,7 @@ class PurchaseRequest extends CommonDBTM
             $count = count($actors[CommonITILActor::REQUESTER]);
         }
         if ($count == 1 && $actor->getFromDBByCrit(
-            ["`tickets_id` = $tickets_id AND `type` = " . CommonITILActor::REQUESTER]
+            ['tickets_id' => (int) $tickets_id, 'type' => CommonITILActor::REQUESTER]
         )) {
             $purchaserequest->fields['users_id'] = $actor->fields['users_id'];
         }
@@ -1275,23 +1322,23 @@ class PurchaseRequest extends CommonDBTM
             // requester
             echo "<td>" . $dbu->getUserName($field['users_id']) . "</td>";
             // requester group
-            echo "<td>" . Dropdown::getDropdownName('glpi_groups', $field['groups_id']) . "</td>";
+            echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_groups', $field['groups_id'])) . "</td>";
             // location
-            echo "<td>" . Dropdown::getDropdownName('glpi_locations', $field['locations_id']) . "</td>";
+            echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_locations', $field['locations_id'])) . "</td>";
             // state
-            echo "<td>" . Dropdown::getDropdownName(
+            echo "<td>" . htmlescape(Dropdown::getDropdownName(
                 'glpi_plugin_purchaserequest_purchaserequeststates',
                 $field['plugin_purchaserequest_purchaserequeststates_id']
-            ) . "</td>";
+            )) . "</td>";
             // item type
             $item = getItemForItemtype($field["itemtype"] ?? '');
             echo "<td>" . ($item !== false ? $item->getTypeName() : '') . "</td>";
             // Model name
             $itemtypeclass = $field['itemtype'] . "Type";
-            echo "<td>" . Dropdown::getDropdownName(
+            echo "<td>" . htmlescape(Dropdown::getDropdownName(
                 $dbu->getTableForItemType($itemtypeclass),
                 $field["types_id"]
-            ) . "</td>";
+            )) . "</td>";
             //due date
             echo "<td>" . Html::convDate($field['due_date']) . "</td>";
             //traited
@@ -1436,23 +1483,23 @@ class PurchaseRequest extends CommonDBTM
                 // requester
                 echo "<td>" . $dbu->getUserName($field['users_id']) . "</td>";
                 // requester group
-                echo "<td>" . Dropdown::getDropdownName('glpi_groups', $field['groups_id']) . "</td>";
+                echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_groups', $field['groups_id'])) . "</td>";
                 // location
-                echo "<td>" . Dropdown::getDropdownName('glpi_locations', $field['locations_id']) . "</td>";
+                echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_locations', $field['locations_id'])) . "</td>";
                 // state
-                echo "<td>" . Dropdown::getDropdownName(
+                echo "<td>" . htmlescape(Dropdown::getDropdownName(
                     'glpi_plugin_purchaserequest_purchaserequeststates',
                     $field['plugin_purchaserequest_purchaserequeststates_id']
-                ) . "</td>";
+                )) . "</td>";
                 // item type
                 $orderItem = getItemForItemtype($field["itemtype"] ?? '');
                 echo "<td>" . ($orderItem !== false ? $orderItem->getTypeName() : '') . "</td>";
                 // Model name
                 $itemtypeclass = $field['itemtype'] . "Type";
-                echo "<td>" . Dropdown::getDropdownName(
+                echo "<td>" . htmlescape(Dropdown::getDropdownName(
                     $dbu->getTableForItemType($itemtypeclass),
                     $field["types_id"]
-                ) . "</td>";
+                )) . "</td>";
                 //due date
                 echo "<td>" . Html::convDate($field['due_date']) . "</td>";
                 //traited
@@ -1598,7 +1645,7 @@ class PurchaseRequest extends CommonDBTM
             if (in_array($item->fields["status"], $status) && !empty($item->fields["comment_validation"])) {
                 echo "<tr class='tab_bg_1'>";
                 echo "<td colspan='2'>" . __('Approval comments') . "</td>";
-                echo "<td>" . $item->fields["comment_validation"] . "</td></tr>";
+                echo "<td>" . htmlescape($item->fields["comment_validation"]) . "</td></tr>";
             }
         }
         echo "</table></div>";
@@ -1679,7 +1726,11 @@ class PurchaseRequest extends CommonDBTM
                 $order_id = $input['plugin_order_orders_id'];
 
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id)) {
+                    // can() enforces the UPDATE right AND entity access per row.
+                    // Core forwards the raw POSTed id list to the plugin, so without
+                    // this gate a user could link a request from another entity to an
+                    // arbitrary order (IDOR) — mirror the front controller's check().
+                    if ($item->can($id, UPDATE)) {
                         //Possible connection with an order if purchase request is validated
                         if ($item->fields['status'] == CommonITILValidation::ACCEPTED) {
                             $item->update([
@@ -1689,6 +1740,8 @@ class PurchaseRequest extends CommonDBTM
                             ]);
                             $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                         }
+                    } else {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
                     }
                 }
                 return;
@@ -1697,13 +1750,18 @@ class PurchaseRequest extends CommonDBTM
             case "delete_link":
 
                 foreach ($ids as $id) {
-                    if ($item->getFromDB($id)) {
+                    // can() enforces the UPDATE right AND entity access per row,
+                    // blocking a cross-entity unlink (IDOR) on ids POSTed to the
+                    // massive-action endpoint — mirror the front controller's check().
+                    if ($item->can($id, UPDATE)) {
                         $item->update([
                             "id" => $id,
                             "plugin_order_orders_id" => 0,
                             "update" => __('Update'),
                         ]);
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
+                    } else {
+                        $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
                     }
                 }
                 return;

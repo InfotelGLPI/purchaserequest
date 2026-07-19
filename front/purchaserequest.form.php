@@ -85,9 +85,15 @@ if (Plugin::isPluginActive("order")
             case 'delete_link':
                 if (isset($_POST["item"])) {
                     foreach ($_POST["item"] as $key => $val) {
-                        if ($val == 1) {
-                            $tmp['id']                     = $key;
-                            $tmp['plugin_order_orders_id'] = 0;
+                        $key = (int) $key;
+                        if ($val == 1 && $key > 0) {
+                            // Enforce UPDATE right + entity access before unlinking
+                            // the request from its order.
+                            $purchase_request->check($key, UPDATE);
+                            $tmp = [
+                                'id'                     => $key,
+                                'plugin_order_orders_id' => 0,
+                            ];
                             $purchase_request->update($tmp);
                         }
                     }

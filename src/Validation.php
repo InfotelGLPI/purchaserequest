@@ -157,6 +157,43 @@ class Validation extends CommonDBTM
     {
         global $CFG_GLPI;
 
+        // Harden against mass assignment: these columns are managed by GLPI core
+        // or fixed at creation and must never be mutated through a generic update.
+        // The designated approver (users_id_validate) is set once when the
+        // validation is created and has no legitimate reassignment flow here.
+        unset(
+            $input['is_deleted'],
+            $input['is_recursive'],
+            $input['users_id_validate'],
+            $input['date_creation'],
+            $input['date_mod']
+        );
+
+        // Server-side enforcement of the approval workflow: only the designated
+        // approver (users_id_validate) may accept/refuse or change the status.
+        // front/validation.form.php only checks the generic UPDATE right, and the
+        // validator check in showValidation() is UI-only, so without this gate any
+        // user holding UPDATE could self-approve by POSTing the accept/refuse/
+        // update_status flags against an arbitrary validation id.
+        $is_validation_action = isset($input['refuse_purchaserequest'])
+            || isset($input['accept_purchaserequest'])
+            || isset($input['update_status']);
+        $is_validator = (int) ($this->fields['users_id_validate'] ?? 0) === (int) Session::getLoginUserID();
+        if ($is_validation_action && !$is_validator) {
+            unset(
+                $input['refuse_purchaserequest'],
+                $input['accept_purchaserequest'],
+                $input['update_status'],
+                $input['status']
+            );
+            Session::addMessageAfterRedirect(
+                __('You are not allowed to approve or refuse this purchase request.', 'purchaserequest'),
+                false,
+                ERROR
+            );
+            return $input;
+        }
+
         if (isset($input['refuse_purchaserequest']) && $input['refuse_purchaserequest'] == 1) {
             $input['status'] = CommonITILValidation::REFUSED;
         }
@@ -599,20 +636,20 @@ class Validation extends CommonDBTM
                 // requester
                 echo "<td>" . $dbu->getUserName($field['users_id']) . "</td>";
                 // requester group
-                echo "<td>" . Dropdown::getDropdownName('glpi_groups', $field['groups_id']) . "</td>";
+                echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_groups', $field['groups_id'])) . "</td>";
                 // location
-                echo "<td>" . Dropdown::getDropdownName('glpi_locations', $field['locations_id']) . "</td>";
+                echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_locations', $field['locations_id'])) . "</td>";
                 // state
-                echo "<td>" . Dropdown::getDropdownName(
+                echo "<td>" . htmlescape(Dropdown::getDropdownName(
                     'glpi_plugin_purchaserequest_purchaserequeststates',
                     $field['plugin_purchaserequest_purchaserequeststates_id']
-                ) . "</td>";
+                )) . "</td>";
                 // item type
                 $orderItem = getItemForItemtype($field["itemtype"] ?? '');
                 echo "<td>" . ($orderItem !== false ? $orderItem->getTypeName() : '') . "</td>";
                 // Model name
                 $itemtypeclass = $field['itemtype'] . "Type";
-                echo "<td>" . Dropdown::getDropdownName($dbu->getTableForItemType($itemtypeclass), $field["types_id"]) . "</td>";
+                echo "<td>" . htmlescape(Dropdown::getDropdownName($dbu->getTableForItemType($itemtypeclass), $field["types_id"])) . "</td>";
                 //due date
                 echo "<td>" . Html::convDate($field['due_date']) . "</td>";
                 //traited

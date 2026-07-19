@@ -27,6 +27,7 @@
  --------------------------------------------------------------------------
  */
 
+use Glpi\Plugin\Hooks;
 use GlpiPlugin\Purchaserequest\Servicecatalog;
 use GlpiPlugin\Purchaserequest\Profile;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
@@ -38,7 +39,7 @@ define('PLUGIN_PURCHASEREQUEST_VERSION', '3.2.0');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
     define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
-    $root = $CFG_GLPI['root_doc'] . '/plugins/purchaserequest';
+    $root = $CFG_GLPI['root_doc'] . Plugin::getPhpDir("purchaserequest", false);
     define("PLUGIN_PURCHASEREQUEST_WEBDIR", $root);
 }
 
@@ -55,7 +56,7 @@ function plugin_init_purchaserequest()
 
 
    /* Init current profile */
-    $PLUGIN_HOOKS['change_profile']['purchaserequest'] = [Profile::class, 'initProfile'];
+    $PLUGIN_HOOKS[Hooks::CHANGE_PROFILE]['purchaserequest'] = [Profile::class, 'changeProfile'];
 
     if (Plugin::isPluginActive('purchaserequest')) {
         Plugin::registerClass(Profile::class, ['addtabon' => ['Profile']]);
@@ -82,14 +83,14 @@ function plugin_init_purchaserequest()
 
        //TODO create right config
         if (Session::haveRight("plugin_purchaserequest_config", READ)) {
-            $PLUGIN_HOOKS['config_page']['purchaserequest'] = 'front/config.form.php';
+            $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['purchaserequest'] = 'front/config.form.php';
         }
 
         if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
           && !class_exists('GlpiPlugin\Servicecatalog\Main')
         ) {
-            $PLUGIN_HOOKS['helpdesk_menu_entry']['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR.'/front/purchaserequest.php';
-            $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['purchaserequest'] = PurchaseRequest::getIcon();
+            $PLUGIN_HOOKS[Hooks::HELPDESK_MENU_ENTRY]['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR.'/front/purchaserequest.php';
+            $PLUGIN_HOOKS[Hooks::HELPDESK_MENU_ENTRY_ICON]['purchaserequest'] = PurchaseRequest::getIcon();
         }
 
         if (PurchaseRequest::canView()) {
@@ -99,7 +100,7 @@ function plugin_init_purchaserequest()
                 'addtabon'                    => ['Ticket',
                 'PluginOrderOrder']]
             );
-            $PLUGIN_HOOKS['menu_toadd']['purchaserequest']['management'] = PurchaseRequest::class;
+            $PLUGIN_HOOKS[Hooks::MENU_TOADD]['purchaserequest']['management'] = PurchaseRequest::class;
 
             if (Plugin::isPluginActive('servicecatalog')) {
                 $PLUGIN_HOOKS['servicecatalog']['purchaserequest'] = [Servicecatalog::class];
@@ -119,7 +120,7 @@ function plugin_version_purchaserequest()
     return ['name'         => _n("Purchase request", "Purchase requests", 1, "purchaserequest"),
            'version'      => PLUGIN_PURCHASEREQUEST_VERSION,
            'author'       => "<a href='https://blogglpi.infotel.com'>Infotel</a>, Xavier CAILLAUD",
-           'license'      => 'GPLv2+',
+           'license'      => 'GPLv3+',
            'requirements' => [
               'glpi' => [
                  'min' => '11.0',
