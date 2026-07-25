@@ -1,0 +1,64 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<form name="form" method="post" action="{{ target }}">
+   <div class="card">
+      <div class="card-header">
+         <h3 class="card-title">{{ __('Add a purchase request', 'purchaserequest') }}</h3>
+      </div>
+      <div class="card-body">
+         <div class="row">
+            {{ fields.htmlField('name', name_field|raw, __('Name')) }}
+            {{ fields.htmlField('_validated_by', validated_by|e, __('Validated by', 'purchaserequest')) }}
+            {{ fields.htmlField('users_id', requester_field|raw, __('Requester'), {'required': true}) }}
+            {{ fields.htmlField('groups_id', group_field|raw, __('Requester group')) }}
+            {{ fields.htmlField('locations_id', location_field|raw, __('Location')) }}
+            {{ fields.htmlField('plugin_purchaserequest_purchaserequeststates_id', state_field|raw, __('Status')) }}
+            {{ fields.htmlField('comment', comment_field|raw, __('Description'), {'required': true}) }}
+            {{ fields.htmlField('itemtype', itemtype_field|raw, __('Item type'), {'required': true}) }}
+            {{ fields.htmlField('types_id', types_field|raw, __('Type'), {'required': true}) }}
+            {{ fields.htmlField('due_date', due_date_field|raw, __('Due date', 'purchaserequest')) }}
+            {{ fields.htmlField('users_id_validate', validator_field|raw, __('To be validated by', 'purchaserequest'), {'required': true}) }}
+            {{ fields.htmlField('amount', amount_field|raw, __('Amount', 'purchaserequest'), {'required': true}) }}
+            {{ fields.htmlField('invoice_customer', invoice_field|raw, __('To be rebilled to the customer', 'purchaserequest')) }}
+         </div>
+      </div>
+      <div class="card-footer d-flex justify-content-end">
+         <button type="submit" name="add_tickets" value="1" class="btn btn-primary">
+            <i class="ti ti-plus"></i>
+            <span>{{ _x('button', 'Add') }}</span>
+         </button>
+      </div>
+   </div>
+
+   <input type="hidden" name="tickets_id" value="{{ tickets_id }}">
+   <input type="hidden" name="entities_id" value="{{ entities_id }}">
+   <input type="hidden" name="users_id_creator" value="{{ users_id_creator }}">
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+</form>

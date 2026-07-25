@@ -27,6 +27,7 @@
  --------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Purchaserequest\Config;
 
 Session::checkLoginUser();
@@ -52,14 +53,16 @@ if (Plugin::isPluginActive("purchaserequest")) {
 
    } else {
       Html::header(__('Setup'), '', "config", Plugin::getType());
-      echo "<div class='alert  alert-warning d-flex'>";
-      echo "<b>" . __("You don't have permission to perform this action.") . "</b></div>";
+      TemplateRenderer::getInstance()->display('@purchaserequest/alert.html.twig', [
+         'message' => __("You don't have permission to perform this action."),
+      ]);
       Html::footer();
    }
 
 } else {
    Html::header(__('Setup'), '', "config", Plugin::getType());
-   echo "<div class='alert  alert-warning d-flex'>";
-   echo "<b>" . __('Please activate the plugin', 'purchaserequest') . "</b></div>";
+   TemplateRenderer::getInstance()->display('@purchaserequest/alert.html.twig', [
+      'message' => __('Please activate the plugin', 'purchaserequest'),
+   ]);
    Html::footer();
 }

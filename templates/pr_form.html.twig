@@ -1,0 +1,65 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<div class="asset">
+   {% include 'components/form/header.html.twig' %}
+
+   <div class="card-body d-flex">
+      <div class="col-12 flex-column">
+         <div class="row">
+            {{ fields.htmlField('name', name_field|raw, __('Name')) }}
+            {{ fields.htmlField('users_id', requester_field|raw, __('Requester'), {'required': true}) }}
+            {{ fields.htmlField('groups_id', group_field|raw, __('Requester group')) }}
+            {{ fields.htmlField('locations_id', location_field|raw, __('Location')) }}
+            {{ fields.htmlField('plugin_purchaserequest_purchaserequeststates_id', state_field|raw, __('Status')) }}
+            {{ fields.htmlField('comment', comment_field|raw, __('Description'), {'required': true}) }}
+            {{ fields.htmlField('itemtype', itemtype_field|raw, __('Item type'), {'required': true}) }}
+            {{ fields.htmlField('types_id', types_field|raw, __('Type'), {'required': true}) }}
+            {{ fields.htmlField('due_date', due_date_field|raw, __('Due date', 'purchaserequest')) }}
+            {{ fields.htmlField('users_id_validate', validator_field|raw, __('To be validated by', 'purchaserequest'), {'required': true}) }}
+            {{ fields.htmlField('amount', amount_field|raw, __('Amount', 'purchaserequest'), {'required': true}) }}
+            {{ fields.htmlField('invoice_customer', invoice_field|raw, __('To be rebilled to the customer', 'purchaserequest')) }}
+
+            {% if order_link_hidden %}<div class="d-none">{% endif %}
+            {{ fields.htmlField('plugin_order_orders_id', order_field|raw, __('Linked to the order', 'purchaserequest')) }}
+            {% if order_link_hidden %}</div>{% endif %}
+
+            {{ fields.htmlField('tickets_id', ticket_field|raw, __('Linked to ticket', 'purchaserequest')) }}
+
+            {% if show_treated %}
+               {{ fields.htmlField('is_process', treated_field|raw, treated_label) }}
+            {% endif %}
+
+            <input type="hidden" name="users_id_creator" value="{{ users_id_creator }}">
+         </div>
+      </div>
+   </div>
+
+   {% include 'components/form/buttons.html.twig' %}
+</div>

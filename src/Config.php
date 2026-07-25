@@ -32,7 +32,7 @@ namespace GlpiPlugin\Purchaserequest;
 use CommonDBTM;
 use CommonGLPI;
 use DbUtils;
-use Html;
+use Glpi\Application\View\TemplateRenderer;
 use Migration;
 use Session;
 use Toolbox;
@@ -110,30 +110,22 @@ class Config extends CommonDBTM
 
     public function showForm($ID, $options = [])
     {
-
-        echo "<form name='form' method='post' action='"
-           . Toolbox::getItemTypeFormURL(self::getType()) . "'>";
-        echo Html::hidden('id', ['value' => $this->fields['id']]);
-        echo "<div class='center'><table class='tab_cadre_fixe'  cellspacing='2' cellpadding='2'>";
-        echo "<tr><th colspan='2'>" . __('Configuration purchase request', 'purchaserequest') . "</th></tr>";
-
-
-        echo "<tr class='tab_bg_1 top'><td>" . __('General Services Manager', 'purchaserequest') . "</td>";
-        echo "<td>";
-        User::dropdown(['name'   => "id_general_service_manager",
+        // Capture the GLPI user dropdown (no direct Twig field macro) and hand it
+        // to the template as pre-rendered HTML.
+        ob_start();
+        User::dropdown([
+            'name'   => "id_general_service_manager",
             'value'  => $this->fields["id_general_service_manager"],
             'entity' => -1,
-            'right'  => 'plugin_purchaserequest_validate']);
+            'right'  => 'plugin_purchaserequest_validate',
+        ]);
+        $manager_dropdown = ob_get_clean();
 
-        echo "</td></tr>";
-
-
-        echo "<tr class='tab_bg_2 center'><td colspan='2'>";
-        echo Html::submit(_sx('button', 'Save'), ['name' => 'update_config', 'class' => 'btn btn-primary']);
-        echo "</td></tr>";
-
-        echo "</table></div>";
-        Html::closeForm();
+        TemplateRenderer::getInstance()->display('@purchaserequest/config.html.twig', [
+            'id'               => $this->fields['id'],
+            'target'           => Toolbox::getItemTypeFormURL(self::getType()),
+            'manager_dropdown' => $manager_dropdown,
+        ]);
     }
 
     /**

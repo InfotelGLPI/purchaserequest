@@ -39,7 +39,7 @@ define('PLUGIN_PURCHASEREQUEST_VERSION', '3.2.0');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
     define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
-    $root = $CFG_GLPI['root_doc'] . Plugin::getPhpDir("purchaserequest", false);
+    $root = $CFG_GLPI['root_doc'] . '/plugins/purchaserequest';
     define("PLUGIN_PURCHASEREQUEST_WEBDIR", $root);
 }
 

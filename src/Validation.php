@@ -35,12 +35,12 @@ use CommonGLPI;
 use CommonITILValidation;
 use DbUtils;
 use Dropdown;
+use Glpi\Application\View\TemplateRenderer;
 use Glpi\RichText\RichText;
 use Html;
 use Log;
 use Migration;
 use NotificationEvent;
-use Plugin;
 use PluginOrderOrder;
 use PluginOrderReference;
 use Session;
@@ -346,7 +346,6 @@ class Validation extends CommonDBTM
 
         $dbu = new DbUtils();
         $this->initForm($ID, $options);
-        $this->showFormHeader($options);
 
         $canedit            = $this->can($ID, UPDATE);
         $options['canedit'] = $canedit;
@@ -367,39 +366,32 @@ class Validation extends CommonDBTM
             unset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id]);
         }
 
-        /* title */
-        echo "<tr class='tab_bg_1'>";
-        echo "<td>" . __("Name") . "</td><td>";
-        if ($canedit) {
-            echo Html::input('name', ['value' => $this->fields['name'], 'size' => 40]);
-        } else {
-            echo htmlescape($this->fields["name"]);
-        }
-        echo "</td><td colspan='2'></td></tr>";
+        $JS = '';
 
-        echo "</td></tr>";
-        /* requester */
-        echo "<tr class='tab_bg_1'><td>" . __("Requester") . "&nbsp;<span class='red'>*</span></td><td>";
+        // Name (editable input or read-only plain value handled in template)
+        $name_field = $canedit
+            ? Html::input('name', ['value' => $this->fields['name'], 'size' => 40])
+            : null;
+
+        // Requester + requester group
         if ($canedit) {
-            $rand_user = User::dropdown(['name'      => "users_id",
+            ob_start();
+            $rand_user = User::dropdown([
+                'name'      => "users_id",
                 'value'     => $this->fields["users_id"],
                 'entity'    => $this->fields["entities_id"],
                 'on_change' => "PurchaserequestLoadGroups();",
-                'right'     => 'all']);
-        } else {
-            echo Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"]);
-        }
-        echo "</td>";
+                'right'     => 'all',
+            ]);
+            $requester_field = ob_get_clean();
 
-        /* requester group */
-        echo "<td>" . __("Requester group");
-        echo "</td><td id='plugin_purchaserequest_group'>";
-
-        if ($canedit) {
+            ob_start();
             if ($this->fields['users_id']) {
                 PurchaseRequest::displayGroup($this->fields['users_id']);
             }
+            $group_field = ob_get_clean();
 
+            // JS updating the requester group dropdown, kept in PHP (rendered after the template)
             $JS     = "function PurchaserequestLoadGroups(){";
             $params = ['users_id' => '__VALUE__',
                 'entity'   => $this->fields["entities_id"]];
@@ -411,56 +403,49 @@ class Validation extends CommonDBTM
                 false
             );
             $JS     .= "}";
-            echo Html::scriptBlock($JS);
         } else {
-            echo Dropdown::getDropdownName($dbu->getTableForItemType('Group'), $this->fields["groups_id"]);
+            $requester_field = Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"]);
+            $group_field     = Dropdown::getDropdownName($dbu->getTableForItemType('Group'), $this->fields["groups_id"]);
         }
-        echo "</td></tr>";
 
-        /* location */
-        echo "<tr class='tab_bg_1'><td>" . __("Location") . "&nbsp;</td>";
-        echo "<td>";
+        // Location
+        ob_start();
         Dropdown::show('Location', ['value'  => $this->fields["locations_id"],
             'entity' => $this->fields["entities_id"]]);
-        echo "</td>";
-        echo "<td>" . __("Status") . "&nbsp;</td>";
-        echo "<td>";
+        $location_field = ob_get_clean();
+
+        // Status
+        ob_start();
         Dropdown::show(
             PurchaseRequestState::class,
             ['value'  => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
                 'entity' => $this->fields["entities_id"]]
         );
-        echo "</td></tr>";
+        $state_field = ob_get_clean();
 
-        /* description */
-        echo "<tr class='tab_bg_1'><td>" . __("Description") . "&nbsp;<span class='red'>*</span></td>";
-        echo "<td colspan='3'>";
+        // Description
+        ob_start();
         Html::textarea(['name'            => 'comment',
             'value'           => stripslashes($this->fields['comment']),
             'enable_richtext' => false,
             'cols'            => '100',
             'rows'            => '4']);
-        echo "</td></tr>";
+        $comment_field = ob_get_clean();
 
-        /* type */
+        // Item type
         $reference = new PluginOrderReference();
-        echo "<tr class='tab_bg_1'><td>" . __("Item type");
-        echo "&nbsp;<span class='red'>*</span></td>";
-        echo "<td>";
-        $params = [
+        ob_start();
+        $reference->dropdownAllItems([
             'myname'    => 'itemtype',
             'value'     => $this->fields["itemtype"],
             'entity'    => $_SESSION["glpiactive_entity"],
             'ajax_page' => $CFG_GLPI['root_doc'] . '/plugins/order/ajax/referencespecifications.php',
             'class'     => __CLASS__,
-        ];
+        ]);
+        $itemtype_field = ob_get_clean();
 
-        $reference->dropdownAllItems($params);
-        echo "</td>";
-
-        echo "<td>" . __("Type") . "&nbsp;<span class='red'>*</span></td>";
-        echo "<td>";
-        echo "<span id='show_types_id'>";
+        // Type
+        ob_start();
         if ($this->fields['itemtype']) {
             if ($this->fields['itemtype'] == 'PluginOrderOther') {
                 $file = 'other';
@@ -482,85 +467,96 @@ class Validation extends CommonDBTM
                 );
             }
         }
-        echo "</span>";
-        echo "</td></tr>";
+        $types_field = ob_get_clean();
 
-        echo "<tr class='tab_bg_1'><td>" . __("Due date", "purchaserequest") . "</td>";
-        echo "<td>";
+        // Due date
+        ob_start();
         Html::showDateField("due_date", ['value' => $this->fields["due_date"]]);
-        echo "</td>";
+        $due_date_field = ob_get_clean();
 
-        echo "<td>" . __("To be validated by", "purchaserequest") . "&nbsp;<span class='red'>*</span></td>";
-        echo "<td>";
+        // To be validated by
+        ob_start();
         User::dropdown(['name'   => "users_id_validate",
             'value'  => $this->fields["users_id_validate"],
             'entity' => $this->fields["entities_id"],
             'right'  => 'plugin_purchaserequest_validate']);
-        echo "</td></tr>";
-        echo "<tr class='tab_bg_1'><td>" . __("Amount", "purchaserequest") . "</td>";
-        echo "<td>";
-        $params = [
-            'type' => 'text',
-            'value' => number_format($this->fields['amount'], 2, '.', ' '),
-        ];
-        echo Html::input('amount', $params);
-        echo "</td>";
+        $validator_field = ob_get_clean();
 
-        echo "<td>" . __("To be rebilled to the customer", "purchaserequest") . "&nbsp;</td>";
-        echo "<td>";
+        // Amount
+        $amount_field = Html::input('amount', [
+            'type'  => 'text',
+            'value' => number_format($this->fields['amount'], 2, '.', ' '),
+        ]);
+
+        // To be rebilled to the customer
+        ob_start();
         Html::showCheckbox(['name'    => "invoice_customer",
             'checked' => $this->fields["invoice_customer"],
         ]);
+        $invoice_field = ob_get_clean();
 
-        echo "</td>";
-        echo "</tr>";
-        echo "<tr class='tab_bg_1'>";
-        $order = new PluginOrderOrder();
-        echo "<td>" . __("Linked to the order", "purchaserequest") . "</td>";
-        echo "<td>";
-
-        $options = [];
+        // Linked to the order
+        ob_start();
+        $order         = new PluginOrderOrder();
+        $order_options = [];
         if ($order->getFromDB($this->fields['plugin_order_orders_id'])) {
-            $options['value'] = $this->fields['plugin_order_orders_id'];
+            $order_options['value'] = $this->fields['plugin_order_orders_id'];
         }
-        PluginOrderOrder::dropdown($options);
-        echo "</td>";
-        $ticket = new Ticket();
-        echo "<td>" . __("Linked to ticket", "purchaserequest") . "</td>";
-        echo "<td>";
-        $options = [];
+        PluginOrderOrder::dropdown($order_options);
+        $order_field = ob_get_clean();
+
+        // Linked to ticket
+        ob_start();
+        $ticket         = new Ticket();
+        $ticket_options = [];
         if ($ticket->getFromDB($this->fields['tickets_id'])) {
-            $options['value'] = $this->fields['tickets_id'];
+            $ticket_options['value'] = $this->fields['tickets_id'];
         }
-        $options['entity'] = $this->fields["entities_id"];
-        Ticket::dropdown($options);
-        echo "</td>";
-        echo "</tr>";
+        $ticket_options['entity'] = $this->fields["entities_id"];
+        Ticket::dropdown($ticket_options);
+        $ticket_field = ob_get_clean();
 
+        // Treated
+        $is_process_field = null;
+        $processing_date  = null;
         if ($ID > 0) {
-            echo "<tr class='tab_bg_1'>";
-
             if ($this->fields['processing_date'] == null) {
-                echo "<td>" . __("Treated", "purchaserequest") . "</td>";
-                echo "<td>";
+                ob_start();
                 Html::showCheckbox(['name' => 'is_process']);
-                echo "</td>";
-                echo "<td colspan='2'></td>";
+                $is_process_field = ob_get_clean();
             } else {
-                echo "<th colspan='4'>" . __("Treated on", "purchaserequest");
-                echo " " . Html::convDateTime($this->fields['processing_date']);
-                echo "</th>";
+                $processing_date = Html::convDateTime($this->fields['processing_date']);
             }
-            echo "</tr>";
         }
 
-        echo Html::hidden('users_id_creator', ['value' => $_SESSION['glpiID']]);
+        TemplateRenderer::getInstance()->display('@purchaserequest/validation_form.html.twig', [
+            'item'             => $this,
+            'params'           => $options,
+            'canedit'          => $canedit,
+            'name_field'       => $name_field,
+            'name_value'       => $this->fields['name'],
+            'requester_field'  => $requester_field,
+            'group_field'      => $group_field,
+            'location_field'   => $location_field,
+            'state_field'      => $state_field,
+            'comment_field'    => $comment_field,
+            'itemtype_field'   => $itemtype_field,
+            'types_field'      => $types_field,
+            'due_date_field'   => $due_date_field,
+            'validator_field'  => $validator_field,
+            'amount_field'     => $amount_field,
+            'invoice_field'    => $invoice_field,
+            'order_field'      => $order_field,
+            'ticket_field'     => $ticket_field,
+            'show_treated'     => ($ID > 0),
+            'is_process_field' => $is_process_field,
+            'processing_date'  => $processing_date,
+            'users_id_creator' => $_SESSION['glpiID'],
+        ]);
 
-        if ($canedit) {
-            $this->showFormButtons($options);
-        } else {
-            echo "</table></div>";
-            Html::closeForm();
+        // Inline JS kept in PHP (server-injected params), rendered after the template.
+        if ($canedit && $JS !== '') {
+            echo Html::scriptBlock($JS);
         }
 
         return true;
@@ -574,120 +570,74 @@ class Validation extends CommonDBTM
      */
     public static function showForOrder($item)
     {
-        global $CFG_GLPI;
-
         $dbu = new DbUtils();
-        $start = (int) ($_REQUEST["start"] ?? 0);
 
         $purchase_request = new PurchaseRequest();
         $data             = $purchase_request->find(['plugin_order_orders_id' => $item->fields['id']]);
 
-        $rows = count($data);
-
+        $rows    = count($data);
         $canread = Session::haveRight(self::$rightname, READ);
 
         if (!$rows || !$canread) {
-            echo __('No results found');
-        } else {
-            $canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]);
-            $rand    = mt_rand();
+            TemplateRenderer::getInstance()->display('@purchaserequest/validation_for_order.html.twig', [
+                'no_results' => true,
+            ]);
+            return;
+        }
 
-            echo "<div class='center'>";
+        $canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]);
+        $rand    = mt_rand();
 
-            Html::printAjaxPager(PurchaseRequest::getTypeName(2), $start, $rows);
-            echo "<form method='post' name='purchaseresquet_form$rand' id='purchaseresquet_form$rand'  "
-                 . "action='" . Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "'>";
+        $entries = [];
+        foreach ($data as $field) {
+            // Name
+            $pr = new PurchaseRequest();
+            $pr->getFromDB($field['id']);
 
-            echo "<table class='tab_cadre_fixe'>";
-            echo "<tr class='tab_bg_1'>";
-            if ($canedit) {
-                echo "<th></th>";
-            }
-            echo "<th>" . __('Name') . "</th>";
-            echo "<th>" . __('Requester') . "</th>";
-            echo "<th>" . __('Requester group') . "</th>";
-            echo "<th>" . __('Location') . "</th>";
-            echo "<th>" . __('Status') . "</th>";
-            echo "<th>" . __('Item type') . "</th>";
-            echo "<th>" . __('Type') . "</th>";
-            echo "<th>" . __('Due date', 'purchaserequest') . "</th>";
-            echo "<th>" . __('Treated on', 'purchaserequest') . "</th>";
-            echo "<th>" . __('Approver') . "</th>";
-            echo "<th>" . __('Approval status') . "</th>";
-            echo "<th>" . PluginOrderOrder::getTypeName() . "</th>";
-            echo "</tr>";
+            // Item type
+            $orderItem = getItemForItemtype($field["itemtype"] ?? '');
+            // Model name (type)
+            $itemtypeclass = $field['itemtype'] . "Type";
+            // Link with order
+            $order = new PluginOrderOrder();
+            $order->getFromDB($field['plugin_order_orders_id']);
 
-            foreach ($data as $field) {
-                echo "<tr class='tab_bg_1'>";
-                if ($canedit) {
-                    echo "<td width='10'>";
-                    $sel = "";
-                    if (isset($_GET["select"]) && $_GET["select"] == "all") {
-                        $sel = "checked";
-                    }
-                    echo "<input type='checkbox' name='item[" . $field["id"] . "]' value='1' $sel>";
-                    echo Html::hidden('plugin_order_orders_id', ['value' => $item->getID()]);
-                    echo "</td>";
-                }
-                // Name
-                $purchase_request = new PurchaseRequest();
-                $purchase_request->getFromDB($field['id']);
-                echo "<td>" . $purchase_request->getLink() . "</td>";
-                // requester
-                echo "<td>" . $dbu->getUserName($field['users_id']) . "</td>";
-                // requester group
-                echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_groups', $field['groups_id'])) . "</td>";
-                // location
-                echo "<td>" . htmlescape(Dropdown::getDropdownName('glpi_locations', $field['locations_id'])) . "</td>";
-                // state
-                echo "<td>" . htmlescape(Dropdown::getDropdownName(
+            $entries[] = [
+                'id'         => $field['id'],
+                'name'       => $pr->getLink(),
+                'requester'  => $dbu->getUserName($field['users_id']),
+                'group'      => Dropdown::getDropdownName('glpi_groups', $field['groups_id']),
+                'location'   => Dropdown::getDropdownName('glpi_locations', $field['locations_id']),
+                'state'      => Dropdown::getDropdownName(
                     'glpi_plugin_purchaserequest_purchaserequeststates',
                     $field['plugin_purchaserequest_purchaserequeststates_id']
-                )) . "</td>";
-                // item type
-                $orderItem = getItemForItemtype($field["itemtype"] ?? '');
-                echo "<td>" . ($orderItem !== false ? $orderItem->getTypeName() : '') . "</td>";
-                // Model name
-                $itemtypeclass = $field['itemtype'] . "Type";
-                echo "<td>" . htmlescape(Dropdown::getDropdownName($dbu->getTableForItemType($itemtypeclass), $field["types_id"])) . "</td>";
-                //due date
-                echo "<td>" . Html::convDate($field['due_date']) . "</td>";
-                //traited
-                echo "<td>" . Html::convDate($field['processing_date']) . "</td>";
-                // validation
-                echo "<td>" . $dbu->getUserName($field['users_id_validate']) . "</td>";
-                //status
-                echo "<td>" . CommonITILValidation::getStatus($field['status']) . "</td>";
-                //link with order
-                $order = new PluginOrderOrder();
-                $order->getFromDB($field['plugin_order_orders_id']);
-                echo "<td>" . $order->getLink() . "</td>";
-                echo "</tr>";
-            }
-
-            echo "</table>";
-            if ($canedit) {
-                echo "<div class='center'>";
-                echo "<table width='950px' class='tab_glpi'>";
-                echo "<tr><td><img src=\"" . $CFG_GLPI["root_doc"]
-                     . "/pics/arrow-left.png\" alt=''></td><td class='center'>";
-                echo "<a onclick= \"if ( markCheckboxes('purchaseresquet_form$rand') ) "
-                     . "return false;\" href='#'>" . __("Check all") . "</a></td>";
-
-                echo "<td>/</td><td class='center'>";
-                echo "<a onclick= \"if ( unMarkCheckboxes('purchaseresquet_form$rand') ) "
-                     . "return false;\" href='#'>" . __("Uncheck all") . "</a>";
-                echo "</td><td align='left' width='80%'>";
-                echo Html::hidden('plugin_order_orders_id', ['value' => $item->getID()]);
-                $purchase_request->dropdownPurchaseRequestItemsActions();
-                echo "&nbsp;";
-                echo Html::submit(_sx('button', 'Post'), ['name' => 'action', 'class' => 'btn btn-primary']);
-                echo "</td>";
-                echo "</table>";
-            }
-            Html::closeForm();
-            echo "</div>";
+                ),
+                'itemtype'   => $orderItem !== false ? $orderItem->getTypeName() : '',
+                'type'       => Dropdown::getDropdownName($dbu->getTableForItemType($itemtypeclass), $field["types_id"]),
+                'due_date'   => Html::convDate($field['due_date']),
+                'processing' => Html::convDate($field['processing_date']),
+                'validator'  => $dbu->getUserName($field['users_id_validate']),
+                'status'     => CommonITILValidation::getStatus($field['status']),
+                'order'      => $order->getLink(),
+            ];
         }
+
+        // Capture the mass action dropdown ("Delete link with order")
+        ob_start();
+        $purchase_request->dropdownPurchaseRequestItemsActions();
+        $action_dropdown = ob_get_clean();
+
+        TemplateRenderer::getInstance()->display('@purchaserequest/validation_for_order.html.twig', [
+            'no_results'      => false,
+            'canedit'         => $canedit,
+            'rand'            => $rand,
+            'target'          => Toolbox::getItemTypeFormURL(PurchaseRequest::class),
+            'entries'         => $entries,
+            'order_id'        => $item->getID(),
+            'order_type_name' => PluginOrderOrder::getTypeName(),
+            'action_dropdown' => $action_dropdown,
+            'select_all'      => (isset($_GET["select"]) && $_GET["select"] == "all"),
+        ]);
     }
 
     /**
@@ -705,40 +655,37 @@ class Validation extends CommonDBTM
      */
     public static function showValidation($item)
     {
-
-        $dbu        = new DbUtils();
         $validation = new self();
-        echo "<form name='form' id='formvalidation' method='post' action='" . Toolbox::getItemTypeFormURL(Validation::class) . "'>";
 
-        echo "<div class='center'><table class='tab_cadre_fixe'>";
-        //      echo "<tr class='tab_bg_2'>";
-        //      echo "<th colspan='3'>" . __('Do you approve this purchase request ?', 'purchaserequest') . "</th>";
-        //      echo "</tr>";
-        //
-        //      echo "<tr class='tab_bg_1'>";
-        //      echo "<td colspan='2'>" . __('Approval requester') . "</td>";
-        //      echo "<td class='center'>" . $dbu->getUserName($item->fields["users_id"]) . "</td></tr>";
-        //
-        //      echo "<tr class='tab_bg_1'><td colspan='2'>" . __('Approver') . "</td>";
-        //      echo "<td class='center'>" . $dbu->getUserName($item->fields["users_id_validate"]) . "</td></tr>";
-        //      echo "</td></tr>";
+        $show_actions  = false;
+        $validation_id = 0;
+        $comment_field = '';
+
         if ($validation->getFromDBByCrit(["status" => CommonITILValidation::WAITING,
             "users_id_validate" => Session::getLoginUserID(),
             "plugin_purchaserequest_purchaserequests_id" => $item->getID()])) {
-            echo "<tr class='tab_bg_1'>";
-            echo "<td>" . __('Status of the approval request') . "</td>";
-            echo "<td class='center'>";
-            echo "<div style='color:forestgreen'><i id='accept_purchaserequest' class='question far fa-check-circle fa-3x'>";
-            echo "</i><br>" . __('Accept purchase request', 'purchaserequest') . "</div>";
-            echo Html::hidden('accept_purchaserequest', ['value' => 0]);
-            echo "</td>";
-            echo "<td class='center'>";
-            echo "<div style='color:darkred'><i id='refuse_purchaserequest' class='question far fa-times-circle fa-3x'>";
-            echo "</i><br>" . __('Refuse purchase request', 'purchaserequest') . "</div>";
-            echo Html::hidden('refuse_purchaserequest', ['value' => 0]);
-            echo "</td>";
-            echo "</tr>";
+            $show_actions  = true;
+            $validation_id = $validation->fields['id'];
 
+            ob_start();
+            Html::textarea(['name'            => 'comment_validation',
+                'enable_richtext' => false,
+                'cols'            => '90',
+                'rows'            => '3']);
+            $comment_field = ob_get_clean();
+        }
+
+        TemplateRenderer::getInstance()->display('@purchaserequest/validation_showvalidation.html.twig', [
+            'target'            => Toolbox::getItemTypeFormURL(Validation::class),
+            'show_actions'      => $show_actions,
+            'validation_id'     => $validation_id,
+            'users_id_validate' => Session::getLoginUserID(),
+            'pr_id'             => $item->fields['id'],
+            'comment_field'     => $comment_field,
+        ]);
+
+        // Accept/refuse handlers kept in PHP (rendered after the template).
+        if ($show_actions) {
             echo Html::scriptBlock('$( "#accept_purchaserequest" ).click(function() {
                                 $( "#formvalidation" ).append("<input type=\'hidden\' name=\'accept_purchaserequest\' value=\'1\' />");
                                 $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
@@ -749,27 +696,7 @@ class Validation extends CommonDBTM
                                 $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
                                 $( "#formvalidation" ).submit();
                               });');
-            echo "</td>";
-            echo "</tr>";
-
-            echo "<tr class='tab_bg_1'>";
-            echo "<td>" . __('Approval comments') . "</td>";
-            echo "<td colspan='2'>";
-            Html::textarea(['name'            => 'comment_validation',
-                'enable_richtext' => false,
-                'cols'            => '90',
-                'rows'            => '3']);
-            echo Html::hidden('id', ['value' => $validation->fields['id']]);
-            echo Html::hidden('users_id_validate', ['value' => Session::getLoginUserID()]);
-            echo Html::hidden('plugin_purchaserequest_purchaserequests_id', ['value' => $item->fields['id']]);
-            echo "</td></tr>";
         }
-
-        $validator = ($item->fields["users_id_validate"] == Session::getLoginUserID());
-
-
-        echo "</table></div>";
-        Html::closeForm();
 
         $self = new self();
         $self->showSummary($item);
@@ -783,61 +710,26 @@ class Validation extends CommonDBTM
      **/
     public function showSummary(CommonDBTM $item)
     {
-        global $DB, $CFG_GLPI;
+        global $DB;
 
-        //      if (!Session::haveRightsOr(static::$rightname,
-        //                                 array_merge(static::getCreateRights(),
-        //                                             static::getValidateRights(),
-        //                                             static::getPurgeRights()))) {
-        //         return false;
-        //      }
+        $tID  = $item->fields['id'];
+        $rand = mt_rand();
 
-        $tID = $item->fields['id'];
-
-        $tmp    = ["plugin_purchaserequest_purchaserequests_id" => $tID];
-        $canadd = $this->can(-1, CREATE, $tmp);
-        $rand   = mt_rand();
-
-
-        echo "<div id='viewvalidation" . $tID . "$rand'></div>\n";
-
-
-        $iterator = $DB->Request([
+        $iterator = $DB->request([
             'FROM'  => $this->getTable(),
             'WHERE' => ["plugin_purchaserequest_purchaserequests_id" => $item->getField('id')],
             'ORDER' => 'submission_date DESC',
         ]);
 
-        $colonnes    = [_x('item', 'State'),
+        $columns = [_x('item', 'State'),
             __('Request date'),
             __('Approval requester'),
             __('Approval status'),
             __('Approver'),
             __('Approval comments')];
-        $nb_colonnes = count($colonnes);
 
-        echo "<table class='tab_cadre_fixehov'>";
-        echo "<tr class='noHover'>";
-        echo "<th colspan='" . $nb_colonnes . "'>" ;
-        echo __('Approvals for the purchase request', 'purchaserequest');
-        echo "</th></tr>";
-
-        //      if ($canadd) {
-        //         if (!in_array($item->fields['status'], array_merge($item->getSolvedStatusArray(),
-        //                                                            $item->getClosedStatusArray()))) {
-        //            echo "<tr class='tab_bg_1 noHover'><td class='center' colspan='" . $nb_colonnes . "'>";
-        //            echo "<a class='vsubmit' href='javascript:viewAddValidation".$tID."$rand();'>";
-        //            echo __('Send an approval request')."</a></td></tr>\n";
-        //         }
-        //      }
+        $entries = [];
         if (count($iterator)) {
-            $header = "<tr>";
-            foreach ($colonnes as $colonne) {
-                $header .= "<th>" . $colonne . "</th>";
-            }
-            $header .= "</tr>";
-            echo $header;
-
             Session::initNavigateListItems(
                 $this->getType(),
                 //TRANS : %1$s is the itemtype name, %2$s is the name of the item (used for headings of a list)
@@ -849,45 +741,27 @@ class Validation extends CommonDBTM
             );
 
             foreach ($iterator as $row) {
-                $canedit = $this->canEdit($row["id"]);
                 Session::addToNavigateListItems($this->getType(), $row["id"]);
-                $bgcolor = CommonITILValidation::getStatusColor($row['status']);
-                $status  = CommonITILValidation::getStatus($row['status']);
 
-                echo "<tr class='tab_bg_1'>";
-                echo "<td>";
-                //            if ($canedit) {
-                //               echo "\n<script type='text/javascript' >\n";
-                //               echo "function viewEditValidation" .$item->fields['id']. $row["id"]. "$rand() {\n";
-                //               $params = ['type'             => $this->getType(),
-                //                          'parenttype'       => static::$itemtype,
-                //                          static::$items_id  => $this->fields[static::$items_id],
-                //                          'id'               => $row["id"]];
-                //               Ajax::updateItemJsCode("viewvalidation" . $item->fields['id'] . "$rand",
-                //                                      $CFG_GLPI["root_doc"]."/ajax/viewsubitem.php",
-                //                                      $params);
-                //               echo "};";
-                //               echo "</script>\n";
-                //            }
-
-                echo "<div style='background-color:" . $bgcolor . ";'>" . $status . "</div></td>";
-
-                echo "<td>" . Html::convDateTime($row["submission_date"]) . "</td>";
-                echo "<td>" . getUserName($row["users_id"]) . "</td>";
-
-                echo "<td>" . Html::convDateTime($row["validation_date"]) . "</td>";
-                echo "<td>" . getUserName($row["users_id_validate"]) . "</td>";
-                echo "<td>" . htmlescape($row["comment_validation"]) . "</td>";
-                echo "</tr>";
-                $iterator->next();
+                $entries[] = [
+                    'bgcolor'         => CommonITILValidation::getStatusColor($row['status']),
+                    'status'          => CommonITILValidation::getStatus($row['status']),
+                    'submission_date' => Html::convDateTime($row["submission_date"]),
+                    'requester'       => getUserName($row["users_id"]),
+                    'validation_date' => Html::convDateTime($row["validation_date"]),
+                    'validator'       => getUserName($row["users_id_validate"]),
+                    'comment'         => $row["comment_validation"],
+                ];
             }
-            echo $header;
-        } else {
-            //echo "<div class='center b'>".__('No results found')."</div>";
-            echo "<tr class='tab_bg_1 noHover'><th colspan='" . $nb_colonnes . "'>";
-            echo __('No results found') . "</th></tr>\n";
         }
-        echo "</table>";
+
+        TemplateRenderer::getInstance()->display('@purchaserequest/validation_summary.html.twig', [
+            'tID'     => $tID,
+            'rand'    => $rand,
+            'title'   => __('Approvals for the purchase request', 'purchaserequest'),
+            'columns' => $columns,
+            'entries' => $entries,
+        ]);
     }
 
 

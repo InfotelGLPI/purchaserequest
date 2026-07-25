@@ -1,0 +1,67 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<form name="form" method="post" action="{{ target }}">
+   <div class="card">
+      <div class="card-header">
+         <h3 class="card-title">{{ __('Purchase threshold', 'purchaserequest') }}</h3>
+      </div>
+      <div class="card-body">
+         {% if canedit %}
+            {{ fields.numberField('thresholds', item.fields['thresholds'], __('Purchase threshold', 'purchaserequest'), {
+               'min': 0,
+               'step': 1
+            }) }}
+         {% else %}
+            {{ fields.htmlField('thresholds', item.fields['thresholds']|e, __('Purchase threshold', 'purchaserequest')) }}
+         {% endif %}
+      </div>
+
+      {% if canedit %}
+         <div class="card-footer d-flex flex-row-reverse">
+            {% if item.isNewID(item.fields['id']) %}
+               <button type="submit" name="add" value="1" class="btn btn-primary">
+                  <i class="ti ti-plus"></i>
+                  <span>{{ _x('button', 'Add') }}</span>
+               </button>
+            {% else %}
+               <button type="submit" name="update" value="1" class="btn btn-primary">
+                  <i class="ti ti-device-floppy"></i>
+                  <span>{{ _x('button', 'Save') }}</span>
+               </button>
+            {% endif %}
+         </div>
+      {% endif %}
+   </div>
+
+   <input type="hidden" name="itemtype" value="{{ host_itemtype }}">
+   <input type="hidden" name="items_id" value="{{ host_items_id }}">
+   <input type="hidden" name="id" value="{{ item.fields['id'] }}">
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+</form>

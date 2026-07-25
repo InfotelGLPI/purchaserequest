@@ -1,0 +1,53 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<form name="form" method="post" action="{{ target }}">
+   <input type="hidden" name="id" value="{{ id }}">
+
+   <div class="card">
+      <div class="card-header">
+         <h3 class="card-title">{{ __('Configuration purchase request', 'purchaserequest') }}</h3>
+      </div>
+      <div class="card-body">
+         {{ fields.htmlField(
+            'id_general_service_manager',
+            manager_dropdown,
+            __('General Services Manager', 'purchaserequest')
+         ) }}
+      </div>
+      <div class="card-footer d-flex justify-content-end">
+         <button type="submit" name="update_config" class="btn btn-primary">
+            <i class="ti ti-device-floppy"></i>
+            <span>{{ _x('button', 'Save') }}</span>
+         </button>
+      </div>
+   </div>
+
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+</form>

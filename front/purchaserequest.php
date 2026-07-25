@@ -27,6 +27,7 @@
  --------------------------------------------------------------------------
  */
 
+use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
 
@@ -58,8 +59,7 @@ if (Plugin::isPluginActive("order")
     if (PurchaseRequest::canView()) {
         Search::show(PurchaseRequest::class);
     } else {
-        echo "<div class='alert  alert-warning d-flex'>";
-        echo "<b>" . __("Access denied") . "</b></div>";
+        throw new AccessDeniedHttpException();
     }
 } else {
     Html::header(__('Setup'), '', "tools", PurchaseRequest::class);

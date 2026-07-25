@@ -31,6 +31,7 @@ namespace GlpiPlugin\Purchaserequest;
 
 use CommonGLPI;
 use DbUtils;
+use Glpi\Application\View\TemplateRenderer;
 use Html;
 use ProfileRight;
 use Session;
@@ -71,92 +72,38 @@ class Profile extends \Profile
 
 
     /**
-     * display tab content for item
-     *
      * @param CommonGLPI $item
-     * @param type       $tabnum
-     * @param type       $withtemplate
+     * @param int $tabnum
+     * @param int $withtemplate
      *
-     * @return boolean
-     * @global type      $CFG_GLPI
+     * @return bool
      */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-    {
-
-        if ($item->getType() == 'Profile') {
-            $ID   = $item->getID();
-            $prof = new self();
-
-            self::addDefaultProfileInfos(
-                $ID,
-                ['plugin_purchaserequest_purchaserequest' => 0,
-                    'plugin_purchaserequest_validate'        => 0,
-                    'plugin_purchaserequest_config'          => 0,
-                ]
-            );
-            $prof->showForm($ID);
-
+    public static function displayTabContentForItem(
+        CommonGLPI $item,
+        $tabnum = 1,
+        $withtemplate = 0
+    ) {
+        if (!$item instanceof \Profile || !self::canView()) {
+            return false;
         }
+
+        $profile = new \Profile();
+        $profile->getFromDB($item->getID());
+
+        $rights = self::getAllRights(true);
+
+        $twig = TemplateRenderer::getInstance();
+        $twig->display('@purchaserequest/profile.html.twig', [
+            'id' => $item->getID(),
+            'profile' => $profile,
+            'title' => self::getTypeName(Session::getPluralNumber()),
+            'rights' => $rights,
+        ]);
 
         return true;
     }
 
-    /**
-     * show profile form
-     *
-     * @param type $ID
-     * @param type $options
-     *
-     * @return boolean
-     */
-    public function showForm($profiles_id = 0, $openform = true, $closeform = true)
-    {
 
-        echo "<div class='firstbloc'>";
-        if (($canedit = Session::haveRightsOr(self::$rightname, [UPDATE, PURGE]))
-            && $openform) {
-            $profile = new \Profile();
-            echo "<form method='post' action='" . $profile->getFormURL() . "'>";
-        }
-
-        $profile = new \Profile();
-        $profile->getFromDB($profiles_id);
-
-        $rights = $this->getAllRights();
-        $profile->displayRightsChoiceMatrix($rights, ['canedit'       => $canedit,
-            'default_class' => 'tab_bg_2',
-            'title'         => __('General')]);
-
-        echo "<table class='tab_cadre_fixehov'>";
-        echo "<tr class='tab_bg_1'><th colspan='4'>" . __('Helpdesk') . "</th></tr>\n";
-
-        $effective_rights = ProfileRight::getProfileRights($profiles_id, ['plugin_purchaserequest_validate']);
-        echo "<tr class='tab_bg_2'>";
-        echo "<td width='20%'>" . __("Purchase request validation", "purchaserequest") . "</td>";
-        echo "<td colspan='5'>";
-        Html::showCheckbox(['name'    => '_plugin_purchaserequest_validate',
-            'checked' => $effective_rights['plugin_purchaserequest_validate']]);
-        echo "</td></tr>\n";
-        $effective_rights = ProfileRight::getProfileRights($profiles_id, ['plugin_purchaserequest_config']);
-        echo "<tr class='tab_bg_2'>";
-        echo "<td width='20%'>" . __("Setup") . "</td>";
-        echo "<td colspan='5'>";
-        Html::showCheckbox(['name'    => '_plugin_purchaserequest_config',
-            'checked' => $effective_rights['plugin_purchaserequest_config']]);
-        echo "</td></tr>\n";
-        echo "</table>";
-        if ($canedit
-            && $closeform) {
-            echo "<div class='center'>";
-            echo Html::hidden('id', ['value' => $profiles_id]);
-            echo Html::submit(_sx('button', 'Save'), ['name' => 'update', 'class' => 'btn btn-primary']);
-            echo "</div>\n";
-            Html::closeForm();
-        }
-        echo "</div>";
-
-        $this->showLegend();
-    }
 
     /**
      * Get all rights
@@ -177,10 +124,17 @@ class Profile extends \Profile
         if ($all) {
             $rights[] = ['itemtype' => PurchaseRequest::class,
                 'label'    => __("Purchase request validation", "purchaserequest"),
-                'field'    => 'plugin_purchaserequest_validate'];
+                'field'    => 'plugin_purchaserequest_validate',
+                'rights' => [
+                    READ => __('Read'),
+                ]];
+
             $rights[] = ['itemtype' => Config::class,
                 'label'    => __("Setup"),
-                'field'    => 'plugin_purchaserequest_config'];
+                'field'    => 'plugin_purchaserequest_config',
+                'rights' => [
+                    READ => __('Read'),
+                ]];
         }
 
         return $rights;

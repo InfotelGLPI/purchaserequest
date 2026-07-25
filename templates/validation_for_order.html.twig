@@ -1,0 +1,92 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{% if no_results %}
+   <div class="alert alert-info d-flex align-items-center">
+      <i class="ti ti-info-circle me-2"></i>
+      {{ __('No results found') }}
+   </div>
+{% else %}
+   <div class="center">
+      <form method="post" name="purchaserequest_form{{ rand }}" id="purchaserequest_form{{ rand }}" action="{{ target }}">
+         <table class="tab_cadre_fixe">
+            <tr class="tab_bg_1">
+               {% if canedit %}<th></th>{% endif %}
+               <th>{{ __('Name') }}</th>
+               <th>{{ __('Requester') }}</th>
+               <th>{{ __('Requester group') }}</th>
+               <th>{{ __('Location') }}</th>
+               <th>{{ __('Status') }}</th>
+               <th>{{ __('Item type') }}</th>
+               <th>{{ __('Type') }}</th>
+               <th>{{ __('Due date', 'purchaserequest') }}</th>
+               <th>{{ __('Treated on', 'purchaserequest') }}</th>
+               <th>{{ __('Approver') }}</th>
+               <th>{{ __('Approval status') }}</th>
+               <th>{{ order_type_name }}</th>
+            </tr>
+
+            {% for entry in entries %}
+               <tr class="tab_bg_1">
+                  {% if canedit %}
+                     <td width="10">
+                        <input type="checkbox" name="item[{{ entry.id }}]" value="1" {{ select_all ? 'checked' : '' }}>
+                     </td>
+                  {% endif %}
+                  <td>{{ entry.name|raw }}</td>
+                  <td>{{ entry.requester }}</td>
+                  <td>{{ entry.group }}</td>
+                  <td>{{ entry.location }}</td>
+                  <td>{{ entry.state }}</td>
+                  <td>{{ entry.itemtype }}</td>
+                  <td>{{ entry.type }}</td>
+                  <td>{{ entry.due_date }}</td>
+                  <td>{{ entry.processing }}</td>
+                  <td>{{ entry.validator }}</td>
+                  <td>{{ entry.status|raw }}</td>
+                  <td>{{ entry.order|raw }}</td>
+               </tr>
+            {% endfor %}
+         </table>
+
+         {% if canedit %}
+            <div class="d-flex align-items-center justify-content-center mt-2">
+               <a class="me-2" href="#" onclick="if ( markCheckboxes('purchaserequest_form{{ rand }}') ) return false;">{{ __('Check all') }}</a>
+               /
+               <a class="mx-2" href="#" onclick="if ( unMarkCheckboxes('purchaserequest_form{{ rand }}') ) return false;">{{ __('Uncheck all') }}</a>
+               <span class="mx-2">{{ action_dropdown|raw }}</span>
+               <button type="submit" name="action" value="1" class="btn btn-primary">{{ _x('button', 'Post') }}</button>
+            </div>
+         {% endif %}
+
+         <input type="hidden" name="plugin_order_orders_id" value="{{ order_id }}">
+         <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+      </form>
+   </div>
+{% endif %}

@@ -1,0 +1,65 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<div id="viewvalidation{{ tID }}{{ rand }}"></div>
+
+<table class="tab_cadre_fixehov">
+   <tr class="noHover">
+      <th colspan="{{ columns|length }}">{{ title }}</th>
+   </tr>
+
+   {% if entries|length > 0 %}
+      <tr>
+         {% for col in columns %}
+            <th>{{ col }}</th>
+         {% endfor %}
+      </tr>
+
+      {% for entry in entries %}
+         <tr class="tab_bg_1">
+            <td><div style="background-color: {{ entry.bgcolor|e('html_attr') }};">{{ entry.status|raw }}</div></td>
+            <td>{{ entry.submission_date }}</td>
+            <td>{{ entry.requester }}</td>
+            <td>{{ entry.validation_date }}</td>
+            <td>{{ entry.validator }}</td>
+            <td>{{ entry.comment }}</td>
+         </tr>
+      {% endfor %}
+
+      <tr>
+         {% for col in columns %}
+            <th>{{ col }}</th>
+         {% endfor %}
+      </tr>
+   {% else %}
+      <tr class="tab_bg_1 noHover">
+         <th colspan="{{ columns|length }}">{{ __('No results found') }}</th>
+      </tr>
+   {% endif %}
+</table>

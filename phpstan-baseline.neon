@@ -1,0 +1,720 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to static method showDefaultHeaderHelpdesk\(\) on an unknown class GlpiPlugin\\Servicecatalog\\Main\.$#'
+			identifier: class.notFound
+			count: 1
+			path: front/purchaserequest.form.php
+
+		-
+			message: '#^Call to static method showNavBarFooter\(\) on an unknown class GlpiPlugin\\Servicecatalog\\Main\.$#'
+			identifier: class.notFound
+			count: 1
+			path: front/purchaserequest.form.php
+
+		-
+			message: '#^Parameter \#2 \$force of method CommonDBTM\:\:delete\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: front/purchaserequest.form.php
+
+		-
+			message: '#^Call to static method showDefaultHeaderHelpdesk\(\) on an unknown class GlpiPlugin\\Servicecatalog\\Main\.$#'
+			identifier: class.notFound
+			count: 1
+			path: front/purchaserequest.php
+
+		-
+			message: '#^Call to static method showNavBarFooter\(\) on an unknown class GlpiPlugin\\Servicecatalog\\Main\.$#'
+			identifier: class.notFound
+			count: 1
+			path: front/purchaserequest.php
+
+		-
+			message: '#^Parameter \#2 \$force of method CommonDBTM\:\:delete\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: front/threshold.form.php
+
+		-
+			message: '#^Parameter \#2 \$force of method CommonDBTM\:\:delete\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: front/validation.form.php
+
+		-
+			message: '#^Array has 3 duplicate keys with value ''glpi_plugin_purchaserequest_purchaserequests'' \("glpi_plugin_purchaserequest_purchaserequests", "glpi_plugin_purchaserequest_purchaserequests", "glpi_plugin_purchaserequest_purchaserequests"\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Call to method getFromDB\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Call to method getLink\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Instantiated class PluginOrderOrder not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 3
+			path: hook.php
+
+		-
+			message: '#^Call to an undefined method CommonGLPI\:\:getID\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^Call to an undefined method CommonGLPI\:\:showForm\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Config\:\:showForm\(\) should return bool but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^Static method CommonGLPI\:\:getMenuName\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 3
+			path: src/Config.php
+
+		-
+			message: '#^Access to an undefined property CommonGLPI\:\:\$fields\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/NotificationTargetPurchaseRequest.php
+
+		-
+			message: '#^Call to an undefined method CommonGLPI\:\:getField\(\)\.$#'
+			identifier: method.notFound
+			count: 13
+			path: src/NotificationTargetPurchaseRequest.php
+
+		-
+			message: '#^Property NotificationTarget\<CommonGLPI\>\:\:\$data \(array\<string, array\<string\>\|string\>\) does not accept array\<string, array\<array\<string, mixed\>\|string\>\|string\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/NotificationTargetPurchaseRequest.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 2
+			path: src/NotificationTargetPurchaseRequest.php
+
+		-
+			message: '#^Call to an undefined method CommonGLPI\:\:getID\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Default value of the parameter \#1 \$all \(false\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Default value of the parameter \#2 \$openform \(true\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:showForm\(\) is incompatible with type array\<string, mixed\>\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Default value of the parameter \#2 \$tabnum \(int\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Default value of the parameter \#3 \$withtemplate \(int\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Profile\:\:migrateOneProfile\(\) should return bool but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Profile\:\:showForm\(\) should return bool but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$ID$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$options$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Parameter \#1 \$all of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) expects GlpiPlugin\\Purchaserequest\\type, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Parameter \#1 \$all of static method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) expects GlpiPlugin\\Purchaserequest\\type, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Parameter \$all of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Parameter \$tabnum of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Parameter \$withtemplate of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 1
+			path: src/Profile.php
+
+		-
+			message: '#^Call to an undefined method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:import\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to method dropdownAllItems\(\) on an unknown class PluginOrderReference\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to method getField\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to method getFromDB\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to method getLink\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to static method dropdown\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to static method getClasses\(\) on an unknown class PluginOrderOrder_Item\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to static method getTypeName\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Comparison operation "\>" between \*NEVER\* and 0 results in an error\.$#'
+			identifier: greater.invalid
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Default value of the parameter \#1 \$history \(int\) of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:post_updateItem\(\) is incompatible with type bool\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Instantiated class PluginOrderOrder not found\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Instantiated class PluginOrderReference not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Instantiating an object from an unrestricted dynamic string is forbidden \(see https\://github\.com/glpi\-project/phpstan\-glpi\?tab\=readme\-ov\-file\#forbiddynamicinstantiationrule\)\.$#'
+			identifier: glpi.forbidDynamicInstantiation
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Loose comparison using \!\= between ''amount''\|''comment''\|''itemtype''\|''types_id''\|''users_id''\|''users_id_validate'' and ''item'' will always evaluate to true\.$#'
+			identifier: notEqual.alwaysTrue
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Loose comparison using \!\= between ''amount''\|''comment''\|''itemtype''\|''types_id''\|''users_id''\|''users_id_validate'' and ''label2'' will always evaluate to true\.$#'
+			identifier: notEqual.alwaysTrue
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Loose comparison using \=\= between ''amount''\|''comment''\|''itemtype''\|''types_id''\|''users_id''\|''users_id_validate'' and ''item'' will always evaluate to false\.$#'
+			identifier: equal.alwaysFalse
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Loose comparison using \=\= between ''amount''\|''comment''\|''itemtype''\|''types_id''\|''users_id''\|''users_id_validate'' and ''label2'' will always evaluate to false\.$#'
+			identifier: equal.alwaysFalse
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method CommonDBTM\:\:getID\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:getItems\(\) has invalid return type all\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:getItems\(\) should return all but returns array\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:getTabNameForItem\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:getTypeName\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:post_addItem\(\) has invalid return type GlpiPlugin\\Purchaserequest\\nothing\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:post_addItem\(\) should return GlpiPlugin\\Purchaserequest\\nothing but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:post_updateItem\(\) has invalid return type GlpiPlugin\\Purchaserequest\\nothing\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:post_updateItem\(\) should return GlpiPlugin\\Purchaserequest\\nothing but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForAdd\(\) has invalid return type datas\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) has invalid return type GlpiPlugin\\Purchaserequest\\the\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should return GlpiPlugin\\Purchaserequest\\the but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should return GlpiPlugin\\Purchaserequest\\the but returns false\.$#'
+			identifier: return.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:rawSearchOptions\(\) has invalid return type GlpiPlugin\\Purchaserequest\\an\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:rawSearchOptions\(\) should return GlpiPlugin\\Purchaserequest\\an but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:showMassiveActionsSubForm\(\) should return bool but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '''
+				#^PHPDoc tag @return has invalid value \(\$actions
+				\*@since version 0\.84
+
+				This should be overloaded in Class\)\: Unexpected token "\$actions", expected type at offset 140 on line 6$#
+			'''
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Parameter \#1 \$data of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:listItems\(\) expects array, all given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Parameter \#1 \$item of static method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:countForPluginOrderOrder\(\) expects PluginOrderOrder, CommonGLPI given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Parameter \#1 \$item of static method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:countForTicket\(\) expects Ticket, CommonGLPI given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, all given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Parameter \$input of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForAdd\(\) has invalid type datas\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Parameter \$item of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:countForPluginOrderOrder\(\) has invalid type PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 2
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Return type \(GlpiPlugin\\Purchaserequest\\an\) of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:rawSearchOptions\(\) should be compatible with return type \(array\<array\<string, mixed\>\>\) of method CommonDBTM\:\:rawSearchOptions\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Return type \(GlpiPlugin\\Purchaserequest\\the\) of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should be compatible with return type \(array\<string, mixed\>\|false\) of method CommonDBTM\:\:prepareInputForUpdate\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 3
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 3
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 3
+			path: src/PurchaseRequestState.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Servicecatalog\:\:countPurchasesToValidate\(\) should return string but returns int\<0, max\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Servicecatalog\:\:getAhrefTitle\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Servicecatalog\:\:getMenuComment\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Servicecatalog\:\:getMenuTitle\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^PHPDoc tag @throws with type GlpitestSQLError is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 4
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^Parameter \#3 \$nb of function _n expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 1
+			path: src/Servicecatalog.php
+
+		-
+			message: '#^Call to an undefined method CommonGLPI\:\:getID\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^Call to method getID\(\) on an unknown class GlpiPlugin\\Purchaserequest\\item\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^Call to method getType\(\) on an unknown class GlpiPlugin\\Purchaserequest\\item\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Threshold\:\:getTabNameForItem\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Threshold\:\:getTypeName\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^Parameter \#2 \$item of method GlpiPlugin\\Purchaserequest\\Threshold\:\:showThresholdForm\(\) expects GlpiPlugin\\Purchaserequest\\item, CommonGLPI given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^Parameter \$item of method GlpiPlugin\\Purchaserequest\\Threshold\:\:showThresholdForm\(\) has invalid type GlpiPlugin\\Purchaserequest\\item\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Threshold.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 3
+			path: src/Threshold.php
+
+		-
+			message: '#^Call to method dropdownAllItems\(\) on an unknown class PluginOrderReference\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Call to method getFromDB\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Validation.php
+
+		-
+			message: '#^Call to method getLink\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Call to static method dropdown\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Call to static method getTypeName\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Default value of the parameter \#1 \$history \(int\) of method GlpiPlugin\\Purchaserequest\\Validation\:\:post_updateItem\(\) is incompatible with type bool\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Instantiated class PluginOrderOrder not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Validation.php
+
+		-
+			message: '#^Instantiated class PluginOrderReference not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:getTabNameForItem\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:getTypeName\(\) has invalid return type translated\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:post_addItem\(\) has invalid return type GlpiPlugin\\Purchaserequest\\nothing\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:post_addItem\(\) should return GlpiPlugin\\Purchaserequest\\nothing but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:post_updateItem\(\) has invalid return type GlpiPlugin\\Purchaserequest\\nothing\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:post_updateItem\(\) should return GlpiPlugin\\Purchaserequest\\nothing but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:prepareInputForAdd\(\) has invalid return type datas\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:prepareInputForUpdate\(\) has invalid return type GlpiPlugin\\Purchaserequest\\the\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Method GlpiPlugin\\Purchaserequest\\Validation\:\:prepareInputForUpdate\(\) should return GlpiPlugin\\Purchaserequest\\the but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 2
+			path: src/Validation.php
+
+		-
+			message: '#^Parameter \$input of method GlpiPlugin\\Purchaserequest\\Validation\:\:prepareInputForAdd\(\) has invalid type datas\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Return type \(GlpiPlugin\\Purchaserequest\\the\) of method GlpiPlugin\\Purchaserequest\\Validation\:\:prepareInputForUpdate\(\) should be compatible with return type \(array\<string, mixed\>\|false\) of method CommonDBTM\:\:prepareInputForUpdate\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^Variable \$validation might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Validation.php
+
+		-
+			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
+			identifier: glpi.forbidExit
+			count: 3
+			path: src/Validation.php

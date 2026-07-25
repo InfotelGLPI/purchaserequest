@@ -1,0 +1,105 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<div class="asset">
+   {{ include('components/form/header.html.twig') }}
+
+   <div class="card-body">
+      <div class="row">
+         {# Name #}
+         {% if canedit %}
+            {{ fields.htmlField('name', name_field|raw, __('Name')) }}
+         {% else %}
+            {{ fields.htmlField('name', name_value|e, __('Name')) }}
+         {% endif %}
+
+         {# Requester #}
+         {% if canedit %}
+            {{ fields.htmlField('users_id', requester_field|raw, __('Requester'), {'required': true}) }}
+         {% else %}
+            {{ fields.htmlField('users_id', requester_field|e, __('Requester'), {'required': true}) }}
+         {% endif %}
+
+         {# Requester group #}
+         {% if canedit %}
+            {% set group_html %}<div id="plugin_purchaserequest_group">{{ group_field|raw }}</div>{% endset %}
+            {{ fields.htmlField('groups_id', group_html, __('Requester group')) }}
+         {% else %}
+            {{ fields.htmlField('groups_id', group_field|e, __('Requester group')) }}
+         {% endif %}
+
+         {# Location #}
+         {{ fields.htmlField('locations_id', location_field|raw, __('Location')) }}
+
+         {# Status #}
+         {{ fields.htmlField('plugin_purchaserequest_purchaserequeststates_id', state_field|raw, __('Status')) }}
+
+         {# Description #}
+         {{ fields.htmlField('comment', comment_field|raw, __('Description'), {'required': true, 'field_class': 'col-12'}) }}
+
+         {# Item type #}
+         {{ fields.htmlField('itemtype', itemtype_field|raw, __('Item type'), {'required': true}) }}
+
+         {# Type #}
+         {% set types_html %}<span id="show_types_id">{{ types_field|raw }}</span>{% endset %}
+         {{ fields.htmlField('types_id', types_html, __('Type'), {'required': true}) }}
+
+         {# Due date #}
+         {{ fields.htmlField('due_date', due_date_field|raw, __('Due date', 'purchaserequest')) }}
+
+         {# To be validated by #}
+         {{ fields.htmlField('users_id_validate', validator_field|raw, __('To be validated by', 'purchaserequest'), {'required': true}) }}
+
+         {# Amount #}
+         {{ fields.htmlField('amount', amount_field|raw, __('Amount', 'purchaserequest')) }}
+
+         {# To be rebilled to the customer #}
+         {{ fields.htmlField('invoice_customer', invoice_field|raw, __('To be rebilled to the customer', 'purchaserequest')) }}
+
+         {# Linked to the order #}
+         {{ fields.htmlField('plugin_order_orders_id', order_field|raw, __('Linked to the order', 'purchaserequest')) }}
+
+         {# Linked to ticket #}
+         {{ fields.htmlField('tickets_id', ticket_field|raw, __('Linked to ticket', 'purchaserequest')) }}
+
+         {# Treated #}
+         {% if show_treated %}
+            {% if processing_date is null %}
+               {{ fields.htmlField('is_process', is_process_field|raw, __('Treated', 'purchaserequest')) }}
+            {% else %}
+               {{ fields.htmlField('processing_date', processing_date|e, __('Treated on', 'purchaserequest')) }}
+            {% endif %}
+         {% endif %}
+      </div>
+   </div>
+
+   <input type="hidden" name="users_id_creator" value="{{ users_id_creator }}">
+
+   {{ include('components/form/buttons.html.twig') }}
+</div>

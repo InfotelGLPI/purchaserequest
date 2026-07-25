@@ -32,8 +32,9 @@ namespace GlpiPlugin\Purchaserequest;
 use CommonDBTM;
 use CommonGLPI;
 use DbUtils;
-use Html;
+use Glpi\Application\View\TemplateRenderer;
 use Migration;
+use Toolbox;
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
@@ -130,10 +131,8 @@ class Threshold extends CommonDBTM
     {
 
         $this->initForm($ID, $options);
-        $this->showFormHeader($options);
 
-        $canedit            = $this->can($ID, UPDATE);
-        $options['canedit'] = $canedit;
+        $canedit = $this->can($ID, UPDATE);
 
         // Data saved in session
         if (isset($_SESSION['glpi_plugin_thresholds_fields'])) {
@@ -143,26 +142,13 @@ class Threshold extends CommonDBTM
             unset($_SESSION['glpi_plugin_thresholds_fields']);
         }
 
-        /* title */
-        echo "<tr class='tab_bg_1'>";
-        echo "<td colspan='2'>" . $this->getTypeName(1) . "</td><td>";
-        if ($canedit) {
-            echo Html::input('thresholds', ['value' => $this->fields['thresholds'], 'size' => 40]);
-        } else {
-            echo htmlescape($this->fields["thresholds"]);
-        }
-        echo "</td></tr>";
-
-        echo Html::hidden('itemtype', ['value' => $item->getType()]);
-        echo Html::hidden('items_id', ['value' => $item->getID()]);
-        echo Html::hidden('id', ['value' => $ID]);
-
-        if ($canedit) {
-            $this->showFormButtons($options);
-        } else {
-            echo "</table></div>";
-            Html::closeForm();
-        }
+        TemplateRenderer::getInstance()->display('@purchaserequest/threshold.html.twig', [
+            'item'          => $this,
+            'canedit'       => $canedit,
+            'target'        => Toolbox::getItemTypeFormURL(self::getType()),
+            'host_itemtype' => $item->getType(),
+            'host_items_id' => $item->getID(),
+        ]);
 
         return true;
     }

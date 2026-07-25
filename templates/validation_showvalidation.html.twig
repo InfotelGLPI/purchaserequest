@@ -1,0 +1,65 @@
+{#
+-------------------------------------------------------------------------
+purchaserequest plugin for GLPI
+Copyright (C) 2021-2026 by the purchaserequest Development Team.
+
+https://github.com/InfotelGLPI/purchaserequest
+-------------------------------------------------------------------------
+
+LICENSE
+
+This file is part of purchaserequest.
+
+purchaserequest is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+purchaserequest is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------
+#}
+
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<form name="form" id="formvalidation" method="post" action="{{ target }}">
+   <div class="center">
+      <table class="tab_cadre_fixe">
+         {% if show_actions %}
+            <tr class="tab_bg_1">
+               <td>{{ __('Status of the approval request') }}</td>
+               <td class="center">
+                  <div style="color:forestgreen">
+                     <i id="accept_purchaserequest" class="question far fa-check-circle fa-3x"></i><br>
+                     {{ __('Accept purchase request', 'purchaserequest') }}
+                  </div>
+                  <input type="hidden" name="accept_purchaserequest" value="0">
+               </td>
+               <td class="center">
+                  <div style="color:darkred">
+                     <i id="refuse_purchaserequest" class="question far fa-times-circle fa-3x"></i><br>
+                     {{ __('Refuse purchase request', 'purchaserequest') }}
+                  </div>
+                  <input type="hidden" name="refuse_purchaserequest" value="0">
+               </td>
+            </tr>
+            <tr class="tab_bg_1">
+               <td>{{ __('Approval comments') }}</td>
+               <td colspan="2">
+                  {{ comment_field|raw }}
+                  <input type="hidden" name="id" value="{{ validation_id }}">
+                  <input type="hidden" name="users_id_validate" value="{{ users_id_validate }}">
+                  <input type="hidden" name="plugin_purchaserequest_purchaserequests_id" value="{{ pr_id }}">
+               </td>
+            </tr>
+         {% endif %}
+      </table>
+   </div>
+
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+</form>
