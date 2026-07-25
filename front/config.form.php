@@ -28,6 +28,7 @@
  */
 
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Purchaserequest\Config;
 
 Session::checkLoginUser();
@@ -52,11 +53,7 @@ if (Plugin::isPluginActive("purchaserequest")) {
       }
 
    } else {
-      Html::header(__('Setup'), '', "config", Plugin::getType());
-      TemplateRenderer::getInstance()->display('@purchaserequest/alert.html.twig', [
-         'message' => __("You don't have permission to perform this action."),
-      ]);
-      Html::footer();
+       throw new AccessDeniedHttpException();
    }
 
 } else {
