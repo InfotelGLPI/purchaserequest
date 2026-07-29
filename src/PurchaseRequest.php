@@ -1666,11 +1666,20 @@ class PurchaseRequest extends CommonDBTM
         $groups = [];
 
         foreach ($group_users as $item) {
-            $groups[] = $item['id'];
+            $groups[] = (int) $item['id'];
         }
 
         if (count($groups) > 0) {
-            $condition['condition'] = ['id' => $groups];
+            // Restrict the dropdown to groups within the caller's own entity scope.
+            // The endpoint only requires plugin READ, so without this an authenticated
+            // user could POST arbitrary users_id values and enumerate any account's
+            // full group membership across entities. Intersecting with the session
+            // entities bounds the disclosure to the caller's perimeter.
+            $dbu = new DbUtils();
+            $condition['condition'] = array_merge(
+                ['id' => $groups],
+                $dbu->getEntitiesRestrictCriteria(Group::getTable(), '', '', true)
+            );
             Group::dropdown($condition);
         } else {
             echo __('No groups for this user', 'purchaserequest');
@@ -1777,7 +1786,8 @@ class PurchaseRequest extends CommonDBTM
                     KEY `is_deleted` (`is_deleted`),
                     KEY `date_mod` (`date_mod`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-            $DB->doQuery($query) or die($DB->error());
+            // No "or die($DB->error())": the raw MySQL error must not leak to output.
+            $DB->doQuery($query);
         } else {
             if (!$DB->fieldExists($table, 'locations_id')) {
                 $DB->doQuery(
@@ -1876,11 +1886,15 @@ class PurchaseRequest extends CommonDBTM
 
         $dbu = new DbUtils();
         $table = $dbu->getTableForItemType(__CLASS__);
+        // Use the query builder instead of a raw DELETE string so the itemtype
+        // is bound safely and the routine follows the GLPI DB API convention.
         foreach (["displaypreferences", "documents_items", "savedsearches", "logs"] as $t) {
-            $query = "DELETE FROM `glpi_$t` WHERE `itemtype` = '" . __CLASS__ . "'";
-            $DB->doQuery($query);
+            $DB->delete('glpi_' . $t, ['itemtype' => self::class]);
         }
-        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die($DB->error());
+        // Do not append "or die($DB->error())": it would echo the raw MySQL error
+        // (table names, constraints) to the install/upgrade screen. doQuery() logs
+        // failures to the SQL error log on its own.
+        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`");
     }
 
     //static function getMenuContent() {

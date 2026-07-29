@@ -59,7 +59,8 @@ class PurchaseRequestState extends CommonDropdown {
                      PRIMARY KEY (`id`),
                      KEY `name` (`name`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-         $DB->doQuery($query) or die($DB->error());
+         // No "or die($DB->error())": the raw MySQL error must not leak to output.
+         $DB->doQuery($query);
       }
    }
 
@@ -67,6 +68,7 @@ class PurchaseRequestState extends CommonDropdown {
       global $DB;
       //New table
       $dbu = new DbUtils();
-      $DB->doQuery("DROP TABLE IF EXISTS `" . $dbu->getTableForItemType(__CLASS__) . "`") or die ($DB->error());
+      // No "or die($DB->error())": the raw MySQL error must not leak to output.
+      $DB->doQuery("DROP TABLE IF EXISTS `" . $dbu->getTableForItemType(__CLASS__) . "`");
    }
 }

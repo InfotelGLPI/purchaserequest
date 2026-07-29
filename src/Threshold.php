@@ -173,7 +173,8 @@ class Threshold extends CommonDBTM
                     `thresholds` int unsigned NOT NULL DEFAULT '0',
                     PRIMARY KEY (`id`)
                   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;";
-            $DB->doQuery($query) or die($DB->error());
+            // No "or die($DB->error())": the raw MySQL error must not leak to output.
+            $DB->doQuery($query);
 
         } else {
 
@@ -187,7 +188,8 @@ class Threshold extends CommonDBTM
 
         $dbu   = new DbUtils();
         $table = $dbu->getTableForItemType(__CLASS__);
-        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`") or die($DB->error());
+        // No "or die($DB->error())": the raw MySQL error must not leak to output.
+        $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`");
     }
 
 

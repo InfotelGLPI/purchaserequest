@@ -220,15 +220,22 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num)
     switch ($table . '.' . $field) {
         /* display associated items with order */
         case "glpi_plugin_purchaserequest_purchaserequests.types_id":
-            $file = "";
-            if (isset($data['raw']["itemtype"]) && $data['raw']["itemtype"] == 'PluginOrderOther') {
-                $file = $CFG_GLPI['root_doc'] . "/plugins/order/inc/othertype.class.php";
-            } elseif (isset($data['raw']["itemtype"])) {
-                $file = GLPI_ROOT . "/src/" . $data['raw']["itemtype"] . "Type.php";
+            // Resolve the *Type class through class_exists() instead of building a
+            // filesystem path from the stored itemtype. The itemtype column is not
+            // constrained to a whitelist on write, so concatenating it into a path
+            // handed to file_exists() would turn a forged value (e.g. "../../..")
+            // into a file-existence oracle. class_exists() cannot be steered outside
+            // the autoloadable classes and never touches an attacker-controlled path.
+            $itemtype   = $data['raw']["itemtype"] ?? '';
+            $type_class = '';
+            if ($itemtype === 'PluginOrderOther') {
+                $type_class = 'PluginOrderOtherType';
+            } elseif ($itemtype !== '') {
+                $type_class = $itemtype . 'Type';
             }
-            if (file_exists($file)) {
+            if ($type_class !== '' && class_exists($type_class)) {
                 return Dropdown::getDropdownName(
-                    $dbu->getTableForItemType($data["itemtype"] . "Type"),
+                    $dbu->getTableForItemType($type_class),
                     $data['raw']["ITEM_" . $num]
                 );
             } else {
