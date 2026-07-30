@@ -27,6 +27,7 @@
  --------------------------------------------------------------------------
  */
 
+use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\Validation;
 
@@ -61,7 +62,23 @@ if (Plugin::isPluginActive("order")
 
         /* update purchaserequest */
     } elseif (isset($_POST["update"]) || (isset($_POST['update_status']))) {
-        $validation->check($_POST['id'], UPDATE);
+        if (isset($_POST['update_status'])) {
+            // Approval action (accept/refuse): authorized by being the designated
+            // approver, not by the generic UPDATE right. A validator profile usually
+            // holds plugin_purchaserequest_validate at READ only, so requiring UPDATE
+            // here locks the real approver out. Require READ (global right + entity
+            // scope), then let the row's own approver through — anyone else still
+            // needs UPDATE. Validation::prepareInputForUpdate() remains the final
+            // gate: only users_id_validate may actually change the status.
+            $validation->check((int) $_POST['id'], READ);
+            if ((int) $validation->fields['users_id_validate'] !== Session::getLoginUserID()
+                && !$validation->can((int) $_POST['id'], UPDATE)) {
+                throw new AccessDeniedHttpException();
+            }
+        } else {
+            // Plain edit of the validation form fields keeps requiring UPDATE.
+            $validation->check((int) $_POST['id'], UPDATE);
+        }
         $validation->update($_POST);
         Html::back();
     }
