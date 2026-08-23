@@ -71,5 +71,3 @@ if (isset($_POST["add"])) {
     $threshold->update($_POST);
     Html::back();
 }
-
-Html::back();
