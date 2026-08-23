@@ -1,30 +1,30 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Purchaserequest;
@@ -139,7 +139,25 @@ class Validation extends CommonDBTM
      */
     public function prepareInputForAdd($input)
     {
-
+        // A Validation is normally created automatically by PurchaseRequest::post_addItem();
+        // this public CREATE endpoint (front/validation.form.php) stays reachable by anyone
+        // holding the plugin validate-create right. Bind the row to a purchase request the
+        // caller can actually reach and derive entities_id from that parent, so a forged POST
+        // cannot attach a validation to a request in another entity (cross-entity reference).
+        $request = new PurchaseRequest();
+        if (
+            !isset($input['plugin_purchaserequest_purchaserequests_id'])
+            || !$request->getFromDB((int) $input['plugin_purchaserequest_purchaserequests_id'])
+            || !Session::haveAccessToEntity($request->fields['entities_id'])
+        ) {
+            Session::addMessageAfterRedirect(
+                __('Invalid purchase request.', 'purchaserequest'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+        $input['entities_id'] = $request->fields['entities_id'];
 
         $input['status'] = CommonITILValidation::WAITING;
 
@@ -166,7 +184,7 @@ class Validation extends CommonDBTM
             $input['is_recursive'],
             $input['users_id_validate'],
             $input['date_creation'],
-            $input['date_mod']
+            $input['date_mod'],
         );
 
         // Server-side enforcement of the approval workflow: only the designated
@@ -184,12 +202,12 @@ class Validation extends CommonDBTM
                 $input['refuse_purchaserequest'],
                 $input['accept_purchaserequest'],
                 $input['update_status'],
-                $input['status']
+                $input['status'],
             );
             Session::addMessageAfterRedirect(
                 __('You are not allowed to approve or refuse this purchase request.', 'purchaserequest'),
                 false,
-                ERROR
+                ERROR,
             );
             return $input;
         }
@@ -238,7 +256,7 @@ class Validation extends CommonDBTM
                 'Ticket',
                 $changes,
                 __CLASS__,
-                Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK
+                Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK,
             );
         }
     }
@@ -261,7 +279,7 @@ class Validation extends CommonDBTM
                     'Ticket',
                     $changes,
                     __CLASS__,
-                    Log::HISTORY_PLUGIN + self::HISTORY_DELLINK
+                    Log::HISTORY_PLUGIN + self::HISTORY_DELLINK,
                 );
             }
             if (!empty($this->fields['tickets_id'])) {
@@ -274,7 +292,7 @@ class Validation extends CommonDBTM
                         'Ticket',
                         $changes,
                         __CLASS__,
-                        Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK
+                        Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK,
                     );
                 }
             }
@@ -400,7 +418,7 @@ class Validation extends CommonDBTM
                 PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
                 $params,
                 'dropdown_users_id' . $rand_user,
-                false
+                false,
             );
             $JS     .= "}";
         } else {
@@ -419,7 +437,7 @@ class Validation extends CommonDBTM
         Dropdown::show(
             PurchaseRequestState::class,
             ['value'  => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
-                'entity' => $this->fields["entities_id"]]
+                'entity' => $this->fields["entities_id"]],
         );
         $state_field = ob_get_clean();
 
@@ -447,23 +465,21 @@ class Validation extends CommonDBTM
         // Type
         ob_start();
         if ($this->fields['itemtype']) {
-            if ($this->fields['itemtype'] == 'PluginOrderOther') {
-                $file = 'other';
-            } else {
-                $file = $this->fields['itemtype'];
-            }
-            $core_typefilename   = GLPI_ROOT . "/src/" . $file . "Type.php";
-            $plugin_typefilename = $CFG_GLPI['root_doc'] . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
-            $itemtypeclass       = $this->fields['itemtype'] . "Type";
+            $itemtypeclass = $this->fields['itemtype'] . "Type";
 
-            if (file_exists($core_typefilename)
-                || file_exists($plugin_typefilename)) {
+            // Resolve the *Type class through class_exists() instead of building a
+            // filesystem path from the stored itemtype and testing it with
+            // file_exists(): itemtype is user-controlled at write time, and
+            // concatenating it into a path handed to file_exists() would turn a
+            // forged value into a file-existence oracle (mirrors the hardening
+            // already applied in hook.php::plugin_purchaserequest_giveItem()).
+            if (class_exists($itemtypeclass)) {
                 Dropdown::show(
                     $itemtypeclass,
                     [
                         'name'  => "types_id",
                         'value' => $this->fields["types_id"],
-                    ]
+                    ],
                 );
             }
         }
@@ -610,7 +626,7 @@ class Validation extends CommonDBTM
                 'location'   => Dropdown::getDropdownName('glpi_locations', $field['locations_id']),
                 'state'      => Dropdown::getDropdownName(
                     'glpi_plugin_purchaserequest_purchaserequeststates',
-                    $field['plugin_purchaserequest_purchaserequeststates_id']
+                    $field['plugin_purchaserequest_purchaserequeststates_id'],
                 ),
                 'itemtype'   => $orderItem !== false ? $orderItem->getTypeName() : '',
                 'type'       => Dropdown::getDropdownName($dbu->getTableForItemType($itemtypeclass), $field["types_id"]),
@@ -736,8 +752,8 @@ class Validation extends CommonDBTM
                 sprintf(
                     __('%1$s = %2$s'),
                     $item->getTypeName(1),
-                    $item->fields["name"]
-                )
+                    $item->fields["name"],
+                ),
             );
 
             foreach ($iterator as $row) {

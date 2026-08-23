@@ -1,30 +1,30 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 use GlpiPlugin\Purchaserequest\Config;
@@ -73,7 +73,7 @@ function plugin_purchaserequest_install()
     foreach ($classes as $old => $new) {
         $displayusers = $DB->request([
             'SELECT' => [
-                'users_id'
+                'users_id',
             ],
             'DISTINCT' => true,
             'FROM' => 'glpi_displaypreferences',
@@ -87,13 +87,13 @@ function plugin_purchaserequest_install()
                 $iterator = $DB->request([
                     'SELECT' => [
                         'num',
-                        'id'
+                        'id',
                     ],
                     'FROM' => 'glpi_displaypreferences',
                     'WHERE' => [
                         'itemtype' => $old,
                         'users_id' => $displayuser['users_id'],
-                        'interface' => 'central'
+                        'interface' => 'central',
                     ],
                 ]);
 
@@ -101,14 +101,14 @@ function plugin_purchaserequest_install()
                     foreach ($iterator as $data) {
                         $iterator2 = $DB->request([
                             'SELECT' => [
-                                'id'
+                                'id',
                             ],
                             'FROM' => 'glpi_displaypreferences',
                             'WHERE' => [
                                 'itemtype' => $new,
                                 'users_id' => $displayuser['users_id'],
                                 'num' => $data['num'],
-                                'interface' => 'central'
+                                'interface' => 'central',
                             ],
                         ]);
                         if (count($iterator2) > 0) {
@@ -119,7 +119,7 @@ function plugin_purchaserequest_install()
                             $DB->update(
                                 'glpi_displaypreferences',
                                 ['itemtype' => $new],
-                                ['id' => $data['id']]
+                                ['id' => $data['id']],
                             );
                         }
                     }
@@ -153,9 +153,12 @@ function plugin_purchaserequest_uninstall()
         call_user_func([$class, 'uninstall']);
     }
 
-    //Delete rights associated with the plugin
+    //Delete rights associated with the plugin. getAllRights() must be called
+    // with $all = true, otherwise only the main right is returned and the
+    // secondary rights (_validate, _config) registered at install stay behind
+    // in glpi_profilerights for every profile.
     $profileRight = new ProfileRight();
-    foreach (Profile::getAllRights() as $right) {
+    foreach (Profile::getAllRights(true) as $right) {
         $profileRight->deleteByCriteria(['name' => $right['field']]);
     }
 
@@ -236,7 +239,7 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num)
             if ($type_class !== '' && class_exists($type_class)) {
                 return Dropdown::getDropdownName(
                     $dbu->getTableForItemType($type_class),
-                    $data['raw']["ITEM_" . $num]
+                    $data['raw']["ITEM_" . $num],
                 );
             } else {
                 return " ";

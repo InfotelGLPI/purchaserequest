@@ -1,30 +1,30 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Purchaserequest;
@@ -67,6 +67,12 @@ class PurchaseRequest extends CommonDBTM
 {
     public static $rightname = 'plugin_purchaserequest_purchaserequest';
     public $dohistory = true;
+
+    /**
+     * Set in prepareInputForUpdate() when a financially engaging field changes on an
+     * already-decided request; consumed in post_updateItem() to reopen approval.
+     */
+    private bool $requeuePendingValidation = false;
 
     public const HISTORY_ADDLINK = 50;
     public const HISTORY_DELLINK = 51;
@@ -163,11 +169,11 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-//        if (!Plugin::isPluginActive('order')) {
-//            echo "<div class='alert  alert-warning d-flex'>";
-//            echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
-//            return false;
-//        }
+        //        if (!Plugin::isPluginActive('order')) {
+        //            echo "<div class='alert  alert-warning d-flex'>";
+        //            echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+        //            return false;
+        //        }
         if ($item->getType() == PurchaseRequest::class) {
             Validation::showValidation($item);
         } elseif ($item->getType() == "Ticket") {
@@ -199,11 +205,24 @@ class PurchaseRequest extends CommonDBTM
             $input['is_deleted'],
             $input['is_recursive'],
             $input['date_creation'],
-            $input['date_mod']
+            $input['date_mod'],
         );
         $input['users_id_creator'] = Session::getLoginUserID();
 
         $input['status'] = CommonITILValidation::WAITING;
+
+        // Constrain itemtype to the whitelist enforced at display time
+        // (Threshold::$list_type_allowed / hook.php's giveItem()) so a forged
+        // POST cannot store an arbitrary itemtype that showForm() later feeds
+        // into a file-path / class resolution.
+        if (!empty($input['itemtype']) && !in_array($input['itemtype'] . 'Type', Threshold::$list_type_allowed, true)) {
+            Session::addMessageAfterRedirect(
+                __('Invalid item type.', 'purchaserequest'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
 
         return $input;
     }
@@ -228,8 +247,21 @@ class PurchaseRequest extends CommonDBTM
             $input['is_recursive'],
             $input['users_id_creator'],
             $input['date_creation'],
-            $input['date_mod']
+            $input['date_mod'],
         );
+
+        // Constrain itemtype to the whitelist enforced at display time
+        // (Threshold::$list_type_allowed / hook.php's giveItem()) so a forged
+        // POST cannot store an arbitrary itemtype that showForm() later feeds
+        // into a file-path / class resolution.
+        if (isset($input['itemtype']) && $input['itemtype'] !== '' && !in_array($input['itemtype'] . 'Type', Threshold::$list_type_allowed, true)) {
+            Session::addMessageAfterRedirect(
+                __('Invalid item type.', 'purchaserequest'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
 
         // Server-side enforcement of the approval workflow: only the designated
         // validator (users_id_validate) may accept/refuse or change the status.
@@ -245,12 +277,12 @@ class PurchaseRequest extends CommonDBTM
                 $input['refuse_purchaserequest'],
                 $input['accept_purchaserequest'],
                 $input['update_status'],
-                $input['status']
+                $input['status'],
             );
             Session::addMessageAfterRedirect(
                 __('You are not allowed to approve or refuse this purchase request.', 'purchaserequest'),
                 false,
-                ERROR
+                ERROR,
             );
         }
 
@@ -288,6 +320,33 @@ class PurchaseRequest extends CommonDBTM
             $input['processing_date'] = date('Y-m-d H:i:s');
         }
 
+        // Re-open the approval cycle when a financially engaging field changes on an
+        // already-decided request: editing the amount (or item type / customer
+        // re-invoicing) after acceptance must not keep the old approval. Force the
+        // status back to WAITING and requeue pending validations (see post_updateItem),
+        // so the validator is re-solicited before the request can be linked to an order.
+        if (!$is_validation_action
+            && in_array(
+                (int) ($this->fields['status'] ?? 0),
+                [CommonITILValidation::ACCEPTED, CommonITILValidation::REFUSED],
+                true,
+            )
+        ) {
+            $engaging_changed = false;
+            foreach (['amount', 'itemtype', 'types_id', 'invoice_customer'] as $field) {
+                if (array_key_exists($field, $input)
+                    && array_key_exists($field, $this->fields)
+                    && (string) $input[$field] !== (string) $this->fields[$field]) {
+                    $engaging_changed = true;
+                    break;
+                }
+            }
+            if ($engaging_changed) {
+                $input['status'] = CommonITILValidation::WAITING;
+                $this->requeuePendingValidation = true;
+            }
+        }
+
         return $input;
     }
 
@@ -299,6 +358,16 @@ class PurchaseRequest extends CommonDBTM
     public function post_addItem()
     {
         global $CFG_GLPI;
+
+        // Convert images pasted in the rich-text description into GLPI documents
+        // so the stored "comment" keeps a small tag instead of an inline base64
+        // blob (which overflows the column and makes MySQL reject the write).
+        $this->input = $this->addFiles($this->input, [
+            'force_update'  => true,
+            'name'          => 'comment',
+            'content_field' => 'comment',
+        ]);
+
         $list = Threshold::$list_type_allowed;
 
         //      if ($CFG_GLPI["notifications_mailing"]) {
@@ -355,7 +424,7 @@ class PurchaseRequest extends CommonDBTM
                 'Ticket',
                 $changes,
                 __CLASS__,
-                Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK
+                Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK,
             );
         }
     }
@@ -367,6 +436,15 @@ class PurchaseRequest extends CommonDBTM
      **/
     public function post_updateItem($history = 1)
     {
+        // Convert images pasted in the rich-text description into GLPI documents
+        // so the stored "comment" keeps a small tag instead of an inline base64
+        // blob (which overflows the column and makes MySQL reject the write).
+        $this->input = $this->addFiles($this->input, [
+            'force_update'  => true,
+            'name'          => 'comment',
+            'content_field' => 'comment',
+        ]);
+
         if (isset($this->oldvalues['tickets_id'])) {
             if ($this->oldvalues['tickets_id'] != 0) {
                 $changes[0] = 0;
@@ -377,7 +455,7 @@ class PurchaseRequest extends CommonDBTM
                     'Ticket',
                     $changes,
                     __CLASS__,
-                    Log::HISTORY_PLUGIN + self::HISTORY_DELLINK
+                    Log::HISTORY_PLUGIN + self::HISTORY_DELLINK,
                 );
             }
             if (!empty($this->fields['tickets_id'])) {
@@ -390,7 +468,7 @@ class PurchaseRequest extends CommonDBTM
                         'Ticket',
                         $changes,
                         __CLASS__,
-                        Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK
+                        Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK,
                     );
                 }
             }
@@ -402,7 +480,7 @@ class PurchaseRequest extends CommonDBTM
                 [
                     "users_id_validate" => $this->oldvalues['users_id_validate'],
                     "plugin_purchaserequest_purchaserequests_id" => $this->fields["id"],
-                ]
+                ],
             );
             $input = [];
             $input["entities_id"] = $this->fields["entities_id"];
@@ -413,6 +491,74 @@ class PurchaseRequest extends CommonDBTM
             $input["submission_date"] = $_SESSION["glpi_currenttime"];
             $input["status"] = CommonITILValidation::WAITING;
             $validation->add($input);
+        }
+
+        // A financially engaging field changed on an already-decided request
+        // (see prepareInputForUpdate): drop the stale decision and re-solicit the
+        // approvers so the new amount/type is validated before any order is placed.
+        if ($this->requeuePendingValidation) {
+            $this->requeuePendingValidation = false;
+            $this->requeuePendingValidations();
+        }
+    }
+
+    /**
+     * Rebuild the pending approval chain from scratch after an engaging change.
+     *
+     * Deletes every existing validation row of the request, then recreates the
+     * primary WAITING validation (for users_id_validate) and, when the amount
+     * exceeds the configured threshold, the second-level service-manager
+     * validation — mirroring post_addItem().
+     *
+     * @return void
+     */
+    private function requeuePendingValidations(): void
+    {
+        $validation = new Validation();
+        $validation->deleteByCriteria([
+            "plugin_purchaserequest_purchaserequests_id" => $this->fields["id"],
+        ]);
+
+        if (!empty($this->fields["users_id_validate"])) {
+            $validation = new Validation();
+            $input = [];
+            $input["entities_id"] = $this->fields["entities_id"];
+            $input["users_id"] = $this->fields["users_id_creator"];
+            $input["plugin_purchaserequest_purchaserequests_id"] = $this->fields["id"];
+            $input["users_id_validate"] = $this->fields["users_id_validate"];
+            $input["comment_validation"] = "";
+            $input["submission_date"] = $_SESSION["glpi_currenttime"];
+            $input["first"] = true;
+            $input["status"] = CommonITILValidation::WAITING;
+            $validation->add($input);
+        }
+
+        $threshold = new Threshold();
+        $itemtype = Threshold::getObject($this->fields["itemtype"]);
+        if ($threshold->getFromDBByCrit([
+            "itemtype" => $itemtype,
+            "items_id" => $this->fields["types_id"],
+        ])) {
+            $th = intval($threshold->fields["thresholds"]);
+            if ($th != -1) {
+                $config = new Config();
+                $config->getFromDB(1);
+
+                if ($th < intval($this->fields["amount"])
+                    && $config->fields["id_general_service_manager"] > 0) {
+                    $validation = new Validation();
+                    $input = [];
+                    $input["entities_id"] = $this->fields["entities_id"];
+                    $input["users_id"] = $this->fields["users_id_creator"];
+                    $input["plugin_purchaserequest_purchaserequests_id"] = $this->fields["id"];
+                    $input["users_id_validate"] = $config->fields["id_general_service_manager"];
+                    $input["comment_validation"] = "";
+                    $input["submission_date"] = $_SESSION["glpi_currenttime"];
+                    $input["status"] = CommonITILValidation::WAITING;
+                    $input["first"] = false;
+                    $validation->add($input);
+                }
+            }
         }
     }
 
@@ -462,7 +608,7 @@ class PurchaseRequest extends CommonDBTM
             Session::addMessageAfterRedirect(
                 sprintf(__("Mandatory fields are not filled. Please correct: %s"), implode(', ', $msg)),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -820,15 +966,15 @@ class PurchaseRequest extends CommonDBTM
                 PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
                 $params,
                 'dropdown_users_id' . $rand_user,
-                false
+                false,
             );
             $JS .= "}";
         } else {
             $requester_field = htmlescape(
-                Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"])
+                Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"]),
             );
             $group_field = htmlescape(
-                Dropdown::getDropdownName($dbu->getTableForItemType('Group'), $this->fields["groups_id"])
+                Dropdown::getDropdownName($dbu->getTableForItemType('Group'), $this->fields["groups_id"]),
             );
         }
 
@@ -847,7 +993,7 @@ class PurchaseRequest extends CommonDBTM
             [
                 'value'  => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
                 'entity' => $this->fields["entities_id"],
-            ]
+            ],
         );
         $state_field = ob_get_clean();
 
@@ -883,23 +1029,21 @@ class PurchaseRequest extends CommonDBTM
         // Type (model), refreshed by the item type selector into #show_types_id
         ob_start();
         if ($this->fields['itemtype']) {
-            if ($this->fields['itemtype'] == 'PluginOrderOther') {
-                $file = 'other';
-            } else {
-                $file = $this->fields['itemtype'];
-            }
-            $core_typefilename   = GLPI_ROOT . "/src/" . $file . "Type.php";
-            $plugin_typefilename = $CFG_GLPI['root_doc'] . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
-            $itemtypeclass       = $this->fields['itemtype'] . "Type";
+            $itemtypeclass = $this->fields['itemtype'] . "Type";
 
-            if (file_exists($core_typefilename)
-                || file_exists($plugin_typefilename)) {
+            // Resolve the *Type class through class_exists() instead of building a
+            // filesystem path from the stored itemtype and testing it with
+            // file_exists(): itemtype is user-controlled at write time, and
+            // concatenating it into a path handed to file_exists() would turn a
+            // forged value into a file-existence oracle (mirrors the hardening
+            // already applied in hook.php::plugin_purchaserequest_giveItem()).
+            if (class_exists($itemtypeclass)) {
                 Dropdown::show(
                     $itemtypeclass,
                     [
                         'name'  => "types_id",
                         'value' => $this->fields["types_id"],
-                    ]
+                    ],
                 );
             }
         }
@@ -1055,7 +1199,7 @@ class PurchaseRequest extends CommonDBTM
             $count = count($actors[CommonITILActor::REQUESTER]);
         }
         if ($count == 1 && $actor->getFromDBByCrit(
-            ['tickets_id' => (int) $tickets_id, 'type' => CommonITILActor::REQUESTER]
+            ['tickets_id' => (int) $tickets_id, 'type' => CommonITILActor::REQUESTER],
         )) {
             $purchaserequest->fields['users_id'] = $actor->fields['users_id'];
         }
@@ -1102,7 +1246,7 @@ class PurchaseRequest extends CommonDBTM
             PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
             $params,
             'dropdown_users_id' . $rand_user,
-            false
+            false,
         );
         $JS .= "}";
 
@@ -1121,7 +1265,7 @@ class PurchaseRequest extends CommonDBTM
             [
                 'value'  => $purchaserequest->fields["plugin_purchaserequest_purchaserequeststates_id"],
                 'entity' => $purchaserequest->fields["entities_id"],
-            ]
+            ],
         );
         $state_field = ob_get_clean();
 
@@ -1154,24 +1298,21 @@ class PurchaseRequest extends CommonDBTM
         // Type (model), refreshed by the item type selector into #show_types_id
         ob_start();
         if ($purchaserequest->fields['itemtype']) {
-            if ($purchaserequest->fields['itemtype'] == 'PluginOrderOther') {
-                $file = 'other';
-            } else {
-                $file = $purchaserequest->fields['itemtype'];
-            }
-            $core_typefilename   = GLPI_ROOT . "/src/" . $file . "Type.php";
-            $plugin_typefilename = $CFG_GLPI['root_doc'] . "/plugins/order/inc/" . strtolower($file) . "type.class.php";
-            $itemtypeclass       = $purchaserequest->fields['itemtype'] . "Type";
+            $itemtypeclass = $purchaserequest->fields['itemtype'] . "Type";
 
-            if (file_exists($core_typefilename)
-                || file_exists($plugin_typefilename)
-            ) {
+            // Resolve the *Type class through class_exists() instead of building a
+            // filesystem path from the stored itemtype and testing it with
+            // file_exists(): itemtype is user-controlled at write time, and
+            // concatenating it into a path handed to file_exists() would turn a
+            // forged value into a file-existence oracle (mirrors the hardening
+            // already applied in hook.php::plugin_purchaserequest_giveItem()).
+            if (class_exists($itemtypeclass)) {
                 Dropdown::show(
                     $itemtypeclass,
                     [
                         'name'  => "types_id",
                         'value' => $purchaserequest->fields["types_id"],
-                    ]
+                    ],
                 );
             }
         }
@@ -1260,12 +1401,12 @@ class PurchaseRequest extends CommonDBTM
                 'location'         => Dropdown::getDropdownName('glpi_locations', $field['locations_id']),
                 'state'            => Dropdown::getDropdownName(
                     'glpi_plugin_purchaserequest_purchaserequeststates',
-                    $field['plugin_purchaserequest_purchaserequeststates_id']
+                    $field['plugin_purchaserequest_purchaserequeststates_id'],
                 ),
                 'item_type'        => $item !== false ? $item->getTypeName() : '',
                 'type'             => Dropdown::getDropdownName(
                     $dbu->getTableForItemType($itemtypeclass),
-                    $field["types_id"]
+                    $field["types_id"],
                 ),
                 'due_date'         => Html::convDate($field['due_date']),
                 'processing_date'  => Html::convDate($field['processing_date']),
@@ -1402,12 +1543,12 @@ class PurchaseRequest extends CommonDBTM
                     'location'        => Dropdown::getDropdownName('glpi_locations', $field['locations_id']),
                     'state'           => Dropdown::getDropdownName(
                         'glpi_plugin_purchaserequest_purchaserequeststates',
-                        $field['plugin_purchaserequest_purchaserequeststates_id']
+                        $field['plugin_purchaserequest_purchaserequeststates_id'],
                     ),
                     'item_type'       => $orderItem !== false ? $orderItem->getTypeName() : '',
                     'type'            => Dropdown::getDropdownName(
                         $dbu->getTableForItemType($itemtypeclass),
-                        $field["types_id"]
+                        $field["types_id"],
                     ),
                     'due_date'        => Html::convDate($field['due_date']),
                     'processing_date' => Html::convDate($field['processing_date']),
@@ -1498,7 +1639,7 @@ class PurchaseRequest extends CommonDBTM
                                 $( "#formvalidation" ).append("<input type=\'hidden\' name=\'refuse_purchaserequest\' value=\'1\' />");
                                 $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
                                 $( "#formvalidation" ).submit();
-                              });'
+                              });',
             );
         }
     }
@@ -1549,7 +1690,7 @@ class PurchaseRequest extends CommonDBTM
         if (self::canValidation()) {
             $actions['GlpiPlugin\Purchaserequest\PurchaseRequest:validate'] = __(
                 "Validate purchasing requests",
-                "purchaserequest"
+                "purchaserequest",
             );
         }
 
@@ -1574,16 +1715,29 @@ class PurchaseRequest extends CommonDBTM
         switch ($ma->getAction()) {
             case "link":
                 $input = $ma->getInput();
-                $order_id = $input['plugin_order_orders_id'];
+                $order_id = (int) ($input['plugin_order_orders_id'] ?? 0);
+
+                // Load the target order once and scope it to the caller's entity:
+                // can() below only re-checks the purchase request row (per-id UPDATE +
+                // entity), but plugin_order_orders_id is a second, independent foreign
+                // key taken from the massive-action input. Without this extra check a
+                // user could link one of their own requests to an order belonging to
+                // another entity (IDOR on the order reference).
+                $order = new PluginOrderOrder();
+                $order_ok = $order_id > 0
+                    && $order->getFromDB($order_id)
+                    && $order->can($order_id, READ);
 
                 foreach ($ids as $id) {
                     // can() enforces the UPDATE right AND entity access per row.
                     // Core forwards the raw POSTed id list to the plugin, so without
                     // this gate a user could link a request from another entity to an
-                    // arbitrary order (IDOR) — mirror the front controller's check().
+                    // arbitrary order (IDOR) -- mirror the front controller's check().
                     if ($item->can($id, UPDATE)) {
                         //Possible connection with an order if purchase request is validated
-                        if ($item->fields['status'] == CommonITILValidation::ACCEPTED) {
+                        if (!$order_ok) {
+                            $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
+                        } elseif ($item->fields['status'] == CommonITILValidation::ACCEPTED) {
                             $item->update([
                                 "id" => $id,
                                 "plugin_order_orders_id" => $order_id,
@@ -1620,9 +1774,22 @@ class PurchaseRequest extends CommonDBTM
             case "validate":
                 if (self::canValidation()) {
                     $input = $ma->getInput();
-                    $validation = $input['status'];
+                    // The applied status comes straight from the massive-action input; a
+                    // forged API request could POST an out-of-enum value. Reject anything
+                    // outside the legal validation statuses before writing it — the front
+                    // controller path is protected by Validation::prepareInputForUpdate(),
+                    // this bulk path was not.
+                    $validation = (int) ($input['status'] ?? -1);
+                    if (!in_array($validation, [CommonITILValidation::WAITING, CommonITILValidation::ACCEPTED, CommonITILValidation::REFUSED], true)) {
+                        $ma->itemDone($item->getType(), 0, MassiveAction::ACTION_KO);
+                        return;
+                    }
                     foreach ($ids as $id) {
-                        if ($item->getFromDB($id)) {
+                        // can() enforces the plugin right AND entity access per row, mirroring
+                        // the front controller's check(). getFromDB() alone skipped the entity
+                        // scope, so a validator who lost access to the request's entity could
+                        // still act on it through this bulk endpoint (IDOR).
+                        if ($item->can($id, READ)) {
                             if ($item->fields['users_id_validate'] == Session::getLoginUserID()) {
                                 $item->update([
                                     "id" => $id,
@@ -1634,9 +1801,10 @@ class PurchaseRequest extends CommonDBTM
 
                                 $validationrequest = new Validation();
                                 if ($validationrequest->getFromDBByCrit(["plugin_purchaserequest_purchaserequests_id" => $id])) {
-                                    $input["id"] = $validationrequest->fields["id"];
-                                    $input["status"] = $validation;
-                                    $validationrequest->update($input);
+                                    $validationrequest->update([
+                                        "id"     => $validationrequest->fields["id"],
+                                        "status" => $validation,
+                                    ]);
                                 }
 
 
@@ -1644,6 +1812,8 @@ class PurchaseRequest extends CommonDBTM
                             } else {
                                 $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
                             }
+                        } else {
+                            $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
                         }
                     }
                 } else {
@@ -1678,7 +1848,7 @@ class PurchaseRequest extends CommonDBTM
             $dbu = new DbUtils();
             $condition['condition'] = array_merge(
                 ['id' => $groups],
-                $dbu->getEntitiesRestrictCriteria(Group::getTable(), '', '', true)
+                $dbu->getEntitiesRestrictCriteria(Group::getTable(), '', '', true),
             );
             Group::dropdown($condition);
         } else {
@@ -1700,14 +1870,14 @@ class PurchaseRequest extends CommonDBTM
                 return sprintf(
                     __('%1$s: %2$s'),
                     __('Add a link with an item'),
-                    $data["new_value"]
+                    $data["new_value"],
                 );
 
             case self::HISTORY_DELLINK:
                 return sprintf(
                     __('%1$s: %2$s'),
                     __('Delete a link with an item'),
-                    $data["old_value"]
+                    $data["old_value"],
                 );
         }
         return '';
@@ -1759,7 +1929,7 @@ class PurchaseRequest extends CommonDBTM
                     `name` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
                     `users_id` int unsigned NOT NULL DEFAULT '0',
                     `groups_id` int unsigned NOT NULL DEFAULT '0',
-                    `comment` TEXT COLLATE utf8mb4_unicode_ci,
+                    `comment` MEDIUMTEXT COLLATE utf8mb4_unicode_ci,
                     `itemtype` VARCHAR(255) NOT NULL,
                     `types_id` int unsigned NOT NULL DEFAULT '0',
                     `due_date` timestamp NULL DEFAULT NULL,
@@ -1792,42 +1962,50 @@ class PurchaseRequest extends CommonDBTM
             if (!$DB->fieldExists($table, 'locations_id')) {
                 $DB->doQuery(
                     "ALTER TABLE `$table`
-                     ADD `locations_id` int unsigned NOT NULL DEFAULT '0';"
+                     ADD `locations_id` int unsigned NOT NULL DEFAULT '0';",
                 );
             }
             if (!$DB->fieldExists($table, 'plugin_purchaserequest_purchaserequeststates_id')) {
                 $DB->doQuery(
                     "ALTER TABLE `$table`
-                     ADD `plugin_purchaserequest_purchaserequeststates_id` int unsigned NOT NULL DEFAULT '0';"
+                     ADD `plugin_purchaserequest_purchaserequeststates_id` int unsigned NOT NULL DEFAULT '0';",
                 );
 
                 $DB->doQuery(
                     "ALTER TABLE `$table`
-                     ADD `is_deleted` tinyint NOT NULL DEFAULT '0';"
+                     ADD `is_deleted` tinyint NOT NULL DEFAULT '0';",
                 );
             }
 
             if (!$DB->fieldExists($table, 'processing_date')) {
                 $DB->doQuery(
                     "ALTER TABLE `$table`
-                     ADD `processing_date` timestamp NULL DEFAULT NULL;"
+                     ADD `processing_date` timestamp NULL DEFAULT NULL;",
                 );
             }
 
             if (!$DB->fieldExists($table, 'invoice_customer')) {
                 $DB->doQuery(
                     "ALTER TABLE `$table`
-                     ADD `invoice_customer` tinyint NOT NULL DEFAULT '0';"
+                     ADD `invoice_customer` tinyint NOT NULL DEFAULT '0';",
                 );
                 $DB->doQuery(
                     "ALTER TABLE `$table`
-                     ADD `amount` int unsigned NOT NULL DEFAULT '0';"
+                     ADD `amount` int unsigned NOT NULL DEFAULT '0';",
                 );
             }
 
             $DB->doQuery(
                 "ALTER TABLE `$table`
-                   CHANGE `amount` `amount` decimal(20, 4) NOT NULL DEFAULT '0.0000';"
+                   CHANGE `amount` `amount` decimal(20, 4) NOT NULL DEFAULT '0.0000';",
+            );
+
+            // The rich-text description embeds pasted images. A TEXT column
+            // (64 KiB) overflows on such content and MySQL rejects the whole
+            // write (error 1406 "Data too long"). Widen it to MEDIUMTEXT (16 MiB).
+            $DB->doQuery(
+                "ALTER TABLE `$table`
+                   CHANGE `comment` `comment` MEDIUMTEXT COLLATE utf8mb4_unicode_ci;",
             );
         }
 
@@ -1838,7 +2016,7 @@ class PurchaseRequest extends CommonDBTM
             ],
             [
                 'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
-            ]
+            ],
         );
 
         $DB->doQuery($query);
@@ -1850,7 +2028,7 @@ class PurchaseRequest extends CommonDBTM
             ],
             [
                 'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
-            ]
+            ],
         );
 
         $DB->doQuery($query);
@@ -1862,7 +2040,7 @@ class PurchaseRequest extends CommonDBTM
             ],
             [
                 'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
-            ]
+            ],
         );
 
         $DB->doQuery($query);
@@ -1874,7 +2052,7 @@ class PurchaseRequest extends CommonDBTM
             ],
             [
                 'itemtype' =>  'PluginPurchaserequestPurchaseRequest',
-            ]
+            ],
         );
 
         $DB->doQuery($query);

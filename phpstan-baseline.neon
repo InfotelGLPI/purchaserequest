@@ -67,6 +67,12 @@ parameters:
 			path: hook.php
 
 		-
+			message: '#^Parameter \#1 \$all of static method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) expects GlpiPlugin\\Purchaserequest\\type, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: hook.php
+
+		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 3
@@ -97,12 +103,6 @@ parameters:
 			path: src/Config.php
 
 		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
-			count: 3
-			path: src/Config.php
-
-		-
 			message: '#^Access to an undefined property CommonGLPI\:\:\$fields\.$#'
 			identifier: property.notFound
 			count: 1
@@ -123,14 +123,8 @@ parameters:
 		-
 			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
 			identifier: glpi.forbidExit
-			count: 2
-			path: src/NotificationTargetPurchaseRequest.php
-
-		-
-			message: '#^Call to an undefined method CommonGLPI\:\:getID\(\)\.$#'
-			identifier: method.notFound
 			count: 1
-			path: src/Profile.php
+			path: src/NotificationTargetPurchaseRequest.php
 
 		-
 			message: '#^Default value of the parameter \#1 \$all \(false\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
@@ -139,44 +133,8 @@ parameters:
 			path: src/Profile.php
 
 		-
-			message: '#^Default value of the parameter \#2 \$openform \(true\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:showForm\(\) is incompatible with type array\<string, mixed\>\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^Default value of the parameter \#2 \$tabnum \(int\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^Default value of the parameter \#3 \$withtemplate \(int\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: src/Profile.php
-
-		-
 			message: '#^Method GlpiPlugin\\Purchaserequest\\Profile\:\:migrateOneProfile\(\) should return bool but return statement is missing\.$#'
 			identifier: return.missing
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^Method GlpiPlugin\\Purchaserequest\\Profile\:\:showForm\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$ID$#'
-			identifier: parameter.notFound
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$options$#'
-			identifier: parameter.notFound
 			count: 1
 			path: src/Profile.php
 
@@ -189,23 +147,11 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$all of static method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) expects GlpiPlugin\\Purchaserequest\\type, true given\.$#'
 			identifier: argument.type
-			count: 1
+			count: 2
 			path: src/Profile.php
 
 		-
 			message: '#^Parameter \$all of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^Parameter \$tabnum of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^Parameter \$withtemplate of method GlpiPlugin\\Purchaserequest\\Profile\:\:displayTabContentForItem\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/Profile.php
@@ -219,6 +165,12 @@ parameters:
 		-
 			message: '#^Call to an undefined method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:import\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/PurchaseRequest.php
+
+		-
+			message: '#^Call to method can\(\) on an unknown class PluginOrderOrder\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/PurchaseRequest.php
 
@@ -237,7 +189,7 @@ parameters:
 		-
 			message: '#^Call to method getFromDB\(\) on an unknown class PluginOrderOrder\.$#'
 			identifier: class.notFound
-			count: 3
+			count: 4
 			path: src/PurchaseRequest.php
 
 		-
@@ -265,12 +217,6 @@ parameters:
 			path: src/PurchaseRequest.php
 
 		-
-			message: '#^Comparison operation "\>" between \*NEVER\* and 0 results in an error\.$#'
-			identifier: greater.invalid
-			count: 1
-			path: src/PurchaseRequest.php
-
-		-
 			message: '#^Default value of the parameter \#1 \$history \(int\) of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:post_updateItem\(\) is incompatible with type bool\.$#'
 			identifier: parameter.defaultValue
 			count: 1
@@ -279,7 +225,7 @@ parameters:
 		-
 			message: '#^Instantiated class PluginOrderOrder not found\.$#'
 			identifier: class.notFound
-			count: 3
+			count: 4
 			path: src/PurchaseRequest.php
 
 		-
@@ -393,7 +339,7 @@ parameters:
 		-
 			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should return GlpiPlugin\\Purchaserequest\\the but returns false\.$#'
 			identifier: return.type
-			count: 1
+			count: 2
 			path: src/PurchaseRequest.php
 
 		-
@@ -494,13 +440,13 @@ parameters:
 		-
 			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
 			identifier: glpi.forbidExit
-			count: 3
+			count: 1
 			path: src/PurchaseRequest.php
 
 		-
 			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
 			identifier: glpi.forbidExit
-			count: 3
+			count: 1
 			path: src/PurchaseRequestState.php
 
 		-
@@ -590,7 +536,7 @@ parameters:
 		-
 			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
 			identifier: glpi.forbidExit
-			count: 3
+			count: 1
 			path: src/Threshold.php
 
 		-
@@ -716,5 +662,5 @@ parameters:
 		-
 			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
 			identifier: glpi.forbidExit
-			count: 3
+			count: 1
 			path: src/Validation.php

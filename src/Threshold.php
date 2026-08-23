@@ -1,30 +1,30 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Purchaserequest;
@@ -34,6 +34,7 @@ use CommonGLPI;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
 use Migration;
+use Session;
 use Toolbox;
 
 if (!defined('GLPI_ROOT')) {
@@ -94,6 +95,54 @@ class Threshold extends CommonDBTM
     public static function getIcon()
     {
         return "ti ti-basket";
+    }
+
+    /**
+     * Constrain itemtype/items_id at write time to the same whitelist already
+     * enforced at display time ($list_type_allowed, used by
+     * displayTabContentForItem()) so a forged POST cannot create a threshold
+     * on an arbitrary itemtype.
+     *
+     * @param array $input
+     *
+     * @return array|false
+     */
+    public function prepareInputForAdd($input)
+    {
+        return $this->checkThresholdInput($input);
+    }
+
+    /**
+     * @param array $input
+     *
+     * @return array|false
+     */
+    public function prepareInputForUpdate($input)
+    {
+        return $this->checkThresholdInput($input);
+    }
+
+    /**
+     * @param array $input
+     *
+     * @return array|false
+     */
+    private function checkThresholdInput($input)
+    {
+        if (isset($input['itemtype']) && !in_array($input['itemtype'], self::$list_type_allowed, true)) {
+            Session::addMessageAfterRedirect(
+                __('Invalid item type.', 'purchaserequest'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
+        if (isset($input['items_id'])) {
+            $input['items_id'] = (int) $input['items_id'];
+        }
+
+        return $input;
     }
 
 

@@ -1,30 +1,30 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Purchaserequest;
@@ -75,7 +75,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
         $this->data['##lang.purchaserequest.entity##'] = __("Entity");
         $this->data['##purchaserequest.entity##']      = Dropdown::getDropdownName(
             'glpi_entities',
-            $this->obj->getField('entities_id')
+            $this->obj->getField('entities_id'),
         );
 
         $this->data['##lang.purchaserequest.name##'] = __("Name");
@@ -93,7 +93,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
         $this->data['##lang.purchaserequest.group##'] = __("Requester group");
         $this->data['##purchaserequest.group##']      = Dropdown::getDropdownName(
             'glpi_groups',
-            $this->obj->getField('groups_id')
+            $this->obj->getField('groups_id'),
         );
 
         $this->data['##lang.purchaserequest.duedate##'] = __("Due date", "purchaserequest");
@@ -111,7 +111,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
         if (file_exists(GLPI_ROOT . "/src/" . $itemtype . "Type.php")) {
             $this->data['##purchaserequest.itemtype##'] = Dropdown::getDropdownName(
                 $dbu->getTableForItemType($itemtype . "Type"),
-                $this->obj->getField("types_id")
+                $this->obj->getField("types_id"),
             );
         } elseif ($itemtype == "PluginOrderOther") {
             $this->data['##purchaserequest.itemtype##'] = $this->obj->getField('othertypename');
@@ -257,7 +257,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
                 $dbu = new DbUtils();
                 if (!$dbu->countElementsInTable(
                     $translation->getTable(),
-                    ["notificationtemplates_id" => $templates_id]
+                    ["notificationtemplates_id" => $templates_id],
                 )) {
                     $tmp['notificationtemplates_id'] = $templates_id;
                     $tmp['language'] = '';
@@ -309,7 +309,7 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
                         [
                             "itemtype" => PurchaseRequest::class,
                             "event" => $name,
-                        ]
+                        ],
                     )) {
                         $tmp = [
                             'name' => $label,

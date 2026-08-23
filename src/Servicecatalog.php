@@ -1,30 +1,30 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Purchaserequest;
@@ -36,194 +36,206 @@ use Session;
 use Toolbox;
 
 if (!defined('GLPI_ROOT')) {
-   die("Sorry. You can't access directly to this file");
+    die("Sorry. You can't access directly to this file");
 }
 
 
 /**
  * Class Servicecatalog
  */
-class Servicecatalog extends CommonGLPI {
+class Servicecatalog extends CommonGLPI
+{
+    public static $rightname = 'plugin_purchaserequest_purchaserequest';
 
-   static $rightname = 'plugin_purchaserequest_purchaserequest';
+    public $dohistory = false;
 
-   var $dohistory = false;
+    /**
+     * @return bool
+     */
+    public static function canUse()
+    {
+        return Session::haveRight(self::$rightname, UPDATE);
+    }
 
-   /**
-    * @return bool
-    */
-   static function canUse() {
-      return Session::haveRight(self::$rightname, UPDATE);
-   }
+    /**
+     * @return string|\translated
+     */
+    public static function getMenuTitle()
+    {
 
-   /**
-    * @return string|\translated
-    */
-   static function getMenuTitle() {
+        $btstyle = "";
+        $nb      = self::countPurchasesToValidate();
+        if ($nb > 0) {
+            $btstyle = "style='color: firebrick;'";
+        }
+        //      if (Session::getCurrentInterface() == 'central') {
+        return "<span $btstyle>" . __('Validate your purchase requests', 'purchaserequest') . "<span>";
+        //      } else {
+        //         return __('Validate your purchase requests', 'purchaserequest');
+        //      }
+    }
 
-      $btstyle = "";
-      $nb      = self::countPurchasesToValidate();
-      if ($nb > 0) {
-         $btstyle = "style='color: firebrick;'";
-      }
-//      if (Session::getCurrentInterface() == 'central') {
-         return "<span $btstyle>" . __('Validate your purchase requests', 'purchaserequest') . "<span>";
-//      } else {
-//         return __('Validate your purchase requests', 'purchaserequest');
-//      }
-   }
+    /**
+     * @return string|\translated
+     */
+    public static function getAhrefTitle()
+    {
 
-   /**
-    * @return string|\translated
-    */
-   static function getAhrefTitle() {
+        return __('Validate your purchase requests', 'purchaserequest');
+    }
 
-      return __('Validate your purchase requests', 'purchaserequest');
-   }
+    /**
+     * @return string
+     * @throws \GlpitestSQLError
+     */
+    public static function getLeftMenuLogoCss()
+    {
 
-   /**
-    * @return string
-    * @throws \GlpitestSQLError
-    */
-   static function getLeftMenuLogoCss() {
+        $addstyle = "";
+        $nb       = self::countPurchasesToValidate();
+        if ($nb > 0) {
+            $addstyle = "color:firebrick;";
+        }
+        return $addstyle;
 
-      $addstyle = "";
-      $nb       = self::countPurchasesToValidate();
-      if ($nb > 0) {
-         $addstyle = "color:firebrick;";
-      }
-      return $addstyle;
+    }
 
-   }
+    /**
+     * @return string
+     */
+    public static function getMenuLink()
+    {
+        global $CFG_GLPI;
 
-   /**
-    * @return string
-    */
-   static function getMenuLink() {
-      global $CFG_GLPI;
+        $options['reset']                     = 'reset';
+        $options['criteria'][0]['field']      = 8; // status
+        $options['criteria'][0]['searchtype'] = 'equals';
+        $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
+        $options['criteria'][0]['link']       = 'AND';
 
-      $options['reset']                     = 'reset';
-      $options['criteria'][0]['field']      = 8; // status
-      $options['criteria'][0]['searchtype'] = 'equals';
-      $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
-      $options['criteria'][0]['link']       = 'AND';
+        $options['criteria'][1]['field']      = 5; // users_id_validate
+        $options['criteria'][1]['searchtype'] = 'equals';
+        $options['criteria'][1]['value']      = Session::getLoginUserID();
+        $options['criteria'][1]['link']       = 'AND';
 
-      $options['criteria'][1]['field']      = 5; // users_id_validate
-      $options['criteria'][1]['searchtype'] = 'equals';
-      $options['criteria'][1]['value']      = Session::getLoginUserID();
-      $options['criteria'][1]['link']       = 'AND';
+        return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
+    }
 
-      return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
-   }
+    /**
+     * @return string
+     */
+    public static function getNavBarLink()
+    {
+        global $CFG_GLPI;
 
-   /**
-    * @return string
-    */
-   static function getNavBarLink() {
-      global $CFG_GLPI;
+        $options['reset']                     = 'reset';
+        $options['criteria'][0]['field']      = 8; // status
+        $options['criteria'][0]['searchtype'] = 'equals';
+        $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
+        $options['criteria'][0]['link']       = 'AND';
 
-      $options['reset']                     = 'reset';
-      $options['criteria'][0]['field']      = 8; // status
-      $options['criteria'][0]['searchtype'] = 'equals';
-      $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
-      $options['criteria'][0]['link']       = 'AND';
+        $options['criteria'][1]['field']      = 5; // users_id_validate
+        $options['criteria'][1]['searchtype'] = 'equals';
+        $options['criteria'][1]['value']      = Session::getLoginUserID();
+        $options['criteria'][1]['link']       = 'AND';
 
-      $options['criteria'][1]['field']      = 5; // users_id_validate
-      $options['criteria'][1]['searchtype'] = 'equals';
-      $options['criteria'][1]['value']      = Session::getLoginUserID();
-      $options['criteria'][1]['link']       = 'AND';
+        return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
+    }
 
-      return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
-   }
+    /**
+     * @return string
+     * @throws \GlpitestSQLError
+     */
+    public static function countPurchasesToValidate()
+    {
+        global $DB;
 
-   /**
-    * @return string
-    * @throws \GlpitestSQLError
-    */
-   static function countPurchasesToValidate() {
-      global $DB;
+        $dbu     = new DbUtils();
+        $nb      = 0;
 
-      $dbu     = new DbUtils();
-      $nb      = 0;
+        $criteria = [
+            'SELECT' => 'glpi_plugin_purchaserequest_purchaserequests.id',
+            'DISTINCT'        => true,
+            'FROM' => 'glpi_plugin_purchaserequest_purchaserequests',
+            'WHERE' => [
+                'users_id_validate' => Session::getLoginUserID(),
+                'status' => CommonITILValidation::WAITING,
+            ],
+        ];
+        $criteria['WHERE'] = $criteria['WHERE'] + getEntitiesRestrictCriteria(
+            'glpi_plugin_purchaserequest_purchaserequests',
+        );
 
-       $criteria = [
-           'SELECT' => 'glpi_plugin_purchaserequest_purchaserequests.id',
-           'DISTINCT'        => true,
-           'FROM' => 'glpi_plugin_purchaserequest_purchaserequests',
-           'WHERE' => [
-               'users_id_validate' => Session::getLoginUserID(),
-               'status' => CommonITILValidation::WAITING,
-           ]
-       ];
-       $criteria['WHERE'] = $criteria['WHERE'] + getEntitiesRestrictCriteria(
-               'glpi_plugin_purchaserequest_purchaserequests'
-           );
+        $iterator = $DB->request($criteria);
 
-       $iterator = $DB->request($criteria);
-
-       if (count($iterator) > 0) {
-           $nb = count($iterator);
-       }
-
-
-      return $nb;
-
-   }
-
-   /**
-    * @return string
-    * @throws \GlpitestSQLError
-    */
-   static function getMenuLogoCss() {
-
-      $addstyle = "";
-      $nb       = self::countPurchasesToValidate();
-      if ($nb > 0) {
-         $addstyle = "style='color:firebrick;'";
-      }
-      return $addstyle;
-
-   }
-
-   /**
-    * @return string
-    * @throws \GlpitestSQLError
-    */
-   static function getMenuLogo() {
-
-      return PurchaseRequest::getIcon();
-
-   }
-
-   /**
-    * @return string|\translated
-    */
-   static function getMenuComment() {
-
-      $nb       = self::countPurchasesToValidate();
-      $comments = __('See your purchase requests to validate', 'purchaserequest');
-      if ($nb > 0) {
-         $comments = "<span style='color:firebrick;'>";
-         $comments .= sprintf(_n('You have %d purchase request to validate !', 'You have %d purchase requests to validate !', $nb, 'servicecatalog'), $nb);
-         $comments .= "</span>";
-      }
+        if (count($iterator) > 0) {
+            $nb = count($iterator);
+        }
 
 
-      return $comments;
+        return $nb;
 
-   }
+    }
 
-   /**
-    * @return string
-    */
-   static function getLinkList() {
-      return "";
-   }
+    /**
+     * @return string
+     * @throws \GlpitestSQLError
+     */
+    public static function getMenuLogoCss()
+    {
 
-   /**
-    * @return string
-    */
-   static function getList() {
-      return "";
-   }
+        $addstyle = "";
+        $nb       = self::countPurchasesToValidate();
+        if ($nb > 0) {
+            $addstyle = "style='color:firebrick;'";
+        }
+        return $addstyle;
+
+    }
+
+    /**
+     * @return string
+     * @throws \GlpitestSQLError
+     */
+    public static function getMenuLogo()
+    {
+
+        return PurchaseRequest::getIcon();
+
+    }
+
+    /**
+     * @return string|\translated
+     */
+    public static function getMenuComment()
+    {
+
+        $nb       = self::countPurchasesToValidate();
+        $comments = __('See your purchase requests to validate', 'purchaserequest');
+        if ($nb > 0) {
+            $comments = "<span style='color:firebrick;'>";
+            $comments .= sprintf(_n('You have %d purchase request to validate !', 'You have %d purchase requests to validate !', $nb, 'servicecatalog'), $nb);
+            $comments .= "</span>";
+        }
+
+
+        return $comments;
+
+    }
+
+    /**
+     * @return string
+     */
+    public static function getLinkList()
+    {
+        return "";
+    }
+
+    /**
+     * @return string
+     */
+    public static function getList()
+    {
+        return "";
+    }
 }

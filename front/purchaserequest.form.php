@@ -1,36 +1,34 @@
 <?php
 
-/*
- -------------------------------------------------------------------------
- purchaserequest plugin for GLPI
- Copyright (C) 2021-2026 by the purchaserequest Development Team.
-
- https://github.com/InfotelGLPI/purchaserequest
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of purchaserequest.
-
- purchaserequest is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 3 of the License, or
- (at your option) any later version.
-
- purchaserequest is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ * -------------------------------------------------------------------------
+ * purchaserequest plugin for GLPI
+ * Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ *
+ * https://github.com/InfotelGLPI/purchaserequest
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of purchaserequest.
+ *
+ * purchaserequest is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * purchaserequest is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
 
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
-
-Session::checkLoginUser();
 
 global $DB;
 
@@ -56,7 +54,7 @@ if (Plugin::isPluginActive("order")
         $newID = $purchase->add($_POST);
         Html::back();
 
-       /* delete purchaserequest */
+        /* delete purchaserequest */
     } elseif (isset($_POST["delete"])) {
         $purchase->check($_POST['id'], DELETE);
         $purchase->delete($_POST);
@@ -70,7 +68,7 @@ if (Plugin::isPluginActive("order")
         $purchase->delete($_POST, 1);
         $purchase->redirectToList();
 
-       /* update purchaserequest */
+        /* update purchaserequest */
     } elseif (isset($_POST["update"]) || (isset($_POST['update_status']))) {
         $purchase->check($_POST['id'], UPDATE);
         $purchase->update($_POST);
@@ -78,7 +76,7 @@ if (Plugin::isPluginActive("order")
     }
 
     if (isset($_POST['action'])) {
-       // Retrieve configuration for generate assets feature
+        // Retrieve configuration for generate assets feature
 
         $purchase_request = new PurchaseRequest();
         switch ($_POST['chooseAction']) {
@@ -109,7 +107,7 @@ if (Plugin::isPluginActive("order")
             $_SERVER['PHP_SELF'],
             "management",
             PurchaseRequest::class,
-            "purchaserequest"
+            "purchaserequest",
         );
     } else {
         if (Plugin::isPluginActive('servicecatalog')) {
