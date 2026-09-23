@@ -35,11 +35,6 @@ use DbUtils;
 use Session;
 use Toolbox;
 
-if (!defined('GLPI_ROOT')) {
-    die("Sorry. You can't access directly to this file");
-}
-
-
 /**
  * Class Servicecatalog
  */
@@ -62,17 +57,16 @@ class Servicecatalog extends CommonGLPI
      */
     public static function getMenuTitle()
     {
-
         $btstyle = "";
-        $nb      = self::countPurchasesToValidate();
+        $nb = self::countPurchasesToValidate();
         if ($nb > 0) {
             $btstyle = "style='color: firebrick;'";
         }
-        //      if (Session::getCurrentInterface() == 'central') {
-        return "<span $btstyle>" . __('Validate your purchase requests', 'purchaserequest') . "<span>";
-        //      } else {
-        //         return __('Validate your purchase requests', 'purchaserequest');
-        //      }
+        if (Session::getCurrentInterface() == 'central') {
+            return __('Validate your purchase requests', 'purchaserequest');
+        } else {
+            return "<span $btstyle>" . __('Validate your purchase requests', 'purchaserequest') . "<span>";
+        }
     }
 
     /**
@@ -80,7 +74,6 @@ class Servicecatalog extends CommonGLPI
      */
     public static function getAhrefTitle()
     {
-
         return __('Validate your purchase requests', 'purchaserequest');
     }
 
@@ -90,14 +83,12 @@ class Servicecatalog extends CommonGLPI
      */
     public static function getLeftMenuLogoCss()
     {
-
         $addstyle = "";
-        $nb       = self::countPurchasesToValidate();
+        $nb = self::countPurchasesToValidate();
         if ($nb > 0) {
             $addstyle = "color:firebrick;";
         }
         return $addstyle;
-
     }
 
     /**
@@ -107,16 +98,16 @@ class Servicecatalog extends CommonGLPI
     {
         global $CFG_GLPI;
 
-        $options['reset']                     = 'reset';
-        $options['criteria'][0]['field']      = 8; // status
+        $options['reset'] = 'reset';
+        $options['criteria'][0]['field'] = 8; // status
         $options['criteria'][0]['searchtype'] = 'equals';
-        $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
-        $options['criteria'][0]['link']       = 'AND';
+        $options['criteria'][0]['value'] = CommonITILValidation::WAITING;
+        $options['criteria'][0]['link'] = 'AND';
 
-        $options['criteria'][1]['field']      = 5; // users_id_validate
+        $options['criteria'][1]['field'] = 5; // users_id_validate
         $options['criteria'][1]['searchtype'] = 'equals';
-        $options['criteria'][1]['value']      = Session::getLoginUserID();
-        $options['criteria'][1]['link']       = 'AND';
+        $options['criteria'][1]['value'] = Session::getLoginUserID();
+        $options['criteria'][1]['link'] = 'AND';
 
         return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
     }
@@ -128,16 +119,16 @@ class Servicecatalog extends CommonGLPI
     {
         global $CFG_GLPI;
 
-        $options['reset']                     = 'reset';
-        $options['criteria'][0]['field']      = 8; // status
+        $options['reset'] = 'reset';
+        $options['criteria'][0]['field'] = 8; // status
         $options['criteria'][0]['searchtype'] = 'equals';
-        $options['criteria'][0]['value']      = CommonITILValidation::WAITING;
-        $options['criteria'][0]['link']       = 'AND';
+        $options['criteria'][0]['value'] = CommonITILValidation::WAITING;
+        $options['criteria'][0]['link'] = 'AND';
 
-        $options['criteria'][1]['field']      = 5; // users_id_validate
+        $options['criteria'][1]['field'] = 5; // users_id_validate
         $options['criteria'][1]['searchtype'] = 'equals';
-        $options['criteria'][1]['value']      = Session::getLoginUserID();
-        $options['criteria'][1]['link']       = 'AND';
+        $options['criteria'][1]['value'] = Session::getLoginUserID();
+        $options['criteria'][1]['link'] = 'AND';
 
         return PLUGIN_PURCHASEREQUEST_WEBDIR . "/front/purchaserequest.php?" . Toolbox::append_params($options, '&');
     }
@@ -150,12 +141,12 @@ class Servicecatalog extends CommonGLPI
     {
         global $DB;
 
-        $dbu     = new DbUtils();
-        $nb      = 0;
+        $dbu = new DbUtils();
+        $nb = 0;
 
         $criteria = [
             'SELECT' => 'glpi_plugin_purchaserequest_purchaserequests.id',
-            'DISTINCT'        => true,
+            'DISTINCT' => true,
             'FROM' => 'glpi_plugin_purchaserequest_purchaserequests',
             'WHERE' => [
                 'users_id_validate' => Session::getLoginUserID(),
@@ -174,7 +165,6 @@ class Servicecatalog extends CommonGLPI
 
 
         return $nb;
-
     }
 
     /**
@@ -183,14 +173,12 @@ class Servicecatalog extends CommonGLPI
      */
     public static function getMenuLogoCss()
     {
-
         $addstyle = "";
-        $nb       = self::countPurchasesToValidate();
+        $nb = self::countPurchasesToValidate();
         if ($nb > 0) {
             $addstyle = "style='color:firebrick;'";
         }
         return $addstyle;
-
     }
 
     /**
@@ -199,9 +187,7 @@ class Servicecatalog extends CommonGLPI
      */
     public static function getMenuLogo()
     {
-
         return PurchaseRequest::getIcon();
-
     }
 
     /**
@@ -209,18 +195,24 @@ class Servicecatalog extends CommonGLPI
      */
     public static function getMenuComment()
     {
-
-        $nb       = self::countPurchasesToValidate();
+        $nb = self::countPurchasesToValidate();
         $comments = __('See your purchase requests to validate', 'purchaserequest');
         if ($nb > 0) {
             $comments = "<span style='color:firebrick;'>";
-            $comments .= sprintf(_n('You have %d purchase request to validate !', 'You have %d purchase requests to validate !', $nb, 'servicecatalog'), $nb);
+            $comments .= sprintf(
+                _n(
+                    'You have %d purchase request to validate !',
+                    'You have %d purchase requests to validate !',
+                    $nb,
+                    'servicecatalog',
+                ),
+                $nb,
+            );
             $comments .= "</span>";
         }
 
 
         return $comments;
-
     }
 
     /**

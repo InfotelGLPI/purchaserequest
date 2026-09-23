@@ -33,10 +33,6 @@ use CommonDropdown;
 use DbUtils;
 use Migration;
 
-if (!defined('GLPI_ROOT')) {
-    die("Sorry. You can't access directly to this file");
-}
-
 class PurchaseRequestState extends CommonDropdown
 {
     public static function getTypeName($nb = 0)
