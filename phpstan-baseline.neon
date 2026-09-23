@@ -121,12 +121,6 @@ parameters:
 			path: src/NotificationTargetPurchaseRequest.php
 
 		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
-			count: 1
-			path: src/NotificationTargetPurchaseRequest.php
-
-		-
 			message: '#^Default value of the parameter \#1 \$all \(false\) of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) is incompatible with type GlpiPlugin\\Purchaserequest\\type\.$#'
 			identifier: parameter.defaultValue
 			count: 1
@@ -153,12 +147,6 @@ parameters:
 		-
 			message: '#^Parameter \$all of method GlpiPlugin\\Purchaserequest\\Profile\:\:getAllRights\(\) has invalid type GlpiPlugin\\Purchaserequest\\type\.$#'
 			identifier: class.notFound
-			count: 1
-			path: src/Profile.php
-
-		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
 			count: 1
 			path: src/Profile.php
 
@@ -438,18 +426,6 @@ parameters:
 			path: src/PurchaseRequest.php
 
 		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
-			count: 1
-			path: src/PurchaseRequest.php
-
-		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
-			count: 1
-			path: src/PurchaseRequestState.php
-
-		-
 			message: '#^Method GlpiPlugin\\Purchaserequest\\Servicecatalog\:\:countPurchasesToValidate\(\) should return string but returns int\<0, max\>\.$#'
 			identifier: return.type
 			count: 1
@@ -482,12 +458,6 @@ parameters:
 		-
 			message: '#^Parameter \#3 \$nb of function _n expects int, string given\.$#'
 			identifier: argument.type
-			count: 1
-			path: src/Servicecatalog.php
-
-		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
 			count: 1
 			path: src/Servicecatalog.php
 
@@ -530,12 +500,6 @@ parameters:
 		-
 			message: '#^Parameter \$item of method GlpiPlugin\\Purchaserequest\\Threshold\:\:showThresholdForm\(\) has invalid type GlpiPlugin\\Purchaserequest\\item\.$#'
 			identifier: class.notFound
-			count: 1
-			path: src/Threshold.php
-
-		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
 			count: 1
 			path: src/Threshold.php
 
@@ -656,11 +620,5 @@ parameters:
 		-
 			message: '#^Variable \$validation might not be defined\.$#'
 			identifier: variable.undefined
-			count: 1
-			path: src/Validation.php
-
-		-
-			message: '#^You should not use the `die` function\. It prevents the execution of post\-request/post\-command routines\.$#'
-			identifier: glpi.forbidExit
 			count: 1
 			path: src/Validation.php
