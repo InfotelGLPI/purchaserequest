@@ -204,6 +204,12 @@ class Validation extends CommonDBTM
             );
             return $input;
         }
+        // Outside the accept/refuse/update_status path the status is never
+        // writable (edit form, core "Update" massive action, API).
+        if (!$is_validation_action
+            || (isset($input['status']) && !in_array((int) $input['status'], [CommonITILValidation::WAITING, CommonITILValidation::ACCEPTED, CommonITILValidation::REFUSED], true))) {
+            unset($input['status']);
+        }
 
         if (isset($input['refuse_purchaserequest']) && $input['refuse_purchaserequest'] == 1) {
             $input['status'] = CommonITILValidation::REFUSED;
@@ -294,12 +300,12 @@ class Validation extends CommonDBTM
             $purchase_request = new PurchaseRequest();
             if (isset($this->input['status'])
                 && $this->input['status'] == CommonITILValidation::REFUSED) {
-                $input["status"] = CommonITILValidation::REFUSED;
-                $input["id"]     = $this->fields["plugin_purchaserequest_purchaserequests_id"];
-                $purchase_request->update($input);
+                $purchase_request->updateStatusFromValidation(
+                    (int) $this->fields["plugin_purchaserequest_purchaserequests_id"],
+                    CommonITILValidation::REFUSED,
+                );
             } elseif (isset($this->input['status'])
                        && $this->input['status'] == CommonITILValidation::ACCEPTED) {
-                $input["id"] = $this->fields["plugin_purchaserequest_purchaserequests_id"];
                 $items       = $this->find(["plugin_purchaserequest_purchaserequests_id" => $this->fields["plugin_purchaserequest_purchaserequests_id"]]);
                 $validation  = true;
                 foreach ($items as $item) {
@@ -309,8 +315,10 @@ class Validation extends CommonDBTM
                 }
 
                 if ($validation == true) {
-                    $input["status"] = CommonITILValidation::ACCEPTED;
-                    $purchase_request->update($input);
+                    $purchase_request->updateStatusFromValidation(
+                        (int) $this->fields["plugin_purchaserequest_purchaserequests_id"],
+                        CommonITILValidation::ACCEPTED,
+                    );
                 }
             }
             if ($CFG_GLPI["notifications_mailing"]) {

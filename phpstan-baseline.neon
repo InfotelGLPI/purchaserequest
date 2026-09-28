@@ -201,7 +201,7 @@ parameters:
 		-
 			message: '#^Call to static method getTypeName\(\) on an unknown class PluginOrderOrder\.$#'
 			identifier: class.notFound
-			count: 3
+			count: 4
 			path: src/PurchaseRequest.php
 
 		-
@@ -313,24 +313,6 @@ parameters:
 			path: src/PurchaseRequest.php
 
 		-
-			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) has invalid return type GlpiPlugin\\Purchaserequest\\the\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/PurchaseRequest.php
-
-		-
-			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should return GlpiPlugin\\Purchaserequest\\the but returns array\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/PurchaseRequest.php
-
-		-
-			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should return GlpiPlugin\\Purchaserequest\\the but returns false\.$#'
-			identifier: return.type
-			count: 2
-			path: src/PurchaseRequest.php
-
-		-
 			message: '#^Method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:rawSearchOptions\(\) has invalid return type GlpiPlugin\\Purchaserequest\\an\.$#'
 			identifier: class.notFound
 			count: 1
@@ -409,12 +391,6 @@ parameters:
 
 		-
 			message: '#^Return type \(GlpiPlugin\\Purchaserequest\\an\) of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:rawSearchOptions\(\) should be compatible with return type \(array\<array\<string, mixed\>\>\) of method CommonDBTM\:\:rawSearchOptions\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: src/PurchaseRequest.php
-
-		-
-			message: '#^Return type \(GlpiPlugin\\Purchaserequest\\the\) of method GlpiPlugin\\Purchaserequest\\PurchaseRequest\:\:prepareInputForUpdate\(\) should be compatible with return type \(array\<string, mixed\>\|false\) of method CommonDBTM\:\:prepareInputForUpdate\(\)$#'
 			identifier: method.childReturnType
 			count: 1
 			path: src/PurchaseRequest.php

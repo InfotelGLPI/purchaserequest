@@ -42,8 +42,30 @@ use Toolbox;
  */
 class Threshold extends CommonDBTM
 {
-    public static $rightname = 'plugin_purchaserequest_purchaserequest';
+    // Thresholds drive the second-level approval: setup right, not the requester one.
+    // plugin_purchaserequest_config only exposes READ, which is the setup access level.
+    public static $rightname = 'plugin_purchaserequest_config';
     public $dohistory = true;
+
+    public static function canCreate(): bool
+    {
+        return Session::haveRight(self::$rightname, READ);
+    }
+
+    public static function canUpdate(): bool
+    {
+        return Session::haveRight(self::$rightname, READ);
+    }
+
+    public static function canDelete(): bool
+    {
+        return Session::haveRight(self::$rightname, READ);
+    }
+
+    public static function canPurge(): bool
+    {
+        return Session::haveRight(self::$rightname, READ);
+    }
 
 
     public static $list_type_allowed = ["ComputerType", "MonitorType", "PeripheralType", "NetworkEquipmentType", "PrinterType",

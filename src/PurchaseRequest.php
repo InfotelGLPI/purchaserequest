@@ -48,6 +48,7 @@ use Plugin;
 use PluginOrderOrder;
 use PluginOrderOrder_Item;
 use PluginOrderReference;
+use Profile_User;
 use Session;
 use Ticket;
 use Ticket_User;
@@ -67,6 +68,12 @@ class PurchaseRequest extends CommonDBTM
      * already-decided request; consumed in post_updateItem() to reopen approval.
      */
     private bool $requeuePendingValidation = false;
+
+    /**
+     * Set by updateStatusFromValidation() only (never from client input) so the
+     * approval chain can write the status on behalf of a second-level approver.
+     */
+    private bool $statusFromValidation = false;
 
     public const HISTORY_ADDLINK = 50;
     public const HISTORY_DELLINK = 51;
@@ -205,6 +212,10 @@ class PurchaseRequest extends CommonDBTM
 
         $input['status'] = CommonITILValidation::WAITING;
 
+        if (!$this->checkLinkedItemsInput($input, true)) {
+            return false;
+        }
+
         // Constrain itemtype to the whitelist enforced at display time
         // (Threshold::$list_type_allowed / hook.php's giveItem()) so a forged
         // POST cannot store an arbitrary itemtype that showForm() later feeds
@@ -224,9 +235,9 @@ class PurchaseRequest extends CommonDBTM
     /**
      * Prepare input datas for updating the item
      *
-     * @param $input datas used to update the item
+     * @param array $input datas used to update the item
      *
-     * @return the modified $input array
+     * @return array|false the modified $input array
      **/
     public function prepareInputForUpdate($input)
     {
@@ -266,7 +277,9 @@ class PurchaseRequest extends CommonDBTM
             || isset($input['accept_purchaserequest'])
             || isset($input['update_status']);
         $is_validator = (int) ($this->fields['users_id_validate'] ?? 0) === (int) Session::getLoginUserID();
-        if ($is_validation_action && !$is_validator) {
+        $from_validation = $this->statusFromValidation;
+        $this->statusFromValidation = false;
+        if ($is_validation_action && !$is_validator && !$from_validation) {
             unset(
                 $input['refuse_purchaserequest'],
                 $input['accept_purchaserequest'],
@@ -278,6 +291,21 @@ class PurchaseRequest extends CommonDBTM
                 false,
                 ERROR,
             );
+        }
+        // The status column is never writable through a plain update (edit form,
+        // core "Update" massive action, API): only the designated validator via
+        // the accept/refuse/update_status path, or the internal approval chain
+        // (updateStatusFromValidation()), may set it. The WAITING reset below
+        // re-adds it server-side when an engaging field changes.
+        $status_allowed = $from_validation || ($is_validation_action && $is_validator);
+        if (!$status_allowed
+            || (isset($input['status']) && !in_array((int) $input['status'], [CommonITILValidation::WAITING, CommonITILValidation::ACCEPTED, CommonITILValidation::REFUSED], true))) {
+            unset($input['status']);
+        }
+        $is_validation_action = $is_validation_action && $status_allowed;
+
+        if (!$this->checkLinkedItemsInput($input, false)) {
+            return false;
         }
 
         if (isset($input['refuse_purchaserequest']) && $input['refuse_purchaserequest'] == 1) {
@@ -342,6 +370,114 @@ class PurchaseRequest extends CommonDBTM
         }
 
         return $input;
+    }
+
+    /**
+     * Apply a status decided by the approval chain (Validation::post_updateItem()).
+     *
+     * The second-level approver is not the request's users_id_validate, so this
+     * internal path bypasses the validator gate of prepareInputForUpdate(). The
+     * flag is an object property, never read from client input.
+     *
+     * @param int $id
+     * @param int $status
+     *
+     * @return bool
+     */
+    public function updateStatusFromValidation(int $id, int $status): bool
+    {
+        $this->statusFromValidation = true;
+        try {
+            return $this->update([
+                'id'            => $id,
+                'status'        => $status,
+                'update_status' => true,
+            ]);
+        } finally {
+            $this->statusFromValidation = false;
+        }
+    }
+
+    /**
+     * Re-validate at write time the foreign keys taken from client input:
+     * the approver (right + entity + separation of duties), the linked ticket
+     * (READ access) and the linked order (accepted request + READ access).
+     * Unchanged values are tolerated on update.
+     *
+     * @param array $input
+     * @param bool  $is_add
+     *
+     * @return bool
+     */
+    private function checkLinkedItemsInput(array &$input, bool $is_add): bool
+    {
+        $denied = __("You don't have permission to perform this action.");
+
+        $entities_id = (int) ($input['entities_id'] ?? $this->fields['entities_id'] ?? $_SESSION['glpiactive_entity'] ?? 0);
+        if (!$is_add) {
+            $entities_id = (int) ($this->fields['entities_id'] ?? $entities_id);
+        }
+
+        if (array_key_exists('users_id_validate', $input)
+            && ($is_add || (int) $input['users_id_validate'] !== (int) ($this->fields['users_id_validate'] ?? 0))
+            && (int) $input['users_id_validate'] > 0) {
+            $validator_id = (int) $input['users_id_validate'];
+            $creator_id   = $is_add
+                ? (int) Session::getLoginUserID()
+                : (int) ($this->fields['users_id_creator'] ?? 0);
+            $validator_entities = Profile_User::getUserEntitiesForRight(
+                $validator_id,
+                'plugin_purchaserequest_validate',
+                READ,
+            );
+            if ($validator_id === $creator_id
+                || !in_array($entities_id, array_map('intval', $validator_entities), true)) {
+                Session::addMessageAfterRedirect(
+                    sprintf(__('%1$s: %2$s'), __('To be validated by', 'purchaserequest'), $denied),
+                    false,
+                    ERROR,
+                );
+                return false;
+            }
+        }
+
+        if (array_key_exists('tickets_id', $input)
+            && ($is_add || (int) $input['tickets_id'] !== (int) ($this->fields['tickets_id'] ?? 0))
+            && (int) $input['tickets_id'] > 0) {
+            $ticket = new Ticket();
+            if (!$ticket->getFromDB((int) $input['tickets_id'])
+                || !$ticket->can((int) $input['tickets_id'], READ)) {
+                Session::addMessageAfterRedirect(
+                    sprintf(__('%1$s: %2$s'), Ticket::getTypeName(1), $denied),
+                    false,
+                    ERROR,
+                );
+                return false;
+            }
+        }
+
+        // Same rule as the "link" massive action: only an accepted request may be
+        // linked, and only to an order the caller can read.
+        if (array_key_exists('plugin_order_orders_id', $input)
+            && ($is_add || (int) $input['plugin_order_orders_id'] !== (int) ($this->fields['plugin_order_orders_id'] ?? 0))
+            && (int) $input['plugin_order_orders_id'] > 0) {
+            $order_id = (int) $input['plugin_order_orders_id'];
+            $status   = $is_add ? CommonITILValidation::WAITING : (int) ($this->fields['status'] ?? 0);
+            $order_ok = $status === CommonITILValidation::ACCEPTED
+                && class_exists(PluginOrderOrder::class)
+                && ($order = new PluginOrderOrder())->getFromDB($order_id)
+                && $order->can($order_id, READ);
+            if (!$order_ok) {
+                unset($input['plugin_order_orders_id']);
+                Session::addMessageAfterRedirect(
+                    sprintf(__('%1$s: %2$s'), PluginOrderOrder::getTypeName(1), $denied),
+                    false,
+                    ERROR,
+                );
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -696,6 +832,8 @@ class PurchaseRequest extends CommonDBTM
             'name' => __('Approval status'),
             'searchtype' => 'equals',
             'datatype' => 'specific',
+            // Status only changes through the approval workflow ("validate" action)
+            'massiveaction' => false,
         ];
 
         $tab[] = [
@@ -1451,10 +1589,14 @@ class PurchaseRequest extends CommonDBTM
                                 ]);
 
                                 $validationrequest = new Validation();
-                                if ($validationrequest->getFromDBByCrit(["plugin_purchaserequest_purchaserequests_id" => $id])) {
+                                if ($validationrequest->getFromDBByCrit([
+                                    "plugin_purchaserequest_purchaserequests_id" => $id,
+                                    "users_id_validate" => Session::getLoginUserID(),
+                                ])) {
                                     $validationrequest->update([
-                                        "id"     => $validationrequest->fields["id"],
-                                        "status" => $validation,
+                                        "id"            => $validationrequest->fields["id"],
+                                        "status"        => $validation,
+                                        "update_status" => true,
                                     ]);
                                 }
 
