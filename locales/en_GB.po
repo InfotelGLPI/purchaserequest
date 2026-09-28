@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI Plugin - Order\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 12:11+0000\n"
+"POT-Creation-Date: 2026-09-28 13:49+0000\n"
 "PO-Revision-Date: 2020-07-20 14:51+0200\n"
 "Last-Translator: Walid Nouh\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/teclib/"
@@ -35,8 +35,8 @@ msgstr ""
 msgid "Add a purchase request"
 msgstr "Add a purchase request"
 
-#: src/PurchaseRequest.php:711 src/PurchaseRequest.php:916
-#: src/PurchaseRequest.php:1282 src/NotificationTargetPurchaseRequest.php:80
+#: src/PurchaseRequest.php:777 src/PurchaseRequest.php:982
+#: src/PurchaseRequest.php:1348 src/NotificationTargetPurchaseRequest.php:80
 #: src/NotificationTargetPurchaseRequest.php:188
 #: templates/pr_fields.html.twig:106
 msgid "Amount"
@@ -56,7 +56,7 @@ msgstr ""
 msgid "Approval status"
 msgstr ""
 
-#: src/Validation.php:573
+#: src/Validation.php:589
 msgid "Approvals for the purchase request"
 msgstr ""
 
@@ -66,7 +66,7 @@ msgstr ""
 msgid "Approver"
 msgstr ""
 
-#: src/NotificationTargetPurchaseRequest.php:378
+#: src/NotificationTargetPurchaseRequest.php:380
 msgid "Author of the purchase request"
 msgstr "Author of the purchase request"
 
@@ -78,7 +78,7 @@ msgstr ""
 msgid "Configuration purchase request"
 msgstr ""
 
-#: src/PurchaseRequest.php:1478
+#: src/PurchaseRequest.php:1548
 msgid "Delete link to order"
 msgstr "Delete link to order"
 
@@ -90,7 +90,7 @@ msgstr ""
 msgid "Do you approve this purchase request ?"
 msgstr "Do you approve this purchase request ?"
 
-#: src/PurchaseRequest.php:813 src/PurchaseRequest.php:1280
+#: src/PurchaseRequest.php:879 src/PurchaseRequest.php:1346
 #: src/NotificationTargetPurchaseRequest.php:95
 #: src/NotificationTargetPurchaseRequest.php:184
 #: templates/pr_fields.html.twig:98 templates/validation_for_order.html.twig:48
@@ -106,8 +106,8 @@ msgstr "Editor of validation"
 msgid "General Services Manager"
 msgstr ""
 
-#: src/PurchaseRequest.php:225 src/PurchaseRequest.php:264
-#: src/Threshold.php:152
+#: src/PurchaseRequest.php:233 src/PurchaseRequest.php:283
+#: src/Threshold.php:146
 msgid "Invalid item type."
 msgstr ""
 
@@ -120,7 +120,7 @@ msgstr ""
 msgid "Item type"
 msgstr ""
 
-#: src/PurchaseRequest.php:1477
+#: src/PurchaseRequest.php:1547
 msgid "Link to an order"
 msgstr "Link to an order"
 
@@ -153,7 +153,7 @@ msgstr "No groups for this user"
 msgid "No results found"
 msgstr ""
 
-#: hook.php:270
+#: hook.php:263
 msgctxt "quantity"
 msgid "Number of purchase request"
 msgstr "Number of purchase request"
@@ -162,14 +162,10 @@ msgstr "Number of purchase request"
 msgid "Please activate the plugin"
 msgstr ""
 
-#: front/purchaserequest.php:65 front/validation.form.php:87
+#: front/purchaserequest.php:64 front/validation.form.php:88
 #: front/purchaserequest.form.php:126
 msgid "Please activate the plugin order"
 msgstr "Please activate the plugin order"
-
-#: hook.php:49
-msgid "Plugin installation or upgrade"
-msgstr "Plugin installation or upgrade"
 
 #: src/Config.php:65
 msgid "Plugin setup"
@@ -181,8 +177,8 @@ msgctxt "button"
 msgid "Post"
 msgstr ""
 
-#: setup.php:120 src/PurchaseRequest.php:88 src/Profile.php:59
-#: src/Profile.php:116
+#: setup.php:120 src/PurchaseRequest.php:95 src/Profile.php:60
+#: src/Profile.php:117
 msgid "Purchase request"
 msgid_plural "Purchase requests"
 msgstr[0] "Purchase request"
@@ -196,16 +192,16 @@ msgstr "Purchase request canceled"
 msgid "Purchase request is validated"
 msgstr "Purchase request is validated"
 
-#: src/PurchaseRequestState.php:40 hook.php:173
+#: src/PurchaseRequestState.php:40 hook.php:164
 msgid "Purchase request status"
 msgstr "Purchase request status"
 
 #: src/NotificationTargetPurchaseRequest.php:56
-#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:122
+#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:123
 msgid "Purchase request validation"
 msgstr "Purchase request validation"
 
-#: src/Threshold.php:83 templates/threshold.html.twig:33
+#: src/Threshold.php:77 templates/threshold.html.twig:33
 #: templates/threshold.html.twig:37 templates/threshold.html.twig:42
 msgid "Purchase threshold"
 msgid_plural "Purchase thresholds"
@@ -257,14 +253,14 @@ msgstr ""
 msgid "Status of the approval request"
 msgstr ""
 
-#: src/PurchaseRequest.php:925 src/PurchaseRequest.php:1283
+#: src/PurchaseRequest.php:991 src/PurchaseRequest.php:1349
 #: src/NotificationTargetPurchaseRequest.php:83
 #: src/NotificationTargetPurchaseRequest.php:189
 #: templates/pr_fields.html.twig:108
 msgid "To be rebilled to the customer"
 msgstr ""
 
-#: src/PurchaseRequest.php:436 src/PurchaseRequest.php:712
+#: src/PurchaseRequest.php:462 src/PurchaseRequest.php:778
 #: templates/pr_fields.html.twig:100
 msgid "To be validated by"
 msgstr "To be validated by"
@@ -273,7 +269,7 @@ msgstr "To be validated by"
 msgid "Treated"
 msgstr "Treated"
 
-#: src/PurchaseRequest.php:898 src/PurchaseRequest.php:1281
+#: src/PurchaseRequest.php:964 src/PurchaseRequest.php:1347
 #: templates/pr_fields.html.twig:125
 #: templates/validation_for_order.html.twig:49
 #: templates/pr_order_list.html.twig:47
@@ -289,7 +285,7 @@ msgstr ""
 msgid "Uncheck all"
 msgstr ""
 
-#: src/PurchaseRequest.php:1481
+#: src/PurchaseRequest.php:1551
 msgid "Validate purchasing requests"
 msgstr "Validate purchasing requests"
 
@@ -308,11 +304,12 @@ msgid_plural "Validations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/NotificationTargetPurchaseRequest.php:377
+#: src/NotificationTargetPurchaseRequest.php:379
 msgid "Validator of the purchase request"
 msgstr "Validator of the purchase request"
 
-#: src/PurchaseRequest.php:290 src/Validation.php:201
+#: src/PurchaseRequest.php:309 src/PurchaseRequest.php:686
+#: src/Validation.php:207 src/Validation.php:225
 msgid "You are not allowed to approve or refuse this purchase request."
 msgstr ""
 
@@ -322,6 +319,9 @@ msgid "You have %d purchase request to validate !"
 msgid_plural "You have %d purchase requests to validate !"
 msgstr[0] "You have %d purchase request to validate !"
 msgstr[1] "You have %d purchase requests to validate !"
+
+#~ msgid "Plugin installation or upgrade"
+#~ msgstr "Plugin installation or upgrade"
 
 #~ msgid "Delete link with order"
 #~ msgstr "Delete link with order"
