@@ -25,8 +25,16 @@
  # --------------------------------------------------------------------------
  #}
 
-{% extends 'generic_show_form.html.twig' %}
-
-{% block form_fields %}
-   {{ include('@purchaserequest/pr_fields.html.twig') }}
-{% endblock %}
+{# Groups of the requester; groups_condition is null when no requester is selected yet. #}
+{% if groups_condition is not null %}
+   {% if groups_condition is empty %}
+      <span class="text-muted">{{ __('No groups for this user', 'purchaserequest') }}</span>
+   {% else %}
+      {{ 'Group'|itemtype_dropdown({
+         'name': 'groups_id',
+         'value': groups_id|default(0),
+         'condition': groups_condition,
+         'width': '100%',
+      }) }}
+   {% endif %}
+{% endif %}

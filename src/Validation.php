@@ -29,7 +29,6 @@
 
 namespace GlpiPlugin\Purchaserequest;
 
-use Ajax;
 use CommonDBTM;
 use CommonGLPI;
 use CommonITILValidation;
@@ -42,11 +41,9 @@ use Log;
 use Migration;
 use NotificationEvent;
 use PluginOrderOrder;
-use PluginOrderReference;
 use Session;
 use Ticket;
 use Toolbox;
-use User;
 
 /**
  * Class Validation
@@ -356,9 +353,6 @@ class Validation extends CommonDBTM
      */
     public function showForm($ID, $options = [])
     {
-        global $CFG_GLPI;
-
-        $dbu = new DbUtils();
         $this->initForm($ID, $options);
 
         $canedit            = $this->can($ID, UPDATE);
@@ -380,196 +374,32 @@ class Validation extends CommonDBTM
             unset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id]);
         }
 
-        $JS = '';
+        // The validation table does not hold every purchase request column: default the missing ones
+        $values = $this->fields + array_fill_keys([
+            'name', 'users_id', 'groups_id', 'locations_id', 'plugin_purchaserequest_purchaserequeststates_id',
+            'comment', 'itemtype', 'types_id', 'due_date', 'users_id_validate', 'amount', 'invoice_customer',
+            'plugin_order_orders_id', 'tickets_id', 'processing_date', 'entities_id',
+        ], null);
 
-        // Name (editable input or read-only plain value handled in template)
-        $name_field = $canedit
-            ? Html::input('name', ['value' => $this->fields['name'], 'size' => 40])
-            : null;
+        $order  = new PluginOrderOrder();
+        $ticket = new Ticket();
 
-        // Requester + requester group
-        if ($canedit) {
-            ob_start();
-            $rand_user = User::dropdown([
-                'name'      => "users_id",
-                'value'     => $this->fields["users_id"],
-                'entity'    => $this->fields["entities_id"],
-                'on_change' => "PurchaserequestLoadGroups();",
-                'right'     => 'all',
-            ]);
-            $requester_field = ob_get_clean();
-
-            ob_start();
-            if ($this->fields['users_id']) {
-                PurchaseRequest::displayGroup($this->fields['users_id']);
-            }
-            $group_field = ob_get_clean();
-
-            // JS updating the requester group dropdown, kept in PHP (rendered after the template)
-            $JS     = "function PurchaserequestLoadGroups(){";
-            $params = ['users_id' => '__VALUE__',
-                'entity'   => $this->fields["entities_id"]];
-            $JS     .= Ajax::updateItemJsCode(
-                "plugin_purchaserequest_group",
-                PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
-                $params,
-                'dropdown_users_id' . $rand_user,
-                false,
-            );
-            $JS     .= "}";
-        } else {
-            $requester_field = Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"]);
-            $group_field     = Dropdown::getDropdownName($dbu->getTableForItemType('Group'), $this->fields["groups_id"]);
-        }
-
-        // Location
-        ob_start();
-        Dropdown::show('Location', ['value'  => $this->fields["locations_id"],
-            'entity' => $this->fields["entities_id"]]);
-        $location_field = ob_get_clean();
-
-        // Status
-        ob_start();
-        Dropdown::show(
-            PurchaseRequestState::class,
-            ['value'  => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
-                'entity' => $this->fields["entities_id"]],
+        TemplateRenderer::getInstance()->display(
+            '@purchaserequest/validation_form.html.twig',
+            array_merge(PurchaseRequest::getFormFieldsContext($values, $canedit, true), [
+                'item'             => $this,
+                'params'           => $options,
+                'comment_richtext' => false,
+                'amount'           => number_format((float) $values['amount'], 2, '.', ' '),
+                'order_itemtype'   => PluginOrderOrder::class,
+                'order_value'      => $order->getFromDB((int) $values['plugin_order_orders_id'])
+                    ? $values['plugin_order_orders_id'] : 0,
+                'order_hidden'     => false,
+                'ticket_value'     => $ticket->getFromDB((int) $values['tickets_id'])
+                    ? $values['tickets_id'] : 0,
+                'show_treated'     => ($ID > 0),
+            ]),
         );
-        $state_field = ob_get_clean();
-
-        // Description
-        ob_start();
-        Html::textarea(['name'            => 'comment',
-            'value'           => stripslashes($this->fields['comment']),
-            'enable_richtext' => false,
-            'cols'            => '100',
-            'rows'            => '4']);
-        $comment_field = ob_get_clean();
-
-        // Item type
-        $reference = new PluginOrderReference();
-        ob_start();
-        $reference->dropdownAllItems([
-            'myname'    => 'itemtype',
-            'value'     => $this->fields["itemtype"],
-            'entity'    => $_SESSION["glpiactive_entity"],
-            'ajax_page' => $CFG_GLPI['root_doc'] . '/plugins/order/ajax/referencespecifications.php',
-            'class'     => __CLASS__,
-        ]);
-        $itemtype_field = ob_get_clean();
-
-        // Type
-        ob_start();
-        if ($this->fields['itemtype']) {
-            $itemtypeclass = $this->fields['itemtype'] . "Type";
-
-            // Resolve the *Type class through class_exists() instead of building a
-            // filesystem path from the stored itemtype and testing it with
-            // file_exists(): itemtype is user-controlled at write time, and
-            // concatenating it into a path handed to file_exists() would turn a
-            // forged value into a file-existence oracle (mirrors the hardening
-            // already applied in hook.php::plugin_purchaserequest_giveItem()).
-            if (class_exists($itemtypeclass)) {
-                Dropdown::show(
-                    $itemtypeclass,
-                    [
-                        'name'  => "types_id",
-                        'value' => $this->fields["types_id"],
-                    ],
-                );
-            }
-        }
-        $types_field = ob_get_clean();
-
-        // Due date
-        ob_start();
-        Html::showDateField("due_date", ['value' => $this->fields["due_date"]]);
-        $due_date_field = ob_get_clean();
-
-        // To be validated by
-        ob_start();
-        User::dropdown(['name'   => "users_id_validate",
-            'value'  => $this->fields["users_id_validate"],
-            'entity' => $this->fields["entities_id"],
-            'right'  => 'plugin_purchaserequest_validate']);
-        $validator_field = ob_get_clean();
-
-        // Amount
-        $amount_field = Html::input('amount', [
-            'type'  => 'text',
-            'value' => number_format($this->fields['amount'], 2, '.', ' '),
-        ]);
-
-        // To be rebilled to the customer
-        ob_start();
-        Html::showCheckbox(['name'    => "invoice_customer",
-            'checked' => $this->fields["invoice_customer"],
-        ]);
-        $invoice_field = ob_get_clean();
-
-        // Linked to the order
-        ob_start();
-        $order         = new PluginOrderOrder();
-        $order_options = [];
-        if ($order->getFromDB($this->fields['plugin_order_orders_id'])) {
-            $order_options['value'] = $this->fields['plugin_order_orders_id'];
-        }
-        PluginOrderOrder::dropdown($order_options);
-        $order_field = ob_get_clean();
-
-        // Linked to ticket
-        ob_start();
-        $ticket         = new Ticket();
-        $ticket_options = [];
-        if ($ticket->getFromDB($this->fields['tickets_id'])) {
-            $ticket_options['value'] = $this->fields['tickets_id'];
-        }
-        $ticket_options['entity'] = $this->fields["entities_id"];
-        Ticket::dropdown($ticket_options);
-        $ticket_field = ob_get_clean();
-
-        // Treated
-        $is_process_field = null;
-        $processing_date  = null;
-        if ($ID > 0) {
-            if ($this->fields['processing_date'] == null) {
-                ob_start();
-                Html::showCheckbox(['name' => 'is_process']);
-                $is_process_field = ob_get_clean();
-            } else {
-                $processing_date = Html::convDateTime($this->fields['processing_date']);
-            }
-        }
-
-        TemplateRenderer::getInstance()->display('@purchaserequest/validation_form.html.twig', [
-            'item'             => $this,
-            'params'           => $options,
-            'canedit'          => $canedit,
-            'name_field'       => $name_field,
-            'name_value'       => $this->fields['name'],
-            'requester_field'  => $requester_field,
-            'group_field'      => $group_field,
-            'location_field'   => $location_field,
-            'state_field'      => $state_field,
-            'comment_field'    => $comment_field,
-            'itemtype_field'   => $itemtype_field,
-            'types_field'      => $types_field,
-            'due_date_field'   => $due_date_field,
-            'validator_field'  => $validator_field,
-            'amount_field'     => $amount_field,
-            'invoice_field'    => $invoice_field,
-            'order_field'      => $order_field,
-            'ticket_field'     => $ticket_field,
-            'show_treated'     => ($ID > 0),
-            'is_process_field' => $is_process_field,
-            'processing_date'  => $processing_date,
-            'users_id_creator' => $_SESSION['glpiID'],
-        ]);
-
-        // Inline JS kept in PHP (server-injected params), rendered after the template.
-        if ($canedit && $JS !== '') {
-            echo Html::scriptBlock($JS);
-        }
 
         return true;
     }
@@ -634,11 +464,6 @@ class Validation extends CommonDBTM
             ];
         }
 
-        // Capture the mass action dropdown ("Delete link with order")
-        ob_start();
-        $purchase_request->dropdownPurchaseRequestItemsActions();
-        $action_dropdown = ob_get_clean();
-
         TemplateRenderer::getInstance()->display('@purchaserequest/validation_for_order.html.twig', [
             'no_results'      => false,
             'canedit'         => $canedit,
@@ -647,19 +472,9 @@ class Validation extends CommonDBTM
             'entries'         => $entries,
             'order_id'        => $item->getID(),
             'order_type_name' => PluginOrderOrder::getTypeName(),
-            'action_dropdown' => $action_dropdown,
+            'webdir'          => PLUGIN_PURCHASEREQUEST_WEBDIR,
             'select_all'      => (isset($_GET["select"]) && $_GET["select"] == "all"),
         ]);
-    }
-
-    /**
-     *
-     */
-    public function dropdownPurchaseRequestItemsActions()
-    {
-
-        $action['delete_link'] = __("Delete link with order", "purchaserequest");
-        Dropdown::showFromArray('chooseAction', $action);
     }
 
     /**
@@ -671,20 +486,12 @@ class Validation extends CommonDBTM
 
         $show_actions  = false;
         $validation_id = 0;
-        $comment_field = '';
 
         if ($validation->getFromDBByCrit(["status" => CommonITILValidation::WAITING,
             "users_id_validate" => Session::getLoginUserID(),
             "plugin_purchaserequest_purchaserequests_id" => $item->getID()])) {
             $show_actions  = true;
             $validation_id = $validation->fields['id'];
-
-            ob_start();
-            Html::textarea(['name'            => 'comment_validation',
-                'enable_richtext' => false,
-                'cols'            => '90',
-                'rows'            => '3']);
-            $comment_field = ob_get_clean();
         }
 
         TemplateRenderer::getInstance()->display('@purchaserequest/validation_showvalidation.html.twig', [
@@ -693,22 +500,7 @@ class Validation extends CommonDBTM
             'validation_id'     => $validation_id,
             'users_id_validate' => Session::getLoginUserID(),
             'pr_id'             => $item->fields['id'],
-            'comment_field'     => $comment_field,
         ]);
-
-        // Accept/refuse handlers kept in PHP (rendered after the template).
-        if ($show_actions) {
-            echo Html::scriptBlock('$( "#accept_purchaserequest" ).click(function() {
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'accept_purchaserequest\' value=\'1\' />");
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
-                                $( "#formvalidation" ).submit();
-                              });
-                              $( "#refuse_purchaserequest" ).click(function() {
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'refuse_purchaserequest\' value=\'1\' />");
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
-                                $( "#formvalidation" ).submit();
-                              });');
-        }
 
         $self = new self();
         $self->showSummary($item);

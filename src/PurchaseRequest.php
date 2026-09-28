@@ -29,7 +29,6 @@
 
 namespace GlpiPlugin\Purchaserequest;
 
-use Ajax;
 use CommonDBTM;
 use CommonGLPI;
 use CommonITILActor;
@@ -54,7 +53,6 @@ use Ticket;
 use Ticket_User;
 use TicketValidation;
 use Toolbox;
-use User;
 
 /**
  * Class PurchaseRequest
@@ -893,6 +891,65 @@ class PurchaseRequest extends CommonDBTM
     }
 
     /**
+     * Template variables of the purchase request fields (templates/pr_fields.html.twig),
+     * shared by the item form and the "add from ticket" form.
+     *
+     * @param array $values  field values
+     * @param bool  $canedit
+     * @param bool  $itemtype_selector whether to display the order plugin item type selector
+     *
+     * @return array
+     */
+    public static function getFormFieldsContext(array $values, bool $canedit, bool $itemtype_selector): array
+    {
+        global $CFG_GLPI;
+
+        // Item type: order reference selector (it refreshes #show_types_id),
+        // plain escaped type name otherwise. The order plugin only echoes its selector.
+        if ($itemtype_selector && Plugin::isPluginActive('order')) {
+            $reference = new PluginOrderReference();
+            ob_start();
+            $reference->dropdownAllItems([
+                'myname'    => 'itemtype',
+                'value'     => $values['itemtype'],
+                'entity'    => $_SESSION['glpiactive_entity'],
+                'ajax_page' => $CFG_GLPI['root_doc'] . '/plugins/order/ajax/referencespecifications.php',
+                'class'     => __CLASS__,
+            ]);
+            $itemtype_field = ob_get_clean();
+        } else {
+            $item = getItemForItemtype($values['itemtype'] ?? '');
+            $itemtype_field = ($item !== false) ? htmlescape($item->getTypeName()) : '';
+        }
+
+        // Type (model) class of the item type.
+        // Resolve the *Type class through class_exists() instead of building a
+        // filesystem path from the stored itemtype and testing it with
+        // file_exists(): itemtype is user-controlled at write time, and
+        // concatenating it into a path handed to file_exists() would turn a
+        // forged value into a file-existence oracle (mirrors the hardening
+        // already applied in hook.php::plugin_purchaserequest_giveItem()).
+        $types_itemtype = null;
+        if (!empty($values['itemtype']) && class_exists($values['itemtype'] . 'Type')) {
+            $types_itemtype = $values['itemtype'] . 'Type';
+        }
+
+        return [
+            'values'           => $values,
+            'canedit'          => $canedit,
+            'webdir'           => PLUGIN_PURCHASEREQUEST_WEBDIR,
+            'group_url'        => PLUGIN_PURCHASEREQUEST_WEBDIR . '/ajax/dropdownGroup.php',
+            'groups_condition' => $values['users_id'] ? self::getGroupsCondition((int) $values['users_id']) : null,
+            'state_itemtype'   => PurchaseRequestState::class,
+            'comment_richtext' => true,
+            'itemtype_field'   => $itemtype_field,
+            'types_itemtype'   => $types_itemtype,
+            'amount'           => $values['amount'] ?? number_format((float) $values['amount'], 2, '.', ' '),
+            'show_treated'     => false,
+        ];
+    }
+
+    /**
      * @param       $ID
      * @param array $options
      *
@@ -900,9 +957,6 @@ class PurchaseRequest extends CommonDBTM
      */
     public function showForm($ID, $options = [])
     {
-        global $CFG_GLPI;
-
-        $dbu = new DbUtils();
         $this->initForm($ID, $options);
 
         $canedit = $this->can($ID, UPDATE);
@@ -924,222 +978,24 @@ class PurchaseRequest extends CommonDBTM
             unset($_SESSION['glpi_plugin_purchaserequests_fields'][$session_id]);
         }
 
-        // Inline JS is kept in PHP (no <script> in templates); echoed after render.
-        $JS = '';
+        $order = new PluginOrderOrder();
+        $ticket = new Ticket();
 
-        // Name (editable input or read-only escaped text)
-        if ($canedit) {
-            $name_field = Html::input('name', ['value' => $this->fields['name'], 'size' => 40]);
-        } else {
-            $name_field = htmlescape($this->fields["name"]);
-        }
-
-        // Requester + requester group (with on-change AJAX group reload)
-        if ($canedit) {
-            ob_start();
-            $rand_user = User::dropdown([
-                'name'      => "users_id",
-                'value'     => $this->fields["users_id"],
-                'entity'    => $this->fields["entities_id"],
-                'on_change' => "PurchaserequestLoadGroups();",
-                'right'     => 'all',
-            ]);
-            $requester_field = ob_get_clean();
-
-            ob_start();
-            if ($this->fields['users_id']) {
-                self::displayGroup($this->fields['users_id']);
-            }
-            $group_field = '<div id="plugin_purchaserequest_group">' . ob_get_clean() . '</div>';
-
-            $params = [
-                'users_id' => '__VALUE__',
-                'entity'   => $this->fields["entities_id"],
-            ];
-            $JS  = "function PurchaserequestLoadGroups(){";
-            $JS .= Ajax::updateItemJsCode(
-                "plugin_purchaserequest_group",
-                PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
-                $params,
-                'dropdown_users_id' . $rand_user,
-                false,
-            );
-            $JS .= "}";
-        } else {
-            $requester_field = htmlescape(
-                Dropdown::getDropdownName($dbu->getTableForItemType('User'), $this->fields["users_id"]),
-            );
-            $group_field = htmlescape(
-                Dropdown::getDropdownName($dbu->getTableForItemType('Group'), $this->fields["groups_id"]),
-            );
-        }
-
-        // Location
-        ob_start();
-        Dropdown::show('Location', [
-            'value'  => $this->fields["locations_id"],
-            'entity' => $this->fields["entities_id"],
-        ]);
-        $location_field = ob_get_clean();
-
-        // Status (purchase request state)
-        ob_start();
-        Dropdown::show(
-            PurchaseRequestState::class,
-            [
-                'value'  => $this->fields["plugin_purchaserequest_purchaserequeststates_id"],
-                'entity' => $this->fields["entities_id"],
-            ],
+        TemplateRenderer::getInstance()->display(
+            '@purchaserequest/pr_form.html.twig',
+            array_merge(self::getFormFieldsContext($this->fields, $canedit, Session::getCurrentInterface() == 'central'), [
+                'item'           => $this,
+                'params'         => $options,
+                'order_itemtype' => PluginOrderOrder::class,
+                'order_value'    => $order->getFromDB($this->fields['plugin_order_orders_id'])
+                    ? $this->fields['plugin_order_orders_id'] : 0,
+                // The order link is only relevant once the request is accepted
+                'order_hidden'   => ($this->fields["status"] != CommonITILValidation::ACCEPTED),
+                'ticket_value'   => $ticket->getFromDB($this->fields['tickets_id'])
+                    ? $this->fields['tickets_id'] : 0,
+                'show_treated'   => ($ID > 0),
+            ]),
         );
-        $state_field = ob_get_clean();
-
-        // Description (richtext)
-        ob_start();
-        Html::textarea([
-            "id"              => "comment",
-            "name"            => "comment",
-            "row"             => 4,
-            "cols"            => 100,
-            "enable_richtext" => true,
-            "value"           => $this->fields['comment'],
-        ]);
-        $comment_field = ob_get_clean();
-
-        // Item type (order reference selector in central, plain type name otherwise)
-        if (Session::getCurrentInterface() == 'central') {
-            $reference = new PluginOrderReference();
-            ob_start();
-            $reference->dropdownAllItems([
-                'myname'    => 'itemtype',
-                'value'     => $this->fields["itemtype"],
-                'entity'    => $_SESSION["glpiactive_entity"],
-                'ajax_page' => $CFG_GLPI['root_doc'] . '/plugins/order/ajax/referencespecifications.php',
-                'class'     => __CLASS__,
-            ]);
-            $itemtype_field = ob_get_clean();
-        } else {
-            $item = getItemForItemtype($this->fields["itemtype"] ?? '');
-            $itemtype_field = ($item !== false) ? htmlescape($item->getTypeName()) : '';
-        }
-
-        // Type (model), refreshed by the item type selector into #show_types_id
-        ob_start();
-        if ($this->fields['itemtype']) {
-            $itemtypeclass = $this->fields['itemtype'] . "Type";
-
-            // Resolve the *Type class through class_exists() instead of building a
-            // filesystem path from the stored itemtype and testing it with
-            // file_exists(): itemtype is user-controlled at write time, and
-            // concatenating it into a path handed to file_exists() would turn a
-            // forged value into a file-existence oracle (mirrors the hardening
-            // already applied in hook.php::plugin_purchaserequest_giveItem()).
-            if (class_exists($itemtypeclass)) {
-                Dropdown::show(
-                    $itemtypeclass,
-                    [
-                        'name'  => "types_id",
-                        'value' => $this->fields["types_id"],
-                    ],
-                );
-            }
-        }
-        $types_field = '<span id="show_types_id">' . ob_get_clean() . '</span>';
-
-        // Due date
-        ob_start();
-        Html::showDateField("due_date", ['value' => $this->fields["due_date"]]);
-        $due_date_field = ob_get_clean();
-
-        // To be validated by
-        ob_start();
-        User::dropdown([
-            'name'   => "users_id_validate",
-            'value'  => $this->fields["users_id_validate"],
-            'entity' => $this->fields["entities_id"],
-            'right'  => 'plugin_purchaserequest_validate',
-        ]);
-        $validator_field = ob_get_clean();
-
-        // Amount
-        $amount       = $this->fields['amount'] ?? number_format($this->fields['amount'], 2, '.', ' ');
-        $amount_field = Html::input('amount', ['type' => 'text', 'value' => $amount]);
-
-        // To be rebilled to the customer
-        ob_start();
-        Html::showCheckbox([
-            'name'    => "invoice_customer",
-            'checked' => $this->fields["invoice_customer"],
-        ]);
-        $invoice_field = ob_get_clean();
-
-        // Linked to the order (only shown when the request is accepted)
-        $order             = new PluginOrderOrder();
-        $order_link_hidden = ($this->fields["status"] != CommonITILValidation::ACCEPTED);
-        $order_options     = [];
-        if ($order->getFromDB($this->fields['plugin_order_orders_id'])) {
-            $order_options['value'] = $this->fields['plugin_order_orders_id'];
-        }
-        ob_start();
-        PluginOrderOrder::dropdown($order_options);
-        $order_field = ob_get_clean();
-
-        // Linked to ticket
-        $ticket         = new Ticket();
-        $ticket_options = [];
-        if ($ticket->getFromDB($this->fields['tickets_id'])) {
-            $ticket_options['value'] = $this->fields['tickets_id'];
-        }
-        $ticket_options['entity'] = $this->fields["entities_id"];
-        ob_start();
-        Ticket::dropdown($ticket_options);
-        $ticket_field = ob_get_clean();
-
-        // Treated flag / date (existing items only)
-        $show_treated  = false;
-        $treated_field = '';
-        $treated_label = '';
-        if ($ID > 0) {
-            $show_treated = true;
-            if ($this->fields['processing_date'] == null) {
-                $treated_label = __("Treated", "purchaserequest");
-                ob_start();
-                Html::showCheckbox(['name' => 'is_process']);
-                $treated_field = ob_get_clean();
-            } else {
-                $treated_label = __("Treated on", "purchaserequest");
-                $treated_field = htmlescape(Html::convDateTime($this->fields['processing_date']));
-            }
-        }
-
-        TemplateRenderer::getInstance()->display('@purchaserequest/pr_form.html.twig', [
-            'item'              => $this,
-            'params'            => $options,
-            'canedit'           => $canedit,
-            'name_field'        => $name_field,
-            'requester_field'   => $requester_field,
-            'group_field'       => $group_field,
-            'location_field'    => $location_field,
-            'state_field'       => $state_field,
-            'comment_field'     => $comment_field,
-            'itemtype_field'    => $itemtype_field,
-            'types_field'       => $types_field,
-            'due_date_field'    => $due_date_field,
-            'validator_field'   => $validator_field,
-            'amount_field'      => $amount_field,
-            'invoice_field'     => $invoice_field,
-            'order_field'       => $order_field,
-            'order_link_hidden' => $order_link_hidden,
-            'ticket_field'      => $ticket_field,
-            'show_treated'      => $show_treated,
-            'treated_field'     => $treated_field,
-            'treated_label'     => $treated_label,
-            'users_id_creator'  => (int) ($_SESSION['glpiID'] ?? 0),
-        ]);
-
-        // Inline JS kept out of the template (no <script> in Twig).
-        if ($JS !== '') {
-            echo Html::scriptBlock($JS);
-        }
 
         return true;
     }
@@ -1177,8 +1033,6 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function showFormPurchase($tickets_id)
     {
-        global $CFG_GLPI;
-
         $dbu = new DbUtils();
         $purchaserequest = new self();
         $purchaserequest->getEmpty();
@@ -1200,9 +1054,6 @@ class PurchaseRequest extends CommonDBTM
             $purchaserequest->fields['users_id'] = $actor->fields['users_id'];
         }
 
-        // Name
-        $name_field = Html::input('name', ['value' => $purchaserequest->fields['name'], 'size' => 40]);
-
         // Ticket validators (accepted validations), read-only text
         $ticket_validation  = new TicketValidation();
         $ticket_validations = $ticket_validation->find([
@@ -1213,153 +1064,15 @@ class PurchaseRequest extends CommonDBTM
         foreach ($ticket_validations as $validation) {
             $users_validations[] = $dbu->getUserName($validation['users_id_validate']);
         }
-        $validated_by = implode(', ', $users_validations);
 
-        // Requester + requester group (with on-change AJAX group reload)
-        ob_start();
-        $rand_user = User::dropdown([
-            'name'      => "users_id",
-            'value'     => $purchaserequest->fields["users_id"],
-            'entity'    => $purchaserequest->fields["entities_id"],
-            'on_change' => "PurchaserequestLoadGroups();",
-            'right'     => 'all',
-        ]);
-        $requester_field = ob_get_clean();
-
-        ob_start();
-        if ($purchaserequest->fields['users_id']) {
-            self::displayGroup($purchaserequest->fields['users_id']);
-        }
-        $group_field = '<div id="plugin_purchaserequest_group">' . ob_get_clean() . '</div>';
-
-        $params = [
-            'users_id' => '__VALUE__',
-            'entity'   => $purchaserequest->fields["entities_id"],
-        ];
-        $JS  = "function PurchaserequestLoadGroups(){";
-        $JS .= Ajax::updateItemJsCode(
-            "plugin_purchaserequest_group",
-            PLUGIN_PURCHASEREQUEST_WEBDIR . "/ajax/dropdownGroup.php",
-            $params,
-            'dropdown_users_id' . $rand_user,
-            false,
+        TemplateRenderer::getInstance()->display(
+            '@purchaserequest/pr_add.html.twig',
+            array_merge(self::getFormFieldsContext($purchaserequest->fields, true, true), [
+                'target'       => Toolbox::getItemTypeFormURL(PurchaseRequest::class),
+                'validated_by' => implode(', ', $users_validations),
+                'tickets_id'   => (int) $tickets_id,
+            ]),
         );
-        $JS .= "}";
-
-        // Location
-        ob_start();
-        Dropdown::show('Location', [
-            'value'  => $purchaserequest->fields["locations_id"],
-            'entity' => $purchaserequest->fields["entities_id"],
-        ]);
-        $location_field = ob_get_clean();
-
-        // Status (purchase request state)
-        ob_start();
-        Dropdown::show(
-            PurchaseRequestState::class,
-            [
-                'value'  => $purchaserequest->fields["plugin_purchaserequest_purchaserequeststates_id"],
-                'entity' => $purchaserequest->fields["entities_id"],
-            ],
-        );
-        $state_field = ob_get_clean();
-
-        // Description (richtext)
-        ob_start();
-        Html::textarea([
-            "id"              => "comment",
-            "name"            => "comment",
-            "row"             => 4,
-            "cols"            => 100,
-            "enable_richtext" => true,
-            "value"           => $purchaserequest->fields['comment'],
-        ]);
-        $comment_field = ob_get_clean();
-
-        // Item type (order reference selector)
-        ob_start();
-        if (Plugin::isPluginActive('order')) {
-            $reference = new PluginOrderReference();
-            $reference->dropdownAllItems([
-                'myname'    => 'itemtype',
-                'value'     => $purchaserequest->fields["itemtype"],
-                'entity'    => $_SESSION["glpiactive_entity"],
-                'ajax_page' => $CFG_GLPI['root_doc'] . '/plugins/order/ajax/referencespecifications.php',
-                'class'     => __CLASS__,
-            ]);
-        }
-        $itemtype_field = ob_get_clean();
-
-        // Type (model), refreshed by the item type selector into #show_types_id
-        ob_start();
-        if ($purchaserequest->fields['itemtype']) {
-            $itemtypeclass = $purchaserequest->fields['itemtype'] . "Type";
-
-            // Resolve the *Type class through class_exists() instead of building a
-            // filesystem path from the stored itemtype and testing it with
-            // file_exists(): itemtype is user-controlled at write time, and
-            // concatenating it into a path handed to file_exists() would turn a
-            // forged value into a file-existence oracle (mirrors the hardening
-            // already applied in hook.php::plugin_purchaserequest_giveItem()).
-            if (class_exists($itemtypeclass)) {
-                Dropdown::show(
-                    $itemtypeclass,
-                    [
-                        'name'  => "types_id",
-                        'value' => $purchaserequest->fields["types_id"],
-                    ],
-                );
-            }
-        }
-        $types_field = '<span id="show_types_id">' . ob_get_clean() . '</span>';
-
-        // Due date
-        ob_start();
-        Html::showDateField("due_date", ['value' => $purchaserequest->fields["due_date"]]);
-        $due_date_field = ob_get_clean();
-
-        // To be validated by
-        ob_start();
-        User::dropdown([
-            'name'   => "users_id_validate",
-            'value'  => $purchaserequest->fields["users_id_validate"],
-            'entity' => $purchaserequest->fields["entities_id"],
-            'right'  => 'plugin_purchaserequest_validate',
-        ]);
-        $validator_field = ob_get_clean();
-
-        // Amount
-        $amount       = $purchaserequest->fields['amount'] ?? number_format($purchaserequest->fields['amount'], 2, '.', ' ');
-        $amount_field = Html::input('amount', ['type' => 'text', 'value' => $amount]);
-
-        // To be rebilled to the customer
-        ob_start();
-        Html::showCheckbox(['name' => "invoice_customer"]);
-        $invoice_field = ob_get_clean();
-
-        TemplateRenderer::getInstance()->display('@purchaserequest/pr_add.html.twig', [
-            'target'           => Toolbox::getItemTypeFormURL(PurchaseRequest::class),
-            'name_field'       => $name_field,
-            'validated_by'     => $validated_by,
-            'requester_field'  => $requester_field,
-            'group_field'      => $group_field,
-            'location_field'   => $location_field,
-            'state_field'      => $state_field,
-            'comment_field'    => $comment_field,
-            'itemtype_field'   => $itemtype_field,
-            'types_field'      => $types_field,
-            'due_date_field'   => $due_date_field,
-            'validator_field'  => $validator_field,
-            'amount_field'     => $amount_field,
-            'invoice_field'    => $invoice_field,
-            'tickets_id'       => (int) $tickets_id,
-            'entities_id'      => (int) $purchaserequest->fields['entities_id'],
-            'users_id_creator' => (int) ($_SESSION['glpiID'] ?? 0),
-        ]);
-
-        // Inline JS kept out of the template (no <script> in Twig).
-        echo Html::scriptBlock($JS);
     }
 
     /**
@@ -1502,8 +1215,6 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function showForOrder($item)
     {
-        global $CFG_GLPI;
-
         $dbu   = new DbUtils();
 
         $purchase_request = new PurchaseRequest();
@@ -1555,11 +1266,6 @@ class PurchaseRequest extends CommonDBTM
             }
         }
 
-        // Massive action selector (delete_link), captured as trusted GLPI HTML.
-        ob_start();
-        $purchase_request->dropdownPurchaseRequestItemsActions();
-        $action_dropdown = ob_get_clean();
-
         TemplateRenderer::getInstance()->display('@purchaserequest/pr_order_list.html.twig', [
             'canread'                => $canread,
             'canedit'                => $canedit,
@@ -1568,19 +1274,9 @@ class PurchaseRequest extends CommonDBTM
             'target'                 => Toolbox::getItemTypeFormURL(PurchaseRequest::class),
             'typename'               => PurchaseRequest::getTypeName(2),
             'order_typename'         => PluginOrderOrder::getTypeName(),
-            'arrow_src'              => $CFG_GLPI["root_doc"] . "/pics/arrow-left.png",
-            'action_dropdown'        => $action_dropdown,
+            'webdir'                 => PLUGIN_PURCHASEREQUEST_WEBDIR,
             'plugin_order_orders_id' => $item->getID(),
         ]);
-    }
-
-    /**
-     *
-     */
-    public function dropdownPurchaseRequestItemsActions()
-    {
-        $action['delete_link'] = __("Delete link with order", "purchaserequest");
-        Dropdown::showFromArray('chooseAction', $action);
     }
 
     /**
@@ -1593,20 +1289,6 @@ class PurchaseRequest extends CommonDBTM
 
         $can_validate = ($validator && $item->fields["status"] == CommonITILValidation::WAITING);
 
-        // Approval comment editor (captured GLPI widget), only used when validating.
-        $comment_field = '';
-        if ($can_validate) {
-            ob_start();
-            Html::textarea([
-                'name'            => 'comment_validation',
-                'value'           => $item->fields["comment_validation"],
-                'enable_richtext' => false,
-                'cols'            => '90',
-                'rows'            => '3',
-            ]);
-            $comment_field = ob_get_clean();
-        }
-
         $refused_or_accepted = [CommonITILValidation::REFUSED, CommonITILValidation::ACCEPTED];
 
         TemplateRenderer::getInstance()->display('@purchaserequest/pr_validation.html.twig', [
@@ -1615,29 +1297,12 @@ class PurchaseRequest extends CommonDBTM
             'requester_name'        => $dbu->getUserName($item->fields["users_id_creator"]),
             'approver_name'         => $dbu->getUserName($item->fields["users_id_validate"]),
             'can_validate'           => $can_validate,
-            'comment_field'          => $comment_field,
             'status_code'            => $item->fields["status"],
             'status_label'           => CommonITILValidation::getStatus($item->fields["status"]),
             'show_validation_comment' => in_array($item->fields["status"], $refused_or_accepted)
                 && !empty($item->fields["comment_validation"]),
             'comment_validation'     => $item->fields["comment_validation"],
         ]);
-
-        // Accept/refuse handlers are inline JS and stay in PHP (no <script> in Twig).
-        if ($can_validate) {
-            echo Html::scriptBlock(
-                '$( "#accept_purchaserequest" ).click(function() {
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'accept_purchaserequest\' value=\'1\' />");
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
-                                $( "#formvalidation" ).submit();
-                              });
-                              $( "#refuse_purchaserequest" ).click(function() {
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'refuse_purchaserequest\' value=\'1\' />");
-                                $( "#formvalidation" ).append("<input type=\'hidden\' name=\'update_status\' value=\'1\' />");
-                                $( "#formvalidation" ).submit();
-                              });',
-            );
-        }
     }
 
     /**
@@ -1647,23 +1312,13 @@ class PurchaseRequest extends CommonDBTM
      **/
     public static function showMassiveActionsSubForm(MassiveAction $ma)
     {
-        switch ($ma->getAction()) {
-            case 'link':
-                PluginOrderOrder::dropdown();
-                echo "&nbsp;"
-                    . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
-                return true;
-
-            case 'delete_link':
-                echo "&nbsp;"
-                    . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
-                return true;
-
-            case 'validate':
-                CommonITILValidation::dropdownStatus('status');
-                echo "</br>"
-                    . Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
-                return true;
+        $action = $ma->getAction();
+        if (in_array($action, ['link', 'delete_link', 'validate'], true)) {
+            TemplateRenderer::getInstance()->display('@purchaserequest/massive_action_subform.html.twig', [
+                'action'         => $action,
+                'order_itemtype' => PluginOrderOrder::class,
+            ]);
+            return true;
         }
         return "";
     }
@@ -1827,6 +1482,21 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function displayGroup($users_id)
     {
+        TemplateRenderer::getInstance()->display('@purchaserequest/requester_group.html.twig', [
+            'groups_condition' => self::getGroupsCondition((int) $users_id),
+            'groups_id'        => 0,
+        ]);
+    }
+
+    /**
+     * Dropdown condition restricting groups to the given user's memberships
+     *
+     * @param int $users_id
+     *
+     * @return array Empty when the user belongs to no group
+     */
+    public static function getGroupsCondition(int $users_id): array
+    {
         //list of groups
         $group_users = Group_User::getUserGroups($users_id);
         $groups = [];
@@ -1835,21 +1505,20 @@ class PurchaseRequest extends CommonDBTM
             $groups[] = (int) $item['id'];
         }
 
-        if (count($groups) > 0) {
-            // Restrict the dropdown to groups within the caller's own entity scope.
-            // The endpoint only requires plugin READ, so without this an authenticated
-            // user could POST arbitrary users_id values and enumerate any account's
-            // full group membership across entities. Intersecting with the session
-            // entities bounds the disclosure to the caller's perimeter.
-            $dbu = new DbUtils();
-            $condition['condition'] = array_merge(
-                ['id' => $groups],
-                $dbu->getEntitiesRestrictCriteria(Group::getTable(), '', '', true),
-            );
-            Group::dropdown($condition);
-        } else {
-            echo __('No groups for this user', 'purchaserequest');
+        if (count($groups) === 0) {
+            return [];
         }
+
+        // Restrict the dropdown to groups within the caller's own entity scope.
+        // The endpoint only requires plugin READ, so without this an authenticated
+        // user could POST arbitrary users_id values and enumerate any account's
+        // full group membership across entities. Intersecting with the session
+        // entities bounds the disclosure to the caller's perimeter.
+        $dbu = new DbUtils();
+        return array_merge(
+            ['id' => $groups],
+            $dbu->getEntitiesRestrictCriteria(Group::getTable(), '', '', true),
+        );
     }
 
     /**

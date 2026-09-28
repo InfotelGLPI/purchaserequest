@@ -25,8 +25,17 @@
  # --------------------------------------------------------------------------
  #}
 
-{% extends 'generic_show_form.html.twig' %}
+{# Action bar of the purchase request lists linked to an order (inside their form). #}
+<div class="d-flex align-items-center gap-2 mt-2">
+   <a href="#" data-purchaserequest-check="all">{{ __('Check all') }}</a>
+   /
+   <a href="#" data-purchaserequest-check="none">{{ __('Uncheck all') }}</a>
+   <div class="ms-2">
+      {% do call('Dropdown::showFromArray', ['chooseAction', {
+         'delete_link': __('Delete link with order', 'purchaserequest'),
+      }]) %}
+   </div>
+   <button type="submit" name="action" value="1" class="btn btn-primary">{{ _x('button', 'Post') }}</button>
+</div>
 
-{% block form_fields %}
-   {{ include('@purchaserequest/pr_fields.html.twig') }}
-{% endblock %}
+<script type="module" src="{{ webdir }}/scripts/check-all.js"></script>

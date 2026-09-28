@@ -1,0 +1,129 @@
+{#
+ # -------------------------------------------------------------------------
+ # purchaserequest plugin for GLPI
+ # Copyright (C) 2021-2026 by the purchaserequest Development Team.
+ #
+ # https://github.com/InfotelGLPI/purchaserequest
+ # -------------------------------------------------------------------------
+ #
+ # LICENSE
+ #
+ # This file is part of purchaserequest.
+ #
+ # purchaserequest is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 3 of the License, or
+ # (at your option) any later version.
+ #
+ # purchaserequest is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License
+ # along with purchaserequest. If not, see <http://www.gnu.org/licenses/>.
+ # --------------------------------------------------------------------------
+ #}
+
+{# Fields shared by the purchase request item form and the "add from ticket" form; values holds the field values. #}
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{% set entity = values['entities_id'] %}
+
+{% if canedit %}
+   {{ fields.textField('name', values['name'], __('Name')) }}
+{% else %}
+   {{ fields.htmlField('name', values['name']|e, __('Name')) }}
+{% endif %}
+
+{% if validated_by is defined %}
+   {{ fields.htmlField('_validated_by', validated_by|e, __('Validated by', 'purchaserequest')) }}
+{% endif %}
+
+{% if canedit %}
+   {{ fields.dropdownField('User', 'users_id', values['users_id'], __('Requester'), {
+      'entity': entity,
+      'right': 'all',
+      'required': true,
+   }) }}
+
+   {# The requester group dropdown is reloaded by scripts/requester-group.js when the requester changes #}
+   {% set group_html %}
+      <div data-purchaserequest-group="users_id" data-url="{{ group_url }}">
+         {{ include('@purchaserequest/requester_group.html.twig', {
+            'groups_condition': groups_condition,
+            'groups_id': values['groups_id'],
+         }) }}
+      </div>
+   {% endset %}
+   {# raw: markup built above from escaped values and the core Group dropdown #}
+   {{ fields.htmlField('groups_id', group_html|raw, __('Requester group')) }}
+{% else %}
+   {{ fields.htmlField('users_id', get_item_name('User', values['users_id'])|e, __('Requester')) }}
+   {{ fields.htmlField('groups_id', get_item_name('Group', values['groups_id'])|e, __('Requester group')) }}
+{% endif %}
+
+{{ fields.dropdownField('Location', 'locations_id', values['locations_id'], __('Location'), {
+   'entity': entity,
+}) }}
+
+{{ fields.dropdownField(state_itemtype, 'plugin_purchaserequest_purchaserequeststates_id', values['plugin_purchaserequest_purchaserequeststates_id'], __('Status'), {
+   'entity': entity,
+}) }}
+
+{{ fields.textareaField('comment', values['comment'], __('Description'), {
+   'enable_richtext': comment_richtext,
+   'rows': 4,
+   'full_width': true,
+   'required': true,
+}) }}
+
+{# raw: order plugin item type selector (it refreshes #show_types_id), or the escaped type name #}
+{{ fields.htmlField('itemtype', itemtype_field|raw, __('Item type'), {'required': true}) }}
+
+{% set types_html %}
+   <span id="show_types_id">
+      {% if types_itemtype is not null %}
+         {{ types_itemtype|itemtype_dropdown({
+            'name': 'types_id',
+            'value': values['types_id'],
+            'width': '100%',
+         }) }}
+      {% endif %}
+   </span>
+{% endset %}
+{# raw: wrapper around the core type dropdown, refreshed by the item type selector #}
+{{ fields.htmlField('types_id', types_html|raw, __('Type'), {'required': true}) }}
+
+{{ fields.dateField('due_date', values['due_date'], __('Due date', 'purchaserequest')) }}
+
+{{ fields.dropdownField('User', 'users_id_validate', values['users_id_validate'], __('To be validated by', 'purchaserequest'), {
+   'entity': entity,
+   'right': 'plugin_purchaserequest_validate',
+   'required': true,
+}) }}
+
+{{ fields.textField('amount', amount, __('Amount', 'purchaserequest'), {'required': true}) }}
+
+{{ fields.checkboxField('invoice_customer', values['invoice_customer'], __('To be rebilled to the customer', 'purchaserequest')) }}
+
+{% if order_itemtype is defined %}
+   {# The order link is only relevant once the request is accepted #}
+   {{ fields.dropdownField(order_itemtype, 'plugin_order_orders_id', order_value, __('Linked to the order', 'purchaserequest'), order_hidden ? {'field_class': 'd-none'} : {}) }}
+{% endif %}
+
+{% if ticket_value is defined %}
+   {{ fields.dropdownField('Ticket', 'tickets_id', ticket_value, __('Linked to ticket', 'purchaserequest'), {
+      'entity': entity,
+   }) }}
+{% endif %}
+
+{% if show_treated %}
+   {% if values['processing_date'] is null %}
+      {{ fields.checkboxField('is_process', 0, __('Treated', 'purchaserequest')) }}
+   {% else %}
+      {{ fields.htmlField('processing_date', values['processing_date']|formatted_datetime|e, __('Treated on', 'purchaserequest')) }}
+   {% endif %}
+{% endif %}
+
+<script type="module" src="{{ webdir }}/scripts/requester-group.js"></script>

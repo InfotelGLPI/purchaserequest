@@ -34,19 +34,7 @@
       </div>
       <div class="card-body">
          <div class="row">
-            {{ fields.htmlField('name', name_field|raw, __('Name')) }}
-            {{ fields.htmlField('_validated_by', validated_by|e, __('Validated by', 'purchaserequest')) }}
-            {{ fields.htmlField('users_id', requester_field|raw, __('Requester'), {'required': true}) }}
-            {{ fields.htmlField('groups_id', group_field|raw, __('Requester group')) }}
-            {{ fields.htmlField('locations_id', location_field|raw, __('Location')) }}
-            {{ fields.htmlField('plugin_purchaserequest_purchaserequeststates_id', state_field|raw, __('Status')) }}
-            {{ fields.htmlField('comment', comment_field|raw, __('Description'), {'required': true}) }}
-            {{ fields.htmlField('itemtype', itemtype_field|raw, __('Item type'), {'required': true}) }}
-            {{ fields.htmlField('types_id', types_field|raw, __('Type'), {'required': true}) }}
-            {{ fields.htmlField('due_date', due_date_field|raw, __('Due date', 'purchaserequest')) }}
-            {{ fields.htmlField('users_id_validate', validator_field|raw, __('To be validated by', 'purchaserequest'), {'required': true}) }}
-            {{ fields.htmlField('amount', amount_field|raw, __('Amount', 'purchaserequest'), {'required': true}) }}
-            {{ fields.htmlField('invoice_customer', invoice_field|raw, __('To be rebilled to the customer', 'purchaserequest')) }}
+            {{ include('@purchaserequest/pr_fields.html.twig') }}
          </div>
       </div>
       <div class="card-footer d-flex justify-content-end">
@@ -57,8 +45,7 @@
       </div>
    </div>
 
-   <input type="hidden" name="tickets_id" value="{{ tickets_id }}">
-   <input type="hidden" name="entities_id" value="{{ entities_id }}">
-   <input type="hidden" name="users_id_creator" value="{{ users_id_creator }}">
+   {{ fields.hiddenField('tickets_id', tickets_id) }}
+   {{ fields.hiddenField('entities_id', values['entities_id']) }}
    <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
 </form>

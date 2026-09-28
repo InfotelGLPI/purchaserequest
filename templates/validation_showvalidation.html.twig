@@ -34,27 +34,30 @@
             <tr class="tab_bg_1">
                <td>{{ __('Status of the approval request') }}</td>
                <td class="center">
-                  <div style="color:forestgreen">
-                     <i id="accept_purchaserequest" class="question far fa-check-circle fa-3x"></i><br>
-                     {{ __('Accept purchase request', 'purchaserequest') }}
-                  </div>
-                  <input type="hidden" name="accept_purchaserequest" value="0">
+                  <button type="submit" name="accept_purchaserequest" value="1" class="btn btn-ghost-success flex-column">
+                     <i class="far fa-check-circle fa-3x"></i>
+                     <span>{{ __('Accept purchase request', 'purchaserequest') }}</span>
+                  </button>
                </td>
                <td class="center">
-                  <div style="color:darkred">
-                     <i id="refuse_purchaserequest" class="question far fa-times-circle fa-3x"></i><br>
-                     {{ __('Refuse purchase request', 'purchaserequest') }}
-                  </div>
-                  <input type="hidden" name="refuse_purchaserequest" value="0">
+                  <button type="submit" name="refuse_purchaserequest" value="1" class="btn btn-ghost-danger flex-column">
+                     <i class="far fa-times-circle fa-3x"></i>
+                     <span>{{ __('Refuse purchase request', 'purchaserequest') }}</span>
+                  </button>
                </td>
             </tr>
             <tr class="tab_bg_1">
                <td>{{ __('Approval comments') }}</td>
                <td colspan="2">
-                  {{ comment_field|raw }}
-                  <input type="hidden" name="id" value="{{ validation_id }}">
-                  <input type="hidden" name="users_id_validate" value="{{ users_id_validate }}">
-                  <input type="hidden" name="plugin_purchaserequest_purchaserequests_id" value="{{ pr_id }}">
+                  {{ fields.textareaField('comment_validation', '', '', {
+                     'no_label': true,
+                     'full_width': true,
+                     'rows': 3,
+                  }) }}
+                  {{ fields.hiddenField('id', validation_id) }}
+                  {{ fields.hiddenField('users_id_validate', users_id_validate) }}
+                  {{ fields.hiddenField('plugin_purchaserequest_purchaserequests_id', pr_id) }}
+                  {{ fields.hiddenField('update_status', 1) }}
                </td>
             </tr>
          {% endif %}

@@ -59,6 +59,7 @@
                         <input type="checkbox" name="item[{{ entry.id }}]" value="1" {{ select_all ? 'checked' : '' }}>
                      </td>
                   {% endif %}
+                  {# raw: getLink() output, escaped by the core #}
                   <td>{{ entry.name|raw }}</td>
                   <td>{{ entry.requester }}</td>
                   <td>{{ entry.group }}</td>
@@ -69,20 +70,15 @@
                   <td>{{ entry.due_date }}</td>
                   <td>{{ entry.processing }}</td>
                   <td>{{ entry.validator }}</td>
-                  <td>{{ entry.status|raw }}</td>
+                  <td>{{ entry.status }}</td>
+                  {# raw: getLink() output, escaped by the core #}
                   <td>{{ entry.order|raw }}</td>
                </tr>
             {% endfor %}
          </table>
 
          {% if canedit %}
-            <div class="d-flex align-items-center justify-content-center mt-2">
-               <a class="me-2" href="#" onclick="if ( markCheckboxes('purchaserequest_form{{ rand }}') ) return false;">{{ __('Check all') }}</a>
-               /
-               <a class="mx-2" href="#" onclick="if ( unMarkCheckboxes('purchaserequest_form{{ rand }}') ) return false;">{{ __('Uncheck all') }}</a>
-               <span class="mx-2">{{ action_dropdown|raw }}</span>
-               <button type="submit" name="action" value="1" class="btn btn-primary">{{ _x('button', 'Post') }}</button>
-            </div>
+            {{ include('@purchaserequest/order_list_actions.html.twig') }}
          {% endif %}
 
          <input type="hidden" name="plugin_order_orders_id" value="{{ order_id }}">
