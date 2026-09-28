@@ -27,6 +27,7 @@
  * --------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
@@ -44,7 +45,6 @@ if (Session::getCurrentInterface() == 'central') {
 } else {
     if (Plugin::isPluginActive('servicecatalog')) {
         Main::showDefaultHeaderHelpdesk(PurchaseRequest::getTypeName(2));
-        echo "<br>";
     } else {
         Html::helpHeader(PurchaseRequest::getTypeName(2));
     }
@@ -60,9 +60,9 @@ if (Plugin::isPluginActive("order")
         throw new AccessDeniedHttpException();
     }
 } else {
-    Html::header(__('Setup'), '', "tools", PurchaseRequest::class);
-    echo "<div class='alert  alert-warning d-flex'>";
-    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+    TemplateRenderer::getInstance()->display('@purchaserequest/alert.html.twig', [
+        'message' => __('Please activate the plugin order', 'purchaserequest'),
+    ]);
 }
 
 if (Session::getCurrentInterface() != 'central'

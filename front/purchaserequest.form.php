@@ -27,6 +27,7 @@
  * --------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Servicecatalog\Main;
 
@@ -112,7 +113,6 @@ if (Plugin::isPluginActive("order")
     } else {
         if (Plugin::isPluginActive('servicecatalog')) {
             Main::showDefaultHeaderHelpdesk(PurchaseRequest::getTypeName(2), true);
-            echo "<br>";
         } else {
             Html::helpHeader(PurchaseRequest::getTypeName(2));
         }
@@ -122,8 +122,9 @@ if (Plugin::isPluginActive("order")
     $purchase->display($_GET);
 } else {
     Html::header(__('Setup'), '', "tools", PurchaseRequest::class);
-    echo "<div class='alert  alert-warning d-flex'>";
-    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+    TemplateRenderer::getInstance()->display('@purchaserequest/alert.html.twig', [
+        'message' => __('Please activate the plugin order', 'purchaserequest'),
+    ]);
 }
 
 if (Session::getCurrentInterface() != 'central'

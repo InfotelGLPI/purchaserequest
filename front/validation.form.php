@@ -27,6 +27,7 @@
  * --------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\Validation;
@@ -83,8 +84,8 @@ if (Plugin::isPluginActive("order")
     Html::back();
 } else {
     Html::header(__('Setup'), '', "tools", PurchaseRequest::class, "config");
-    echo "<div class='alert  alert-warning d-flex'>";
-    echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
+    TemplateRenderer::getInstance()->display('@purchaserequest/alert.html.twig', [
+        'message' => __('Please activate the plugin order', 'purchaserequest'),
+    ]);
+    Html::footer();
 }
-
-Html::footer();

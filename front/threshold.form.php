@@ -27,7 +27,6 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\Threshold;
 
 if (!isset($_GET["id"])) {
@@ -38,13 +37,12 @@ $threshold = new Threshold();
 
 if (isset($_POST["add"])) {
     $threshold->check(-1, CREATE, $_POST);
-    $newID = $threshold->add($_POST);
-    $url   = Toolbox::getItemTypeFormURL(PurchaseRequest::class) . "?id=$newID";
+    $threshold->add($_POST);
     Html::back();
 
 } elseif (isset($_POST["add_tickets"])) {
     $threshold->check(-1, CREATE, $_POST);
-    $newID = $threshold->add($_POST);
+    $threshold->add($_POST);
     Html::back();
 
     /* delete purchaserequest */
@@ -71,3 +69,6 @@ if (isset($_POST["add"])) {
     $threshold->update($_POST);
     Html::back();
 }
+
+// Thresholds are edited from the host item tab: nothing to render here
+Html::back();

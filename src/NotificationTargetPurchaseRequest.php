@@ -227,16 +227,18 @@ class NotificationTargetPurchaseRequest extends NotificationTarget
 
             $template = new NotificationTemplate();
             $templates_id = false;
-            $query_id = "SELECT `id`
-                       FROM `glpi_notificationtemplates`
-                       WHERE `itemtype`='GlpiPlugin\\Purchaserequest\\PurchaseRequest'
-                       AND `name` = 'Purchase Request Validation'";
-            // No "or die($DB->error())": the raw MySQL error must not leak to output
-            // (and the trailing "or die" bound to $result rather than the query anyway).
-            $result = $DB->doQuery($query_id);
+            $iterator = $DB->request([
+                'SELECT' => ['id'],
+                'FROM'   => 'glpi_notificationtemplates',
+                'WHERE'  => [
+                    'itemtype' => PurchaseRequest::class,
+                    'name'     => 'Purchase Request Validation',
+                ],
+                'LIMIT'  => 1,
+            ]);
 
-            if ($DB->numrows($result) > 0) {
-                $templates_id = $DB->result($result, 0, 'id');
+            if (count($iterator) > 0) {
+                $templates_id = $iterator->current()['id'];
             } else {
                 $tmp = [
                     'name' => 'Purchase Request Validation',

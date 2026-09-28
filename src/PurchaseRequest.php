@@ -75,6 +75,13 @@ class PurchaseRequest extends CommonDBTM
      */
     private bool $statusFromValidation = false;
 
+    /**
+     * Decision (ACCEPTED/REFUSED) posted by the designated validator; set in
+     * prepareInputForUpdate() and applied in post_updateItem() to the validator's
+     * own Validation row, never to the request status directly.
+     */
+    private ?int $validatorDecision = null;
+
     public const HISTORY_ADDLINK = 50;
     public const HISTORY_DELLINK = 51;
 
@@ -127,7 +134,8 @@ class PurchaseRequest extends CommonDBTM
     {
         if ($item->getType() == PurchaseRequest::class) {
             return self::createTabEntry(__('Approval'));
-        } elseif ($item->getType() == "Ticket" && Session::getCurrentInterface() == 'central') {
+        } elseif ($item->getType() == "Ticket" && Session::getCurrentInterface() == 'central'
+            && Session::haveRight(self::$rightname, READ)) {
             if ($_SESSION['glpishow_count_on_tabs']) {
                 return self::createTabEntry(self::getTypeName(2), self::countForTicket($item));
             }
@@ -146,7 +154,8 @@ class PurchaseRequest extends CommonDBTM
     public static function countForTicket(Ticket $item)
     {
         $dbu = new DbUtils();
-        $restrict = ["tickets_id" => $item->getField('id')];
+        $restrict = ["tickets_id" => $item->getField('id')]
+            + getEntitiesRestrictCriteria('glpi_plugin_purchaserequest_purchaserequests', '', '', true);
         $nb = $dbu->countElementsInTable(['glpi_plugin_purchaserequest_purchaserequests'], $restrict);
 
         return $nb;
@@ -155,7 +164,8 @@ class PurchaseRequest extends CommonDBTM
     public static function countForPluginOrderOrder(PluginOrderOrder $item)
     {
         $dbu = new DbUtils();
-        $restrict = ["plugin_order_orders_id" => $item->getField('id')];
+        $restrict = ["plugin_order_orders_id" => $item->getField('id')]
+            + getEntitiesRestrictCriteria('glpi_plugin_purchaserequest_purchaserequests', '', '', true);
         $nb = $dbu->countElementsInTable(['glpi_plugin_purchaserequest_purchaserequests'], $restrict);
 
         return $nb;
@@ -170,14 +180,12 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        //        if (!Plugin::isPluginActive('order')) {
-        //            echo "<div class='alert  alert-warning d-flex'>";
-        //            echo "<b>" . __('Please activate the plugin order', 'purchaserequest') . "</b></div>";
-        //            return false;
-        //        }
         if ($item->getType() == PurchaseRequest::class) {
             Validation::showValidation($item);
-        } elseif ($item->getType() == "Ticket") {
+        } elseif ($item->getType() == "Ticket"
+            // Tab content is reachable through ajax/common.tabs.php even when
+            // the tab is not registered: enforce the plugin right here too.
+            && Session::haveRight(self::$rightname, READ)) {
             self::showForTicket($item);
         } elseif ($item->getType() == "PluginOrderOrder"
             && Session::haveRight(self::$rightname, READ)) {
@@ -247,6 +255,17 @@ class PurchaseRequest extends CommonDBTM
         // or set once at creation and must never be mutated through a generic
         // update. Soft-delete/restore go through delete()/restore(), and the
         // creator is immutable after creation.
+        // The entity is fixed too: check() only covers the current row entity,
+        // not a posted one, so a forged entities_id could move the request into
+        // an entity the caller cannot access.
+        if (isset($input['entities_id'])
+            && (int) $input['entities_id'] !== (int) ($this->fields['entities_id'] ?? 0)
+            && !Session::haveAccessToEntity((int) $input['entities_id'])) {
+            unset($input['entities_id']);
+        }
+        if (!isset($input['_transfer'])) {
+            unset($input['entities_id']);
+        }
         unset(
             $input['is_deleted'],
             $input['is_recursive'],
@@ -292,28 +311,35 @@ class PurchaseRequest extends CommonDBTM
                 ERROR,
             );
         }
-        // The status column is never writable through a plain update (edit form,
-        // core "Update" massive action, API): only the designated validator via
-        // the accept/refuse/update_status path, or the internal approval chain
-        // (updateStatusFromValidation()), may set it. The WAITING reset below
-        // re-adds it server-side when an engaging field changes.
-        $status_allowed = $from_validation || ($is_validation_action && $is_validator);
-        if (!$status_allowed
+        // The request status is the aggregate of its validation rows: only the
+        // approval chain (Validation::post_updateItem() through
+        // updateStatusFromValidation()) may write it. The designated validator's
+        // decision is recorded on their own Validation row (post_updateItem()),
+        // so a second-level approval required above the threshold cannot be
+        // skipped by accepting the request directly. The WAITING reset below
+        // re-adds the status server-side when an engaging field changes.
+        $this->validatorDecision = null;
+        if ($is_validation_action && $is_validator && !$from_validation) {
+            $decision = null;
+            if (isset($input['refuse_purchaserequest']) && $input['refuse_purchaserequest'] == 1) {
+                $decision = CommonITILValidation::REFUSED;
+            } elseif (isset($input['accept_purchaserequest']) && $input['accept_purchaserequest'] == 1) {
+                $decision = CommonITILValidation::ACCEPTED;
+            } elseif (isset($input['status'])) {
+                $decision = (int) $input['status'];
+            }
+            if (in_array($decision, [CommonITILValidation::ACCEPTED, CommonITILValidation::REFUSED], true)) {
+                $this->validatorDecision = $decision;
+            }
+        }
+        if (!$from_validation
             || (isset($input['status']) && !in_array((int) $input['status'], [CommonITILValidation::WAITING, CommonITILValidation::ACCEPTED, CommonITILValidation::REFUSED], true))) {
             unset($input['status']);
         }
-        $is_validation_action = $is_validation_action && $status_allowed;
+        $is_validation_action = $is_validation_action && ($from_validation || $is_validator);
 
         if (!$this->checkLinkedItemsInput($input, false)) {
             return false;
-        }
-
-        if (isset($input['refuse_purchaserequest']) && $input['refuse_purchaserequest'] == 1) {
-            $input['status'] = CommonITILValidation::REFUSED;
-        }
-
-        if (isset($input['accept_purchaserequest']) && $input['accept_purchaserequest'] == 1) {
-            $input['status'] = CommonITILValidation::ACCEPTED;
         }
 
         if (isset($input['update_status'])) {
@@ -630,6 +656,46 @@ class PurchaseRequest extends CommonDBTM
             $this->requeuePendingValidation = false;
             $this->requeuePendingValidations();
         }
+
+        if ($this->validatorDecision !== null) {
+            $decision = $this->validatorDecision;
+            $this->validatorDecision = null;
+            $this->applyValidatorDecision($decision);
+        }
+    }
+
+    /**
+     * Record the designated validator's decision on their own Validation row.
+     * Validation::prepareInputForUpdate() only accepts it while the row is
+     * WAITING, and Validation::post_updateItem() recomputes the request status
+     * once every validation of the chain has been decided.
+     *
+     * @param int $decision CommonITILValidation::ACCEPTED or REFUSED
+     *
+     * @return bool
+     */
+    private function applyValidatorDecision(int $decision): bool
+    {
+        $validation = new Validation();
+        if (!$validation->getFromDBByCrit([
+            'plugin_purchaserequest_purchaserequests_id' => $this->fields['id'],
+            'users_id_validate'                          => Session::getLoginUserID(),
+            'status'                                     => CommonITILValidation::WAITING,
+        ])) {
+            Session::addMessageAfterRedirect(
+                __('You are not allowed to approve or refuse this purchase request.', 'purchaserequest'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
+        return $validation->update([
+            'id'                 => $validation->fields['id'],
+            'status'             => $decision,
+            'comment_validation' => $this->input['comment_validation'] ?? '',
+            'update_status'      => true,
+        ]);
     }
 
     /**
@@ -1331,7 +1397,7 @@ class PurchaseRequest extends CommonDBTM
             'WHERE' => [
                 'is_deleted' => 0,
                 'tickets_id' => (int) $tickets_id,
-            ],
+            ] + getEntitiesRestrictCriteria($this->getTable(), '', '', true),
         ];
 
         if ($params['addLimit']) {
@@ -1356,7 +1422,11 @@ class PurchaseRequest extends CommonDBTM
         $dbu   = new DbUtils();
 
         $purchase_request = new PurchaseRequest();
-        $data = $purchase_request->find(['plugin_order_orders_id' => $item->fields['id']]);
+        // A linked request may belong to another entity than the (recursive) order
+        $data = $purchase_request->find(
+            ['plugin_order_orders_id' => $item->fields['id']]
+            + getEntitiesRestrictCriteria($purchase_request->getTable(), '', '', true),
+        );
 
         $rows    = count($data);
         $canread = Session::haveRight(self::$rightname, READ);
@@ -1579,28 +1649,22 @@ class PurchaseRequest extends CommonDBTM
                         // scope, so a validator who lost access to the request's entity could
                         // still act on it through this bulk endpoint (IDOR).
                         if ($item->can($id, READ)) {
-                            if ($item->fields['users_id_validate'] == Session::getLoginUserID()) {
-                                $item->update([
-                                    "id" => $id,
-                                    "update_status" => true,
-                                    "status" => $validation,
-                                    "comment_validation" => "",
-                                    "update" => __('Update'),
-                                ]);
-
-                                $validationrequest = new Validation();
-                                if ($validationrequest->getFromDBByCrit([
+                            // Only the caller's own pending Validation row is decided; the
+                            // request status is then recomputed by Validation::post_updateItem()
+                            // from the whole chain (second-level approval included), never
+                            // written here directly.
+                            $validationrequest = new Validation();
+                            if ($validation !== CommonITILValidation::WAITING
+                                && $validationrequest->getFromDBByCrit([
                                     "plugin_purchaserequest_purchaserequests_id" => $id,
                                     "users_id_validate" => Session::getLoginUserID(),
+                                    "status" => CommonITILValidation::WAITING,
+                                ])
+                                && $validationrequest->update([
+                                    "id"            => $validationrequest->fields["id"],
+                                    "status"        => $validation,
+                                    "update_status" => true,
                                 ])) {
-                                    $validationrequest->update([
-                                        "id"            => $validationrequest->fields["id"],
-                                        "status"        => $validation,
-                                        "update_status" => true,
-                                    ]);
-                                }
-
-
                                 $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                             } else {
                                 $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
@@ -1690,32 +1754,6 @@ class PurchaseRequest extends CommonDBTM
         return '';
     }
 
-    public static function transfer($ID, $entity)
-    {
-        global $DB;
-
-        if ($ID > 0) {
-            $iterator = $DB->request([
-                'FROM'  => self::getTable(),
-                'WHERE' => ['id' => (int) $ID],
-            ]);
-
-            if (count($iterator)) {
-                $data              = $iterator->current();
-                $input['name']     = $data['name'];
-                $input['entities_id'] = $entity;
-                $temp  = new self();
-                $newID = $temp->getID($input);
-
-                if ($newID < 0) {
-                    $newID = $temp->import($input);
-                }
-
-                return $newID;
-            }
-        }
-        return 0;
-    }
 
     /**
      * @param Migration $migration

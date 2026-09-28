@@ -43,28 +43,22 @@ use Toolbox;
 class Threshold extends CommonDBTM
 {
     // Thresholds drive the second-level approval: setup right, not the requester one.
-    // plugin_purchaserequest_config only exposes READ, which is the setup access level.
     public static $rightname = 'plugin_purchaserequest_config';
     public $dohistory = true;
 
     public static function canCreate(): bool
     {
-        return Session::haveRight(self::$rightname, READ);
-    }
-
-    public static function canUpdate(): bool
-    {
-        return Session::haveRight(self::$rightname, READ);
+        return Session::haveRight(self::$rightname, UPDATE);
     }
 
     public static function canDelete(): bool
     {
-        return Session::haveRight(self::$rightname, READ);
+        return Session::haveRight(self::$rightname, UPDATE);
     }
 
     public static function canPurge(): bool
     {
-        return Session::haveRight(self::$rightname, READ);
+        return Session::haveRight(self::$rightname, UPDATE);
     }
 
 
@@ -255,6 +249,11 @@ class Threshold extends CommonDBTM
 
         $dbu   = new DbUtils();
         $table = $dbu->getTableForItemType(__CLASS__);
+        // Purge rows referencing this itemtype (history, display prefs, bookmarks)
+        // so no orphan points to a class that no longer exists.
+        foreach (["displaypreferences", "savedsearches", "logs"] as $t) {
+            $DB->delete('glpi_' . $t, ['itemtype' => self::class]);
+        }
         // No "or die($DB->error())": the raw MySQL error must not leak to output.
         $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`");
     }

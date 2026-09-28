@@ -160,9 +160,9 @@ class Validation extends CommonDBTM
     /**
      * Prepare input datas for updating the item
      *
-     * @param $input datas used to update the item
+     * @param array $input datas used to update the item
      *
-     * @return the modified $input array
+     * @return array|false the modified $input array
      **/
     public function prepareInputForUpdate($input)
     {
@@ -172,7 +172,13 @@ class Validation extends CommonDBTM
         // or fixed at creation and must never be mutated through a generic update.
         // The designated approver (users_id_validate) is set once when the
         // validation is created and has no legitimate reassignment flow here.
+        // The parent request, entity and requester are set by the approval chain
+        // too: re-pointing a validation would propagate its decision to another
+        // request through post_updateItem().
         unset(
+            $input['plugin_purchaserequest_purchaserequests_id'],
+            $input['entities_id'],
+            $input['users_id'],
             $input['is_deleted'],
             $input['is_recursive'],
             $input['users_id_validate'],
@@ -191,6 +197,24 @@ class Validation extends CommonDBTM
             || isset($input['update_status']);
         $is_validator = (int) ($this->fields['users_id_validate'] ?? 0) === (int) Session::getLoginUserID();
         if ($is_validation_action && !$is_validator) {
+            unset(
+                $input['refuse_purchaserequest'],
+                $input['accept_purchaserequest'],
+                $input['update_status'],
+                $input['status'],
+            );
+            Session::addMessageAfterRedirect(
+                __('You are not allowed to approve or refuse this purchase request.', 'purchaserequest'),
+                false,
+                ERROR,
+            );
+            return $input;
+        }
+        // A decision is final: only a WAITING row may be accepted or refused.
+        // Reopening goes through PurchaseRequest::requeuePendingValidations(),
+        // which rebuilds the whole chain.
+        if ($is_validation_action
+            && (int) ($this->fields['status'] ?? CommonITILValidation::WAITING) !== CommonITILValidation::WAITING) {
             unset(
                 $input['refuse_purchaserequest'],
                 $input['accept_purchaserequest'],
@@ -246,18 +270,6 @@ class Validation extends CommonDBTM
             }
         }
 
-        if (isset($this->fields['tickets_id'])) {
-            $changes[0] = 0;
-            $changes[1] = '';
-            $changes[2] = $this->fields["id"];
-            Log::history(
-                $this->input['tickets_id'],
-                'Ticket',
-                $changes,
-                __CLASS__,
-                Log::HISTORY_PLUGIN + self::HISTORY_ADDLINK,
-            );
-        }
     }
 
     /**
@@ -423,7 +435,11 @@ class Validation extends CommonDBTM
         $dbu = new DbUtils();
 
         $purchase_request = new PurchaseRequest();
-        $data             = $purchase_request->find(['plugin_order_orders_id' => $item->fields['id']]);
+        // A linked request may belong to another entity than the (recursive) order
+        $data             = $purchase_request->find(
+            ['plugin_order_orders_id' => $item->fields['id']]
+            + getEntitiesRestrictCriteria($purchase_request->getTable(), '', '', true),
+        );
 
         $rows    = count($data);
         $canread = Session::haveRight(self::$rightname, READ);
@@ -613,6 +629,11 @@ class Validation extends CommonDBTM
 
         $dbu   = new DbUtils();
         $table = $dbu->getTableForItemType(__CLASS__);
+        // Purge rows referencing this itemtype (history, display prefs, bookmarks)
+        // so no orphan points to a class that no longer exists.
+        foreach (["displaypreferences", "savedsearches", "logs"] as $t) {
+            $DB->delete('glpi_' . $t, ['itemtype' => self::class]);
+        }
         // No "or die($DB->error())": the raw MySQL error must not leak to output.
         $DB->doQuery("DROP TABLE IF EXISTS`" . $table . "`");
     }

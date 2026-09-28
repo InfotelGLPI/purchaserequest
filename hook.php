@@ -44,13 +44,6 @@ function plugin_purchaserequest_install()
 {
     global $DB;
 
-    echo "<div class ='center'>";
-    echo "<table class='tab_cadre_fixe'>";
-    echo "<tr><th>" . __("Plugin installation or upgrade", "purchaserequest") . "<th></tr>";
-
-    echo "<tr class='tab_bg_1'>";
-    echo "<td class='center'>";
-
     $migration = new Migration(PLUGIN_PURCHASEREQUEST_VERSION);
     $classes   = [NotificationTargetPurchaseRequest::class,
         PurchaseRequest::class,
@@ -63,9 +56,7 @@ function plugin_purchaserequest_install()
         call_user_func([$class, 'install'], $migration);
     }
 
-    echo "</td>";
-    echo "</tr>";
-    echo "</table></div>";
+    $migration->executeMigration();
 
     //DisplayPreferences Migration
     $classes = ['PluginPurchaserequestPurchaserequest' => PurchaseRequest::class];
@@ -237,10 +228,12 @@ function plugin_purchaserequest_giveItem($type, $ID, $data, $num)
                 $type_class = $itemtype . 'Type';
             }
             if ($type_class !== '' && class_exists($type_class)) {
-                return Dropdown::getDropdownName(
+                // giveItem hook output is injected verbatim in the search HTML: escape
+                // the raw dropdown name (stored XSS via a renamed *Type).
+                return htmlescape(Dropdown::getDropdownName(
                     $dbu->getTableForItemType($type_class),
                     $data['raw']["ITEM_" . $num],
-                );
+                ));
             } else {
                 return " ";
             }

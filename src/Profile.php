@@ -31,6 +31,7 @@ namespace GlpiPlugin\Purchaserequest;
 
 use CommonGLPI;
 use DbUtils;
+use Glpi\DBAL\QueryExpression;
 use Glpi\Application\View\TemplateRenderer;
 use Html;
 use ProfileRight;
@@ -129,7 +130,8 @@ class Profile extends \Profile
                 'label'    => __("Setup"),
                 'field'    => 'plugin_purchaserequest_config',
                 'rights' => [
-                    READ => __('Read'),
+                    READ   => __('Read'),
+                    UPDATE => __('Update'),
                 ]];
         }
 
@@ -220,6 +222,24 @@ class Profile extends \Profile
         foreach ($it as $prof) {
             self::migrateOneProfile($prof['id']);
         }
+
+        // The setup right used to expose READ only, while saving the setup and
+        // editing thresholds require UPDATE: grant UPDATE to profiles holding
+        // READ so existing setup access keeps working after the upgrade.
+        // One-shot: once any profile holds UPDATE, admins manage it themselves.
+        if ($dbu->countElementsInTable('glpi_profilerights', [
+            'name'   => 'plugin_purchaserequest_config',
+            'rights' => ['&', UPDATE],
+        ]) === 0) {
+            $DB->update(
+                'glpi_profilerights',
+                ['rights' => new QueryExpression($DB::quoteName('rights') . ' | ' . UPDATE)],
+                [
+                    'name'   => 'plugin_purchaserequest_config',
+                    'rights' => ['&', READ],
+                ],
+            );
+        }
         $it = $DB->request([
             'FROM' => 'glpi_profilerights',
             'WHERE' => [
@@ -259,7 +279,7 @@ class Profile extends \Profile
 
         $rights = ['plugin_purchaserequest_purchaserequest' => 127,
             'plugin_purchaserequest_validate'        => 1,
-            'plugin_purchaserequest_config'          => 1,
+            'plugin_purchaserequest_config'          => READ | UPDATE,
         ];
 
         self::addDefaultProfileInfos(
