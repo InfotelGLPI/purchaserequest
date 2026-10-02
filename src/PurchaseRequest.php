@@ -381,7 +381,8 @@ class PurchaseRequest extends CommonDBTM
             )
         ) {
             $engaging_changed = false;
-            foreach (['amount', 'itemtype', 'types_id', 'invoice_customer'] as $field) {
+            // The validator is engaging too: a decision only stands for the one who took it
+            foreach (['amount', 'itemtype', 'types_id', 'invoice_customer', 'users_id_validate'] as $field) {
                 if (array_key_exists($field, $input)
                     && array_key_exists($field, $this->fields)
                     && (string) $input[$field] !== (string) $this->fields[$field]) {
@@ -456,7 +457,11 @@ class PurchaseRequest extends CommonDBTM
                 'plugin_purchaserequest_validate',
                 READ,
             );
+            // Separation of duties: neither the author of the request nor the user changing
+            // its validator may become the validator. Otherwise anyone with UPDATE on the
+            // request and the validate right could name himself and accept it right away.
             if ($validator_id === $creator_id
+                || (!$is_add && $validator_id === (int) Session::getLoginUserID())
                 || !in_array($entities_id, array_map('intval', $validator_entities), true)) {
                 Session::addMessageAfterRedirect(
                     sprintf(__('%1$s: %2$s'), __('To be validated by', 'purchaserequest'), $denied),

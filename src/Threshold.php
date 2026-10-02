@@ -64,7 +64,7 @@ class Threshold extends CommonDBTM
 
     public static $list_type_allowed = ["ComputerType", "MonitorType", "PeripheralType", "NetworkEquipmentType", "PrinterType",
         "PhoneType", "ConsumableItemType", "CartridgeItemType", "ContractType", "PluginOrderOtherType",
-        "SoftwareLicenseType", "CertificateType", "RackType", "PduType",];
+        "SoftwareLicenseType", "CertificateType", "RackType", "PDUType",];
 
 
     /**
@@ -99,9 +99,13 @@ class Threshold extends CommonDBTM
      */
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
+        // The threshold is internal configuration: reading the tab of a type takes the
+        // configuration right, as editing it does
+        if (!in_array($item->getType(), self::$list_type_allowed, true) || !self::canView()) {
+            return '';
+        }
 
         return self::createTabEntry(self::getTypeName(1));
-
     }
 
     public static function getIcon()
@@ -167,9 +171,13 @@ class Threshold extends CommonDBTM
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        $type = $item->getType();
+        // ajax/common.tabs.php reaches this method without calling getTabNameForItem(): the
+        // right checked on the declaration has to be replayed on the rendering
+        if (!self::canView()) {
+            return false;
+        }
 
-        if (in_array($item->getType(), self::$list_type_allowed)) {
+        if (in_array($item->getType(), self::$list_type_allowed, true)) {
             $threshold = new self();
             $threshold->getEmpty();
             $threshold->getFromDBByCrit(["itemtype" => $item->getType(),
