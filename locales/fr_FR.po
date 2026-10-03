@@ -2,24 +2,26 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 # Translators:
 # Xavier CAILLAUD <thetsmr@gmail.com>, 2026
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-28 13:54+0000\n"
+"POT-Creation-Date: 2026-10-02 10:16+0000\n"
 "PO-Revision-Date: 2021-05-27 08:40+0000\n"
 "Last-Translator: Xavier CAILLAUD <thetsmr@gmail.com>, 2026\n"
-"Language-Team: French (France) (https://app.transifex.com/infotelGLPI/teams/121073/fr_FR/)\n"
+"Language-Team: French (France) (https://app.transifex.com/infotelGLPI/"
+"teams/121073/fr_FR/)\n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr_FR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #: templates/pr_validation.html.twig:51
 #: templates/validation_showvalidation.html.twig:39
@@ -35,8 +37,8 @@ msgstr "Ajouter"
 msgid "Add a purchase request"
 msgstr "Ajouter une demande d'achat"
 
-#: src/PurchaseRequest.php:777 src/PurchaseRequest.php:982
-#: src/PurchaseRequest.php:1348 src/NotificationTargetPurchaseRequest.php:80
+#: src/PurchaseRequest.php:782 src/PurchaseRequest.php:987
+#: src/PurchaseRequest.php:1353 src/NotificationTargetPurchaseRequest.php:80
 #: src/NotificationTargetPurchaseRequest.php:188
 #: templates/pr_fields.html.twig:106
 msgid "Amount"
@@ -78,7 +80,7 @@ msgstr "Tout cocher"
 msgid "Configuration purchase request"
 msgstr "Configurer la demande d'achat"
 
-#: src/PurchaseRequest.php:1548
+#: src/PurchaseRequest.php:1553
 msgid "Delete link to order"
 msgstr "Supprimer le lien à la commande"
 
@@ -90,11 +92,10 @@ msgstr "Description"
 msgid "Do you approve this purchase request ?"
 msgstr "Validez-vous la demande d'achat ?"
 
-#: src/PurchaseRequest.php:879 src/PurchaseRequest.php:1346
+#: src/PurchaseRequest.php:884 src/PurchaseRequest.php:1351
 #: src/NotificationTargetPurchaseRequest.php:95
 #: src/NotificationTargetPurchaseRequest.php:184
-#: templates/pr_fields.html.twig:98
-#: templates/validation_for_order.html.twig:48
+#: templates/pr_fields.html.twig:98 templates/validation_for_order.html.twig:48
 #: templates/pr_order_list.html.twig:46
 msgid "Due date"
 msgstr "Date d'échéance"
@@ -108,7 +109,7 @@ msgid "General Services Manager"
 msgstr "Responsable des services généraux"
 
 #: src/PurchaseRequest.php:233 src/PurchaseRequest.php:283
-#: src/Threshold.php:146
+#: src/Threshold.php:150
 msgid "Invalid item type."
 msgstr "Type d'objet invalide."
 
@@ -116,13 +117,12 @@ msgstr "Type d'objet invalide."
 msgid "Invalid purchase request."
 msgstr "Demande d'achat invalide."
 
-#: templates/pr_fields.html.twig:82
-#: templates/validation_for_order.html.twig:46
+#: templates/pr_fields.html.twig:82 templates/validation_for_order.html.twig:46
 #: templates/pr_order_list.html.twig:44
 msgid "Item type"
 msgstr "Type d'objet"
 
-#: src/PurchaseRequest.php:1547
+#: src/PurchaseRequest.php:1552
 msgid "Link to an order"
 msgstr "Lier à une commande"
 
@@ -134,8 +134,7 @@ msgstr "Liée à la commande"
 msgid "Linked to ticket"
 msgstr "Liée au ticket"
 
-#: templates/pr_fields.html.twig:66
-#: templates/validation_for_order.html.twig:44
+#: templates/pr_fields.html.twig:66 templates/validation_for_order.html.twig:44
 #: templates/pr_order_list.html.twig:42
 msgid "Location"
 msgstr "Lieu"
@@ -248,8 +247,7 @@ msgstr "Sauvegarder"
 msgid "See your purchase requests to validate"
 msgstr "Voir les demandes d’achat à valider"
 
-#: templates/pr_fields.html.twig:70
-#: templates/validation_for_order.html.twig:45
+#: templates/pr_fields.html.twig:70 templates/validation_for_order.html.twig:45
 #: templates/pr_order_list.html.twig:43
 msgid "Status"
 msgstr "Statut"
@@ -259,14 +257,14 @@ msgstr "Statut"
 msgid "Status of the approval request"
 msgstr "Statut de la demande de validation"
 
-#: src/PurchaseRequest.php:991 src/PurchaseRequest.php:1349
+#: src/PurchaseRequest.php:996 src/PurchaseRequest.php:1354
 #: src/NotificationTargetPurchaseRequest.php:83
 #: src/NotificationTargetPurchaseRequest.php:189
 #: templates/pr_fields.html.twig:108
 msgid "To be rebilled to the customer"
 msgstr "A refacturer au client"
 
-#: src/PurchaseRequest.php:462 src/PurchaseRequest.php:778
+#: src/PurchaseRequest.php:467 src/PurchaseRequest.php:783
 #: templates/pr_fields.html.twig:100
 msgid "To be validated by"
 msgstr "A valider par"
@@ -275,15 +273,14 @@ msgstr "A valider par"
 msgid "Treated"
 msgstr "Traité"
 
-#: src/PurchaseRequest.php:964 src/PurchaseRequest.php:1347
+#: src/PurchaseRequest.php:969 src/PurchaseRequest.php:1352
 #: templates/pr_fields.html.twig:125
 #: templates/validation_for_order.html.twig:49
 #: templates/pr_order_list.html.twig:47
 msgid "Treated on"
 msgstr "Traité le"
 
-#: templates/pr_fields.html.twig:96
-#: templates/validation_for_order.html.twig:47
+#: templates/pr_fields.html.twig:96 templates/validation_for_order.html.twig:47
 #: templates/pr_order_list.html.twig:45
 msgid "Type"
 msgstr "Type"
@@ -292,7 +289,7 @@ msgstr "Type"
 msgid "Uncheck all"
 msgstr "Tout décocher"
 
-#: src/PurchaseRequest.php:1551
+#: src/PurchaseRequest.php:1556
 msgid "Validate purchasing requests"
 msgstr "Valider les demandes d'achats"
 
@@ -316,7 +313,7 @@ msgstr[2] "Validations"
 msgid "Validator of the purchase request"
 msgstr "Valideur de la demande d'achat"
 
-#: src/PurchaseRequest.php:309 src/PurchaseRequest.php:686
+#: src/PurchaseRequest.php:309 src/PurchaseRequest.php:691
 #: src/Validation.php:207 src/Validation.php:225
 msgid "You are not allowed to approve or refuse this purchase request."
 msgstr ""
