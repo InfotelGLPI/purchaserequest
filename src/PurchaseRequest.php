@@ -816,6 +816,15 @@ class PurchaseRequest extends CommonDBTM
         return true;
     }
 
+    public static function getDefaultSearchRequest(): array
+    {
+        // Most recent requests first when the list is opened without a search
+        return [
+            'sort'  => 14, // Creation date
+            'order' => 'DESC',
+        ];
+    }
+
     /**
      * Get the Search options for the given Type
      *
