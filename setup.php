@@ -36,7 +36,7 @@ use GlpiPlugin\Purchaserequest\Config;
 
 global $CFG_GLPI;
 
-define('PLUGIN_PURCHASEREQUEST_VERSION', '3.2.5');
+define('PLUGIN_PURCHASEREQUEST_VERSION', '3.3.0');
 
 if (!defined("PLUGIN_PURCHASEREQUEST_DIR")) {
     define("PLUGIN_PURCHASEREQUEST_DIR", Plugin::getPhpDir("purchaserequest"));
