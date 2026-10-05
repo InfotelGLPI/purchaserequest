@@ -32,11 +32,11 @@ use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Purchaserequest\Config;
 
 if (Plugin::isPluginActive("purchaserequest")) {
-    if (Session::haveRight("plugin_purchaserequest_config", READ)) {
+    if (Session::haveRight(Config::$rightname, READ)) {
         $config = new Config();
 
         if (isset($_POST["update_config"])) {
-            Session::checkRight("plugin_purchaserequest_config", UPDATE);
+            Session::checkRight(Config::$rightname, UPDATE);
             $config->update($_POST);
             Html::back();
 

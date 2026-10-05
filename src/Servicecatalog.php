@@ -40,9 +40,9 @@ use Toolbox;
  */
 class Servicecatalog extends CommonGLPI
 {
-    public static $rightname = 'plugin_purchaserequest_purchaserequest';
+    public static string $rightname = 'plugin_purchaserequest_purchaserequest';
 
-    public $dohistory = false;
+    public bool $dohistory = false;
 
     /**
      * @return bool

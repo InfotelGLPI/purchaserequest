@@ -50,8 +50,8 @@ use Toolbox;
  */
 class Validation extends CommonDBTM
 {
-    public static $rightname = 'plugin_purchaserequest_validate';
-    public $dohistory = true;
+    public static string $rightname = 'plugin_purchaserequest_validate';
+    public bool $dohistory = true;
 
     public const HISTORY_ADDLINK = 50;
     public const HISTORY_DELLINK = 51;
@@ -71,7 +71,7 @@ class Validation extends CommonDBTM
      */
     public static function canValidation()
     {
-        return Session::haveRight("plugin_purchaserequest_validate", 1);
+        return Session::haveRight(Validation::$rightname, 1);
     }
 
     /**

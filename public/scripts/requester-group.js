@@ -33,11 +33,6 @@
  * change event through jQuery only, hence the jQuery delegated listener.
  */
 
-const csrfToken = () => {
-    const meta = document.querySelector('meta[property="glpi:csrf_token"]');
-    return meta !== null ? meta.getAttribute('content') : '';
-};
-
 /**
  * Replace the container content, running the scripts the new markup carries
  * (the select2 setup of the group dropdown): innerHTML never runs them.
@@ -60,7 +55,6 @@ const reloadGroups = async (container, users_id) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Glpi-Csrf-Token': csrfToken(),
             'X-Requested-With': 'XMLHttpRequest',
         },
         body,

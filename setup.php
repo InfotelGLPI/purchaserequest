@@ -32,6 +32,7 @@ use GlpiPlugin\Purchaserequest\Servicecatalog;
 use GlpiPlugin\Purchaserequest\Profile;
 use GlpiPlugin\Purchaserequest\PurchaseRequest;
 use GlpiPlugin\Purchaserequest\Threshold;
+use GlpiPlugin\Purchaserequest\Config;
 
 global $CFG_GLPI;
 
@@ -82,11 +83,11 @@ function plugin_init_purchaserequest()
         Plugin::registerClass(Threshold::getType(), ['addtabon' => $types]);
 
         //TODO create right config
-        if (Session::haveRight("plugin_purchaserequest_config", READ)) {
+        if (Session::haveRight(Config::$rightname, READ)) {
             $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['purchaserequest'] = 'front/config.form.php';
         }
 
-        if (Session::haveRight("plugin_purchaserequest_purchaserequest", READ)
+        if (Session::haveRight(PurchaseRequest::$rightname, READ)
           && !class_exists('GlpiPlugin\Servicecatalog\Main')
         ) {
             $PLUGIN_HOOKS[Hooks::HELPDESK_MENU_ENTRY]['purchaserequest'] = PLUGIN_PURCHASEREQUEST_WEBDIR . '/front/purchaserequest.php';
@@ -123,8 +124,8 @@ function plugin_version_purchaserequest()
         'license'      => 'GPLv3+',
         'requirements' => [
             'glpi' => [
-                'min' => '11.0',
-                'max' => '12.0',
+                'min' => '11.0.99',
+                'max' => '12.0.99',
                 'dev' => false,
             ],
         ],

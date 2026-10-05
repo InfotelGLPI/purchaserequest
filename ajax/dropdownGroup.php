@@ -32,7 +32,7 @@ use GlpiPlugin\Purchaserequest\PurchaseRequest;
 header("Content-Type: text/html; charset=UTF-8");
 Html::header_nocache();
 
-Session::checkRight('plugin_purchaserequest_purchaserequest', READ);
+Session::checkRight(PurchaseRequest::$rightname, READ);
 
 if (isset($_POST["users_id"])) {
 

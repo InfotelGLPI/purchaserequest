@@ -43,8 +43,8 @@ use Toolbox;
 class Threshold extends CommonDBTM
 {
     // Thresholds drive the second-level approval: setup right, not the requester one.
-    public static $rightname = 'plugin_purchaserequest_config';
-    public $dohistory = true;
+    public static string $rightname = 'plugin_purchaserequest_config';
+    public bool $dohistory = true;
 
     public static function canCreate(): bool
     {

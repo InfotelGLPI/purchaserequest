@@ -60,8 +60,8 @@ use Toolbox;
  */
 class PurchaseRequest extends CommonDBTM
 {
-    public static $rightname = 'plugin_purchaserequest_purchaserequest';
-    public $dohistory = true;
+    public static string $rightname = 'plugin_purchaserequest_purchaserequest';
+    public bool $dohistory = true;
 
     /**
      * Set in prepareInputForUpdate() when a financially engaging field changes on an
@@ -105,7 +105,7 @@ class PurchaseRequest extends CommonDBTM
      */
     public static function canValidation()
     {
-        return Session::haveRight("plugin_purchaserequest_validate", 1);
+        return Session::haveRight(Validation::$rightname, 1);
     }
 
     /**
@@ -1569,7 +1569,7 @@ class PurchaseRequest extends CommonDBTM
 
         $isadmin = static::canUpdate();
         if ($isadmin) {
-            if (Session::haveRight('transfer', READ)
+            if (Session::haveRight(\Transfer::$rightname, READ)
                 && Session::isMultiEntitiesMode()) {
                 $actions['PluginOrderOrder:transfert'] = __('Transfer');
             }

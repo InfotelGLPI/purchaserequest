@@ -257,7 +257,7 @@ function plugin_purchaserequest_getAddSearchOptions($itemtype)
     $sopt = [];
 
     if ($itemtype == 'Ticket') {
-        if (Session::haveRight('plugin_purchaserequest_purchaserequest', READ)) {
+        if (Session::haveRight(PurchaseRequest::$rightname, READ)) {
             $sopt[22227]['table']         = 'glpi_plugin_purchaserequest_purchaserequests';
             $sopt[22227]['field']         = 'id';
             $sopt[22227]['name']          = _x('quantity', 'Number of purchase request', 'purchaserequest');

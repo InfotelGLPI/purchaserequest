@@ -40,7 +40,7 @@ use User;
 
 class Config extends CommonDBTM
 {
-    public static $rightname         = "plugin_purchaserequest_config";
+    public static string $rightname         = "plugin_purchaserequest_config";
     public $can_be_translated = true;
 
     /**
