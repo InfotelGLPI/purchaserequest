@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-03 14:44+0000\n"
+"POT-Creation-Date: 2026-10-04 13:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,8 +32,8 @@ msgstr ""
 msgid "Add a purchase request"
 msgstr ""
 
-#: src/PurchaseRequest.php:782 src/PurchaseRequest.php:987
-#: src/PurchaseRequest.php:1353 src/NotificationTargetPurchaseRequest.php:80
+#: src/PurchaseRequest.php:782 src/PurchaseRequest.php:996
+#: src/PurchaseRequest.php:1362 src/NotificationTargetPurchaseRequest.php:80
 #: src/NotificationTargetPurchaseRequest.php:188
 #: templates/pr_fields.html.twig:106
 msgid "Amount"
@@ -75,7 +75,7 @@ msgstr ""
 msgid "Configuration purchase request"
 msgstr ""
 
-#: src/PurchaseRequest.php:1553
+#: src/PurchaseRequest.php:1562
 msgid "Delete link to order"
 msgstr ""
 
@@ -87,7 +87,7 @@ msgstr ""
 msgid "Do you approve this purchase request ?"
 msgstr ""
 
-#: src/PurchaseRequest.php:884 src/PurchaseRequest.php:1351
+#: src/PurchaseRequest.php:893 src/PurchaseRequest.php:1360
 #: src/NotificationTargetPurchaseRequest.php:95
 #: src/NotificationTargetPurchaseRequest.php:184
 #: templates/pr_fields.html.twig:98 templates/validation_for_order.html.twig:48
@@ -117,7 +117,7 @@ msgstr ""
 msgid "Item type"
 msgstr ""
 
-#: src/PurchaseRequest.php:1552
+#: src/PurchaseRequest.php:1561
 msgid "Link to an order"
 msgstr ""
 
@@ -249,7 +249,7 @@ msgstr ""
 msgid "Status of the approval request"
 msgstr ""
 
-#: src/PurchaseRequest.php:996 src/PurchaseRequest.php:1354
+#: src/PurchaseRequest.php:1005 src/PurchaseRequest.php:1363
 #: src/NotificationTargetPurchaseRequest.php:83
 #: src/NotificationTargetPurchaseRequest.php:189
 #: templates/pr_fields.html.twig:108
@@ -265,7 +265,7 @@ msgstr ""
 msgid "Treated"
 msgstr ""
 
-#: src/PurchaseRequest.php:969 src/PurchaseRequest.php:1352
+#: src/PurchaseRequest.php:978 src/PurchaseRequest.php:1361
 #: templates/pr_fields.html.twig:125
 #: templates/validation_for_order.html.twig:49
 #: templates/pr_order_list.html.twig:47
@@ -281,7 +281,7 @@ msgstr ""
 msgid "Uncheck all"
 msgstr ""
 
-#: src/PurchaseRequest.php:1556
+#: src/PurchaseRequest.php:1565
 msgid "Validate purchasing requests"
 msgstr ""
 
