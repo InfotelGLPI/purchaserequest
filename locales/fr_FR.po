@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-04 13:57+0000\n"
+"POT-Creation-Date: 2026-10-05 14:57+0000\n"
 "PO-Revision-Date: 2021-05-27 08:40+0000\n"
 "Last-Translator: Xavier CAILLAUD <thetsmr@gmail.com>, 2026\n"
 "Language-Team: French (France) (https://app.transifex.com/infotelGLPI/"
@@ -179,7 +179,7 @@ msgctxt "button"
 msgid "Post"
 msgstr "Envoyer"
 
-#: setup.php:120 src/PurchaseRequest.php:95 src/Profile.php:60
+#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:60
 #: src/Profile.php:117
 msgid "Purchase request"
 msgid_plural "Purchase requests"

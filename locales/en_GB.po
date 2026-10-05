@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI Plugin - Order\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-04 13:57+0000\n"
+"POT-Creation-Date: 2026-10-05 14:57+0000\n"
 "PO-Revision-Date: 2020-07-20 14:51+0200\n"
 "Last-Translator: Walid Nouh\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/teclib/"
@@ -177,7 +177,7 @@ msgctxt "button"
 msgid "Post"
 msgstr ""
 
-#: setup.php:120 src/PurchaseRequest.php:95 src/Profile.php:60
+#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:60
 #: src/Profile.php:117
 msgid "Purchase request"
 msgid_plural "Purchase requests"
