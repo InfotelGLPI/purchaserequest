@@ -44,6 +44,7 @@ use Session;
  */
 class Profile extends \Profile
 {
+    public static string $rightname = "profile";
     /**
      * @param int $nb
      *
@@ -51,13 +52,13 @@ class Profile extends \Profile
      */
     public static function getTypeName($nb = 0)
     {
-        return self::createTabEntry(__('Rights management'));
+        return __('Rights management');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Profile') {
-            return self::createTabEntry(_n("Purchase request", "Purchase requests", 2, "purchaserequest"));
+            return self::createTabEntry(PurchaseRequest::getTypeName(2));
         }
         return '';
     }
