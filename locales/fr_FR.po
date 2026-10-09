@@ -2,10 +2,10 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 # Translators:
 # Xavier CAILLAUD <thetsmr@gmail.com>, 2026
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
@@ -14,14 +14,12 @@ msgstr ""
 "POT-Creation-Date: 2026-10-09 10:44+0000\n"
 "PO-Revision-Date: 2021-05-27 08:40+0000\n"
 "Last-Translator: Xavier CAILLAUD <thetsmr@gmail.com>, 2026\n"
-"Language-Team: French (France) (https://app.transifex.com/infotelGLPI/"
-"teams/121073/fr_FR/)\n"
-"Language: fr_FR\n"
+"Language-Team: French (France) (https://app.transifex.com/infotelGLPI/teams/121073/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
-"1000000 == 0 ? 1 : 2;\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: templates/pr_validation.html.twig:51
 #: templates/validation_showvalidation.html.twig:39
@@ -86,7 +84,7 @@ msgstr "Supprimer le lien à la commande"
 
 #: templates/order_list_actions.html.twig:35
 msgid "Delete link with order"
-msgstr ""
+msgstr "Supprimer le lien avec la commande"
 
 #: templates/pr_fields.html.twig:74
 msgid "Description"
@@ -99,7 +97,8 @@ msgstr "Validez-vous la demande d'achat ?"
 #: src/PurchaseRequest.php:893 src/PurchaseRequest.php:1360
 #: src/NotificationTargetPurchaseRequest.php:95
 #: src/NotificationTargetPurchaseRequest.php:184
-#: templates/pr_fields.html.twig:98 templates/validation_for_order.html.twig:48
+#: templates/pr_fields.html.twig:98
+#: templates/validation_for_order.html.twig:48
 #: templates/pr_order_list.html.twig:46
 msgid "Due date"
 msgstr "Date d'échéance"
@@ -121,7 +120,8 @@ msgstr "Type d'objet invalide."
 msgid "Invalid purchase request."
 msgstr "Demande d'achat invalide."
 
-#: templates/pr_fields.html.twig:82 templates/validation_for_order.html.twig:46
+#: templates/pr_fields.html.twig:82
+#: templates/validation_for_order.html.twig:46
 #: templates/pr_order_list.html.twig:44
 msgid "Item type"
 msgstr "Type d'objet"
@@ -138,7 +138,8 @@ msgstr "Liée à la commande"
 msgid "Linked to ticket"
 msgstr "Liée au ticket"
 
-#: templates/pr_fields.html.twig:66 templates/validation_for_order.html.twig:44
+#: templates/pr_fields.html.twig:66
+#: templates/validation_for_order.html.twig:44
 #: templates/pr_order_list.html.twig:42
 msgid "Location"
 msgstr "Lieu"
@@ -250,7 +251,8 @@ msgstr "Sauvegarder"
 msgid "See your purchase requests to validate"
 msgstr "Voir les demandes d’achat à valider"
 
-#: templates/pr_fields.html.twig:70 templates/validation_for_order.html.twig:45
+#: templates/pr_fields.html.twig:70
+#: templates/validation_for_order.html.twig:45
 #: templates/pr_order_list.html.twig:43
 msgid "Status"
 msgstr "Statut"
@@ -283,7 +285,8 @@ msgstr "Traité"
 msgid "Treated on"
 msgstr "Traité le"
 
-#: templates/pr_fields.html.twig:96 templates/validation_for_order.html.twig:47
+#: templates/pr_fields.html.twig:96
+#: templates/validation_for_order.html.twig:47
 #: templates/pr_order_list.html.twig:45
 msgid "Type"
 msgstr "Type"
