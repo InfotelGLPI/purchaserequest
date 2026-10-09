@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 14:57+0000\n"
+"POT-Creation-Date: 2026-10-09 10:44+0000\n"
 "PO-Revision-Date: 2021-05-27 08:40+0000\n"
 "Last-Translator: Xavier CAILLAUD <thetsmr@gmail.com>, 2026\n"
 "Language-Team: French (France) (https://app.transifex.com/infotelGLPI/"
@@ -83,6 +83,10 @@ msgstr "Configurer la demande d'achat"
 #: src/PurchaseRequest.php:1562
 msgid "Delete link to order"
 msgstr "Supprimer le lien à la commande"
+
+#: templates/order_list_actions.html.twig:35
+msgid "Delete link with order"
+msgstr ""
 
 #: templates/pr_fields.html.twig:74
 msgid "Description"
@@ -179,8 +183,7 @@ msgctxt "button"
 msgid "Post"
 msgstr "Envoyer"
 
-#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:60
-#: src/Profile.php:117
+#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:118
 msgid "Purchase request"
 msgid_plural "Purchase requests"
 msgstr[0] "Demande d'achat"
@@ -200,7 +203,7 @@ msgid "Purchase request status"
 msgstr "Statut de la demande d'achat"
 
 #: src/NotificationTargetPurchaseRequest.php:56
-#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:123
+#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:124
 msgid "Purchase request validation"
 msgstr "Validation de la demande d'achat"
 
