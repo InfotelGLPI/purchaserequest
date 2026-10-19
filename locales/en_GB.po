@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI Plugin - Order\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 10:44+0000\n"
+"POT-Creation-Date: 2026-10-19 08:07+0000\n"
 "PO-Revision-Date: 2020-07-20 14:51+0200\n"
 "Last-Translator: Walid Nouh\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/teclib/"
@@ -35,8 +35,8 @@ msgstr ""
 msgid "Add a purchase request"
 msgstr "Add a purchase request"
 
-#: src/PurchaseRequest.php:782 src/PurchaseRequest.php:996
-#: src/PurchaseRequest.php:1362 src/NotificationTargetPurchaseRequest.php:80
+#: src/PurchaseRequest.php:828 src/PurchaseRequest.php:1042
+#: src/PurchaseRequest.php:1408 src/NotificationTargetPurchaseRequest.php:80
 #: src/NotificationTargetPurchaseRequest.php:188
 #: templates/pr_fields.html.twig:106
 msgid "Amount"
@@ -78,7 +78,7 @@ msgstr ""
 msgid "Configuration purchase request"
 msgstr ""
 
-#: src/PurchaseRequest.php:1562
+#: src/PurchaseRequest.php:1608
 msgid "Delete link to order"
 msgstr "Delete link to order"
 
@@ -94,7 +94,7 @@ msgstr ""
 msgid "Do you approve this purchase request ?"
 msgstr "Do you approve this purchase request ?"
 
-#: src/PurchaseRequest.php:893 src/PurchaseRequest.php:1360
+#: src/PurchaseRequest.php:939 src/PurchaseRequest.php:1406
 #: src/NotificationTargetPurchaseRequest.php:95
 #: src/NotificationTargetPurchaseRequest.php:184
 #: templates/pr_fields.html.twig:98 templates/validation_for_order.html.twig:48
@@ -110,7 +110,7 @@ msgstr "Editor of validation"
 msgid "General Services Manager"
 msgstr ""
 
-#: src/PurchaseRequest.php:233 src/PurchaseRequest.php:283
+#: src/PurchaseRequest.php:238 src/PurchaseRequest.php:288
 #: src/Threshold.php:150
 msgid "Invalid item type."
 msgstr ""
@@ -124,7 +124,7 @@ msgstr ""
 msgid "Item type"
 msgstr ""
 
-#: src/PurchaseRequest.php:1561
+#: src/PurchaseRequest.php:1607
 msgid "Link to an order"
 msgstr "Link to an order"
 
@@ -256,14 +256,14 @@ msgstr ""
 msgid "Status of the approval request"
 msgstr ""
 
-#: src/PurchaseRequest.php:1005 src/PurchaseRequest.php:1363
+#: src/PurchaseRequest.php:1051 src/PurchaseRequest.php:1409
 #: src/NotificationTargetPurchaseRequest.php:83
 #: src/NotificationTargetPurchaseRequest.php:189
 #: templates/pr_fields.html.twig:108
 msgid "To be rebilled to the customer"
 msgstr ""
 
-#: src/PurchaseRequest.php:467 src/PurchaseRequest.php:783
+#: src/PurchaseRequest.php:513 src/PurchaseRequest.php:829
 #: templates/pr_fields.html.twig:100
 msgid "To be validated by"
 msgstr "To be validated by"
@@ -272,7 +272,7 @@ msgstr "To be validated by"
 msgid "Treated"
 msgstr "Treated"
 
-#: src/PurchaseRequest.php:978 src/PurchaseRequest.php:1361
+#: src/PurchaseRequest.php:1024 src/PurchaseRequest.php:1407
 #: templates/pr_fields.html.twig:125
 #: templates/validation_for_order.html.twig:49
 #: templates/pr_order_list.html.twig:47
@@ -288,7 +288,7 @@ msgstr ""
 msgid "Uncheck all"
 msgstr ""
 
-#: src/PurchaseRequest.php:1565
+#: src/PurchaseRequest.php:1611
 msgid "Validate purchasing requests"
 msgstr "Validate purchasing requests"
 
@@ -311,7 +311,7 @@ msgstr[1] ""
 msgid "Validator of the purchase request"
 msgstr "Validator of the purchase request"
 
-#: src/PurchaseRequest.php:309 src/PurchaseRequest.php:691
+#: src/PurchaseRequest.php:314 src/PurchaseRequest.php:737
 #: src/Validation.php:207 src/Validation.php:225
 msgid "You are not allowed to approve or refuse this purchase request."
 msgstr ""
