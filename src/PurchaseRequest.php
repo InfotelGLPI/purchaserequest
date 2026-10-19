@@ -218,6 +218,11 @@ class PurchaseRequest extends CommonDBTM
         );
         $input['users_id_creator'] = Session::getLoginUserID();
 
+        // Stored as a number, whatever the separators typed
+        if (array_key_exists('amount', $input)) {
+            $input['amount'] = self::parseAmount($input['amount']);
+        }
+
         $input['status'] = CommonITILValidation::WAITING;
 
         if (!$this->checkLinkedItemsInput($input, true)) {
@@ -380,23 +385,64 @@ class PurchaseRequest extends CommonDBTM
                 true,
             )
         ) {
-            $engaging_changed = false;
-            // The validator is engaging too: a decision only stands for the one who took it
-            foreach (['amount', 'itemtype', 'types_id', 'invoice_customer', 'users_id_validate'] as $field) {
-                if (array_key_exists($field, $input)
-                    && array_key_exists($field, $this->fields)
-                    && (string) $input[$field] !== (string) $this->fields[$field]) {
-                    $engaging_changed = true;
-                    break;
-                }
-            }
-            if ($engaging_changed) {
+            if (self::hasEngagingChange($input, $this->fields)) {
                 $input['status'] = CommonITILValidation::WAITING;
                 $this->requeuePendingValidation = true;
             }
         }
 
+        // Stored as a number, whatever the separators typed (after the comparison above, which
+        // parses it the same way)
+        if (array_key_exists('amount', $input)) {
+            $input['amount'] = self::parseAmount($input['amount']);
+        }
+
         return $input;
+    }
+
+    /**
+     * Whether a financially engaging field really changes: the amount, the item type, the
+     * customer re-invoicing or the validator. Values are compared by their meaning, not their
+     * text: the form posts the amount as typed ("1500", "1 500,00") while the database returns
+     * it with four decimals ("1500.0000"), which used to re-open the approval cycle, and send
+     * its mails again, on every save of an accepted request.
+     *
+     * @param array $input  posted values
+     * @param array $fields current values of the request
+     *
+     * @return bool
+     */
+    public static function hasEngagingChange(array $input, array $fields): bool
+    {
+        if (array_key_exists('amount', $input) && array_key_exists('amount', $fields)
+            && abs(self::parseAmount($input['amount']) - (float) $fields['amount']) >= 0.00005) {
+            return true;
+        }
+        if (array_key_exists('itemtype', $input) && array_key_exists('itemtype', $fields)
+            && (string) $input['itemtype'] !== (string) $fields['itemtype']) {
+            return true;
+        }
+        // The validator is engaging too: a decision only stands for the one who took it
+        foreach (['types_id', 'invoice_customer', 'users_id_validate'] as $field) {
+            if (array_key_exists($field, $input) && array_key_exists($field, $fields)
+                && (int) $input[$field] !== (int) $fields[$field]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Amount as typed in the form: spaces as thousands separator, a comma or a dot as decimal
+     * separator
+     */
+    public static function parseAmount(mixed $amount): float
+    {
+        $amount = str_replace([' ', "\u{00A0}", "\u{202F}"], '', trim((string) $amount));
+        $amount = str_replace(',', '.', $amount);
+
+        return is_numeric($amount) ? (float) $amount : 0.0;
     }
 
     /**
