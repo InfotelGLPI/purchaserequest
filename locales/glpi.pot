@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 15:01+0000\n"
+"POT-Creation-Date: 2026-10-09 10:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,6 +77,10 @@ msgstr ""
 
 #: src/PurchaseRequest.php:1562
 msgid "Delete link to order"
+msgstr ""
+
+#: templates/order_list_actions.html.twig:35
+msgid "Delete link with order"
 msgstr ""
 
 #: templates/pr_fields.html.twig:74
@@ -173,8 +177,7 @@ msgctxt "button"
 msgid "Post"
 msgstr ""
 
-#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:60
-#: src/Profile.php:117
+#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:118
 msgid "Purchase request"
 msgid_plural "Purchase requests"
 msgstr[0] ""
@@ -193,7 +196,7 @@ msgid "Purchase request status"
 msgstr ""
 
 #: src/NotificationTargetPurchaseRequest.php:56
-#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:123
+#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:124
 msgid "Purchase request validation"
 msgstr ""
 

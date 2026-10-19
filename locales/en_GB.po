@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI Plugin - Order\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 14:57+0000\n"
+"POT-Creation-Date: 2026-10-09 10:44+0000\n"
 "PO-Revision-Date: 2020-07-20 14:51+0200\n"
 "Last-Translator: Walid Nouh\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/teclib/"
@@ -81,6 +81,10 @@ msgstr ""
 #: src/PurchaseRequest.php:1562
 msgid "Delete link to order"
 msgstr "Delete link to order"
+
+#: templates/order_list_actions.html.twig:35
+msgid "Delete link with order"
+msgstr "Delete link with order"
 
 #: templates/pr_fields.html.twig:74
 msgid "Description"
@@ -177,8 +181,7 @@ msgctxt "button"
 msgid "Post"
 msgstr ""
 
-#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:60
-#: src/Profile.php:117
+#: setup.php:121 src/PurchaseRequest.php:95 src/Profile.php:118
 msgid "Purchase request"
 msgid_plural "Purchase requests"
 msgstr[0] "Purchase request"
@@ -197,7 +200,7 @@ msgid "Purchase request status"
 msgstr "Purchase request status"
 
 #: src/NotificationTargetPurchaseRequest.php:56
-#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:123
+#: src/NotificationTargetPurchaseRequest.php:122 src/Profile.php:124
 msgid "Purchase request validation"
 msgstr "Purchase request validation"
 
@@ -322,9 +325,6 @@ msgstr[1] "You have %d purchase requests to validate !"
 
 #~ msgid "Plugin installation or upgrade"
 #~ msgstr "Plugin installation or upgrade"
-
-#~ msgid "Delete link with order"
-#~ msgstr "Delete link with order"
 
 #~ msgid "This plugin requires GLPI 9.1 or higher"
 #~ msgstr "This plugin requires GLPI 9.1 or higher"
